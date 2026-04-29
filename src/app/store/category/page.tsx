@@ -9,7 +9,7 @@ interface CategoryPageProps {
 }
 
 export async function generateMetadata({ params }: CategoryPageProps) {
-  const name = params.slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+  const name = params?.slug?.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
   return {
     title: `${name} — ShopFresherz`,
     description: `Browse ${name} at the best prices in Nigeria.`,
