@@ -1,0 +1,57 @@
+export interface User {
+  id: string
+  email: string
+  phone?: string
+  firstName: string
+  lastName: string
+  avatarUrl?: string
+  role: 'Customer' | 'Admin' | 'SuperAdmin'
+  loyaltyPoints: number
+}
+
+
+
+// ─── Order ──────────────────────────────────────────────────────────────────
+ 
+export type OrderStatus =
+  | 'Pending'
+  | 'AwaitingPayment'
+  | 'Paid'
+  | 'Processing'
+  | 'Shipped'
+  | 'Delivered'
+  | 'Cancelled'
+  | 'RefundRequested'
+  | 'Refunded'
+ 
+export interface Order {
+  id: string
+  orderNumber: string
+  status: OrderStatus
+  paymentStatus: 'Unpaid' | 'Paid' | 'Refunded'
+  paymentMethod: 'Card' | 'Transfer' | 'USSD' | 'POD'
+  subtotal: number
+  discountAmount: number
+  deliveryFee: number
+  vatAmount: number
+  total: number
+  createdAt: string
+}
+
+
+
+// ─── API Responses ──────────────────────────────────────────────────────────
+ 
+export interface PaginatedResponse<T> {
+  data: T[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+ 
+export interface ApiError {
+  code: string       // e.g. SF-2001
+  message: string
+  status: number
+}
