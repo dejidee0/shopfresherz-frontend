@@ -17,16 +17,14 @@ export async function generateMetadata({ params }: CategoryPageProps) {
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
-  const categoryName = params.slug
-    .replace(/-/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase())
+  const categoryName = params?.slug?.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 
   // let products = []
   let totalCount = 0
 
   try {
     const res = await productsApi.list({
-      category: params.slug,
+      category: params?.slug,
       limit: 24,
       sort: 'best_selling',
     })
