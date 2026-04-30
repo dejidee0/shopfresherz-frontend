@@ -36,15 +36,15 @@ const NotificationConfig = () => {
   return (
     <div className="rounded-md border border-border p-4 flex flex-1 flex-col gap-4">
       <p className=" font-semibold">Notification Templates</p>
-      <div className="flex flex-col gap-5 mb-6">
+      <div className="flex flex-col gap-5 mb-2 md:mb-6">
         {notificationTemplates.map((template)=>(
             <div key={template.tempId} className="flex flex-1 justify-between bg-gray-200 rounded-md p-3">
-                <p>{template.title}</p>
-                <button className="text-sm hover:text-primary cursor-pointer">Edit</button>
+                <p className="text-sm md:text-base">{template.title}</p>
+                <button className="text-xs md:text-sm hover:text-primary cursor-pointer">Edit</button>
             </div>
         ))}
       </div>
-      <Button className="w-fit rounded-md">Save Settings</Button>
+      <Button className="text-xs md:text-sm w-fit rounded-md">Save Settings</Button>
     </div>
   );
 };

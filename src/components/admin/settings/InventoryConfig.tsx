@@ -34,7 +34,7 @@ const InventoryConfig = () => {
 
           <p className="text-xs text-text-muted">Products below this stock level will trigger alerts</p>
 
-          <Button className="w-fit rounded-md">Save Settings</Button>
+          <Button className="text-xs md:text-sm w-fit rounded-md">Save Settings</Button>
         </div>
   )
 }

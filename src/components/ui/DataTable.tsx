@@ -42,7 +42,7 @@ export function DataTable<T>({
               {columns.map((col) => (
                 <th
                   key={String(col.key)}
-                  className={`pb-3 ${alignClass[col.align ?? "left"]}`}
+                  className={`pb-3 px-3 md:px-0 ${alignClass[col.align ?? "left"]}`}
                 >
                   {col.header}
                 </th>
@@ -69,7 +69,7 @@ export function DataTable<T>({
                   {columns.map((col) => (
                     <td
                       key={String(col.key)}
-                      className={`py-3 text-gray-600 ${alignClass[col.align ?? "left"]}`}
+                      className={`py-3 px-3 md:px-0 text-gray-600 ${alignClass[col.align ?? "left"]}`}
                     >
                       {col.render
                         ? col.render(row)

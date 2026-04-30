@@ -32,7 +32,7 @@ const TaxConfig = () => {
             </div>
           </div>
 
-          <Button className="w-fit rounded-md">Save Settings</Button>
+          <Button className="text-xs md:text-sm w-fit rounded-md">Save Settings</Button>
         </div>
   )
 }

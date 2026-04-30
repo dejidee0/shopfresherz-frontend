@@ -114,9 +114,9 @@ const products = [
 const AdminProductsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   return (
-    <div className="p-6">
-      <div className="flex justify-between">
-        <div className="flex gap-3 mb-6">
+    <div className="p-2 md:p-4 lg:p-6 flex flex-col gap-6">
+      <div className="flex flex-col md:flex-row justify-between">
+        <div className="flex flex-col md:flex-row gap-3 mb-2 lg:mb-6">
           {/* Search */}
           <div className="relative">
             <HiMagnifyingGlass
@@ -145,10 +145,10 @@ const AdminProductsPage = () => {
 
         {/* Buttons */}
         <div className="flex gap-3 ">
-          <Button variant="ghost" className="rounded-md text-gray-500">
+          <Button variant="ghost" className="text-xs md:text-sm rounded-md text-gray-500">
             Import CSV
           </Button>{" "}
-          <Button className="rounded-md" onClick={() => setIsModalOpen(true)}>
+          <Button className="text-xs md:text-sm rounded-md" onClick={() => setIsModalOpen(true)}>
             ADD PRODUCT
           </Button>
         </div>

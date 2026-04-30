@@ -50,7 +50,7 @@ const DeliveryConfig = () => {
 
           <p className="text-xs text-text-muted">orders above the threshold get free delivery</p>
 
-          <Button className="w-fit rounded-md">Save Settings</Button>
+          <Button className="w-fit text-xs md:text-sm rounded-md">Save Settings</Button>
         </div>
   )
 }

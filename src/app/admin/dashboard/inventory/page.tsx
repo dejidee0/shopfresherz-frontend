@@ -110,9 +110,9 @@ const inventory = [
 
 const AdminInventoryPage = () => {
   return (
-    <div className="p-6">
-      <div className="flex justify-between">
-        <div className="flex gap-3 mb-6">
+    <div className="flex flex-col gap-6 md:flex-row p-2 md:p-4 lg:p-6">
+      <div className="flex flex-col md:flex-row justify-between">
+        <div className="flex flex-col md:flex-row gap-3 mb-6">
           {/* Search */}
           <div className="relative">
             <HiMagnifyingGlass

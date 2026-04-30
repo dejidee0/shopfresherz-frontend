@@ -33,14 +33,14 @@ const contentData: ContetntEntry[] = [
 const AdminContentPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
   return (
-    <div className="flex flex-col p-6 gap-4 lg:gap-6">
-        <div className="flex flex-col md:flex-row justify-between items-center">
+    <div className="flex flex-col p-2 md:p-4 lg:p-6 gap-4 lg:gap-6">
+        <div className="flex flex-col gap-4 md:gap-0 md:flex-row justify-between items-start md:items-center">
             <p className="text-sm text-text-muted">Manage Homepage Banners and Content</p>
-            <Button onClick={()=> setIsModalOpen(true)} className="rounded-md cursor-pointer">Add Banner</Button>
+            <Button onClick={()=> setIsModalOpen(true)} className="text-xs md:text-sm rounded-md cursor-pointer">Add Banner</Button>
         </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
         {contentData.map((content) => (
-          <div key={content.id} className="flex flex-col w-[90%] lg:w-full rounded-md bg-white">
+          <div key={content.id} className="flex flex-col md:w-[90%] lg:w-full rounded-md bg-white">
             {content.imgUrl ? (
               <img
                 src={content.imgUrl}

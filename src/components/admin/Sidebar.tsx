@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSidebar } from "@/components/admin/SidebarContext";
+import { HiXMark } from "react-icons/hi2";
 import {
   MdDashboard,
   MdInventory,
@@ -29,11 +31,7 @@ const navSections = [
   {
     title: "CATALOG",
     items: [
-      {
-        label: "Products",
-        href: "/admin/dashboard/products",
-        icon: HiShoppingBag,
-      },
+      { label: "Products", href: "/admin/dashboard/products", icon: HiShoppingBag },
       { label: "Categories", href: "/admin/dashboard/categories", icon: HiTag },
       { label: "Inventory", href: "/admin/dashboard/inventory", icon: MdInventory },
     ],
@@ -55,7 +53,9 @@ const navSections = [
   },
   {
     title: "INSIGHTS",
-    items: [{ label: "Analytics", href: "/admin/dashboard/analytics", icon: MdBarChart }],
+    items: [
+      { label: "Analytics", href: "/admin/dashboard/analytics", icon: MdBarChart },
+    ],
   },
   {
     title: "MANAGE",
@@ -66,17 +66,31 @@ const navSections = [
   },
 ];
 
-export default function Sidebar() {
+function SidebarContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
 
   return (
-    <aside className="w-50 sticky top-0 h-screen bg-white border-r border-gray-100 flex flex-col py-6 px-4 shrink-0">
-      {/* Logo — stays fixed at top, never scrolls */}
-      <div className="flex items-center gap-2 mb-8 px-1 shrink-0">
-        <img src="/icons/shopfresherz_logo_black.png" alt="shopfresherz logo" />
+    <>
+      {/* Logo row */}
+      <div className="flex items-center justify-between mb-8 px-1 shrink-0">
+        <img
+          src="/icons/shopfresherz_logo_black.png"
+          alt="shopfresherz logo"
+          className="h-8 w-auto"
+        />
+        {/* Close button — only visible on mobile */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+            aria-label="Close menu"
+          >
+            <HiXMark size={20} className="text-gray-500" />
+          </button>
+        )}
       </div>
 
-      {/* Nav — scrolls independently when content overflows */}
+      {/* Nav */}
       <nav className="flex-1 space-y-2.5 overflow-y-auto">
         {navSections.map((section) => (
           <div key={section.title}>
@@ -86,12 +100,12 @@ export default function Sidebar() {
             <ul className="space-y-0.5">
               {section.items.map((item) => {
                 const isActive = pathname === item.href;
-                // || pathname.startsWith(item.href + "/");
                 const Icon = item.icon;
                 return (
                   <li key={item.label}>
                     <Link
                       href={item.href}
+                      onClick={onClose}
                       className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group ${
                         isActive
                           ? "bg-[#F97316] text-white shadow-sm shadow-orange-200"
@@ -115,6 +129,40 @@ export default function Sidebar() {
           </div>
         ))}
       </nav>
-    </aside>
+    </>
+  );
+}
+
+export default function Sidebar() {
+  const { isOpen, close } = useSidebar();
+
+  return (
+    <>
+      {/* ── Desktop sidebar — always visible, in normal flow ── */}
+      <aside className="hidden lg:flex w-52 sticky top-0 h-screen bg-white border-r border-gray-100 flex-col py-6 px-4 shrink-0">
+        <SidebarContent />
+      </aside>
+
+      {/* ── Mobile drawer — slides in over content ── */}
+      <>
+        {/* Backdrop */}
+        <div
+          className={`lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity duration-300 ${
+            isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
+          onClick={close}
+          aria-hidden="true"
+        />
+
+        {/* Drawer panel */}
+        <aside
+          className={`lg:hidden fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-100 flex flex-col py-6 px-4 z-50 transition-transform duration-300 ease-in-out ${
+            isOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <SidebarContent onClose={close} />
+        </aside>
+      </>
+    </>
   );
 }

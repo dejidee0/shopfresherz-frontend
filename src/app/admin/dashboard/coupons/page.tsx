@@ -110,12 +110,12 @@ const coupons = [
 const AdminCouponsPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
   return (
-    <div className="p-6">
+    <div className="flex flex-col gap-4 p-2 md:p-4 lg:p-6">
       <div className="mb-6 flex flex-col gap-3">
         <p className="font-bold">Coupon Details</p>
         <p className="text-xs text-text-muted">Manage discount codes</p>
       </div>
-      <div className="flex justify-between">
+      <div className="flex flex-col-reverse md:flex-row gap-4 md:gap-0 justify-between">
         <div className="flex gap-3 mb-6">
           {/* Search */}
           <div className="relative">
@@ -132,7 +132,7 @@ const AdminCouponsPage = () => {
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-3 ">
+        <div className="flex text-xs md:text-sm gap-3 ">
           <Button onClick={()=> setIsModalOpen(true)} className="rounded-md cursor-pointer">Create Coupons</Button>{" "}
         </div>
       </div>

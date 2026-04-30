@@ -14,7 +14,7 @@ import PaymentConfig from "@/components/admin/settings/PaymentConfig";
 const navSections = [
   {
     id: "config",
-    label: "Conigure Your Store",
+    label: "Configure Your Store",
     icon: FiTruck,
   },
   {
@@ -42,10 +42,10 @@ const AdminSettingsPage = () => {
   const [navState, setNavState] = useState("config");
 
   return (
-    <div className="p-6 flex flex-col gap-6">
+    <div className="p-2 md:p-4 lg:p-6 flex flex-col gap-6">
       <p className="text-text-muted text-sm">Configure your store</p>
 
-      <div className="flex gap-3">
+      <div className="flex flex-col md:flex-row gap-3">
         <div className="rounded-md border border-border p-4 lg:w-[30%] h-fit">
           <nav>
             <ul className="flex flex-col gap-5">
@@ -58,7 +58,7 @@ const AdminSettingsPage = () => {
                     onClick={() => setNavState(item.id)}
                   >
                     <li
-                      className={`flex items-center gap-3 ${navState === item.id ? "text-primary" : "text-text-muted hover:text-secondary"}`}
+                      className={`flex items-center text-xs md:text-sm lg:text-base gap-3 ${navState === item.id ? "text-primary" : "text-text-muted hover:text-secondary"}`}
                     >
                       <Icon />
                       <p>{item.label}</p>

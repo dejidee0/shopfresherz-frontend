@@ -71,9 +71,9 @@ export default function DashboardPage() {
       <div className="flex-1">
         {/* <Navbar title="Dashboard" /> */}
 
-        <main className="p-8 space-y-8">
+        <main className="p-2 md:p-4 lg:p-8 space-y-8">
           {/* Stats Row */}
-          <div className="grid grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             <StatsCard title="Total Revenue" value="₦10,000" change="+22%" positive sparkData={sparkRevenue} sparkColor="#10B981" />
             <StatsCard title="Total Orders" value="920" change="-25%" positive={false} sparkData={sparkOrders} sparkColor="#EF4444" />
             <StatsCard title="Pending Products" value="10" change="+49%" positive sparkData={sparkPending} sparkColor="#10B981" />
@@ -81,10 +81,10 @@ export default function DashboardPage() {
           </div>
 
           {/* Charts Row */}
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Revenue Chart */}
             <div className="col-span-2 bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
-              <div className="flex items-start justify-between mb-2">
+              <div className="flex flex-col md:flex-row items-start justify-between mb-2">
                 <div>
                   <h3 className="font-bold text-gray-900">Total Revenue</h3>
                   <p className="text-3xl font-black text-gray-900 mt-1">₦5,000,000</p>
@@ -101,7 +101,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
-              <div className="h-56 mt-4">
+              <div className="h-56 w-full mt-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={revenueData} barGap={4}>
                     <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#F3F4F6" />
@@ -151,13 +151,13 @@ export default function DashboardPage() {
           </div>
 
           {/* Bottom Row */}
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Low Stock */}
             <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
               <h3 className="font-bold text-gray-900 mb-4">Low Stock Alerts</h3>
-              <div className="space-y-4">
+              <div className="space-y-6 md:space-y-4">
                 {lowStockItems.map((item) => (
-                  <div key={item.sku} className="flex items-center justify-between">
+                  <div key={item.sku} className="flex flex-col md:flex-row md:items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-lg">📦</div>
                       <div>
@@ -175,7 +175,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Logistics */}
-            <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+            <div className="bg-white rounded-xl border border-gray-100 p-2 md:p-6 shadow-sm">
               <h3 className="font-bold text-gray-900 mb-4">Logistics Feed</h3>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">

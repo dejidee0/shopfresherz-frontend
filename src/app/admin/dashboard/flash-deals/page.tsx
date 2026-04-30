@@ -49,13 +49,13 @@ const AdminFlashDealsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between md:items-center">
         <div className="mb-6 flex flex-col gap-3">
           <p className="font-bold">Flash Deals Details</p>
           <p className="text-xs text-text-muted">Manage time-limited offers</p>
         </div>
 
-        <Button onClick={()=> setIsModalOpen(true)} className="rounded-md cursor-pointer">Create Deals</Button>
+        <Button onClick={()=> setIsModalOpen(true)} className="rounded-md cursor-pointer text-xs md:text-sm">Create Deals</Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">

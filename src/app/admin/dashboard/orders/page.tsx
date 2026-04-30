@@ -33,7 +33,7 @@ const orderColumns: ColumnDef<OrderEntry>[] = [
     header: "CUSTOMER",
     render: (row) => (
       <div className="flex items-center gap-2">
-        <div className="flex items-center justify-center h-6 w-6 bg-border text-muted rounded-full">
+        <div className="hidden lg:flex items-center justify-center h-6 w-6 bg-border text-muted rounded-full">
           {row.customer?.split("").at(0)}
         </div>
         {row.customer}
@@ -100,13 +100,13 @@ const orders = [
 
 const AdminOrderPage = () => {
   return (
-    <div className="p-6">
+    <div className="flex flex-col gap-4 md:gap-2 p-2 md:p-4 lg:p-6">
       <div className="mb-6 flex flex-col gap-3">
         <p className="font-bold">Order Details</p>
         <p className="text-xs text-text-muted">{orders.length} total orders</p>
       </div>
-      <div className="flex justify-between">
-        <div className="flex gap-3 mb-6">
+      <div className="flex flex-col md:flex-row justify-between">
+        <div className="flex flex-col md:flex-row gap-3 mb-6">
           {/* Search */}
           <div className="relative">
             <HiMagnifyingGlass

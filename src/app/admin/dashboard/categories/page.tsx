@@ -57,7 +57,7 @@ const AdminCategoriesPage = () => {
     setForm((prev) => ({ ...prev, [key]: value }));
 
   return (
-    <div className="p-6">
+    <div className="p-2 md:p-4 lg:p-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div className="mb-6 flex flex-col gap-3">
@@ -68,26 +68,26 @@ const AdminCategoriesPage = () => {
           </p>
         </div>
 
-        <Button onClick={()=> setInEditMode(true)} className="rounded-md">Add Category</Button>
+        <Button onClick={()=> setInEditMode(true)} className="text-xs md:text-sm rounded-md">Add Category</Button>
       </div>
 
       {/* Content */}
-      <div className="flex gap-3 ">
-        <SectionCard className="flex flex-1 flex-col gap-3 p-6">
+      <div className="flex flex-col-reverse md:flex-row gap-3 ">
+        <SectionCard className="flex flex-1 flex-col gap-3 p-1 md:p-6">
           {fetchedCategories.map((cat) => (
             <div key={cat.id} className="flex w-full p-3 justify-between">
               <div className="flex gap-2">
                 <button>
                   <MdDragIndicator />
                 </button>
-                <p className="text-sm flex gap-2 items-center">
+                <p className="flex text-xs md:text-sm gap-2 items-center">
                   <span className="h-8 flex justify-center items-center w-8 rounded-full p-2 bg-border">
                     {cat.name.split("").at(0)}
                   </span>
                   {cat.name}
                 </p>
               </div>
-              <p className="text-sm text-text-muted">{cat.itemsUnder}</p>
+              <p className="flex items-center text-xs md:text-sm text-text-muted">{cat.itemsUnder}</p>
             </div>
           ))}
         </SectionCard>
@@ -172,8 +172,8 @@ const AdminCategoriesPage = () => {
             </div>
 
             <div className="flex gap-2">
-                 <Button variant="ghost" onClick={()=>(setInEditMode(false))} className="rounded-md">Cancel</Button>
-                <Button className="rounded-md">Save Category</Button>
+                 <Button variant="ghost" onClick={()=>(setInEditMode(false))} className="text-xs md:text-sm rounded-md">Cancel</Button>
+                <Button className="text-xs md:text-sm rounded-md">Save Category</Button>
             </div>
           </div>
         </SectionCard>
