@@ -55,7 +55,7 @@ export default function AdminNavbar({ title }: NavbarProps) {
           <div className="w-9 h-9 rounded-full bg-linear-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
             M
           </div>
-          {/* Name — hidden on small screens */}
+          {/* Name — hidden on small screens */} 
           <div className="leading-none hidden sm:block">
             <p className="text-sm font-semibold text-gray-800">Mfoniso..</p>
             <p className="text-xs text-gray-400">Admin</p>
