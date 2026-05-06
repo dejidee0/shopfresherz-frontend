@@ -8,20 +8,17 @@ import {
   FiCheckCircle,
   FiStar,
   FiPlus,
-  FiEdit2,
 } from "react-icons/fi";
 import { AccountLayout } from "@/features/account/components/AccountLayout";
 import { PaymentCard } from "@/features/account/components/PaymentCard";
 import { OrderStatusBadge } from "@/features/account/components/OrderStatusBadge";
 import { DataTable, type ColumnDef } from "@/components/ui/DataTable";
-import { ProductCard } from "@/features/product/components/ProductCard";
 import { useAuthStore } from "@/store/auth";
-
 import { formatPrice, formatDate } from "@/lib/utils/format";
 import type { Order } from "@/lib/types/order";
 import { accountApi, DashboardStats, PaymentMethod } from "@/lib/api/account";
 
-// ─── Recent orders table column definition ────────────────────────────────────
+// ─── Recent orders columns ────────────────────────────────────────────────────
 
 const ORDER_COLUMNS: ColumnDef<Order>[] = [
   {
@@ -39,10 +36,11 @@ const ORDER_COLUMNS: ColumnDef<Order>[] = [
     render: (row) => <OrderStatusBadge status={row.status} />,
   },
   {
+    // Hidden on mobile — date is secondary info
     key: "createdAt",
     header: "Date",
     render: (row) => (
-      <span className="text-[#6B7280] text-sm">
+      <span className="text-[#6B7280] text-sm hidden sm:block">
         {formatDate(row.createdAt)}
       </span>
     ),
@@ -64,7 +62,7 @@ const ORDER_COLUMNS: ColumnDef<Order>[] = [
         href={`/account/orders/${row.id}`}
         className="text-sm text-[#F5820A] font-medium hover:underline whitespace-nowrap"
       >
-        View Details →
+        View →
       </Link>
     ),
   },
@@ -82,12 +80,12 @@ function StatCard({
   label: string;
 }) {
   return (
-    <div className="bg-white border border-[#E5E7EB] rounded-card p-4 flex items-center gap-4">
-      <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
-        <Icon size={18} className="text-[#F5820A]" />
+    <div className="bg-white border border-[#E5E7EB] p-2 md:p-4 flex flex-col md:flex-row items-center gap-3">
+      <div className="w-9 h-9 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
+        <Icon size={17} className="text-[#F5820A]" />
       </div>
-      <div>
-        <p className="text-2xl font-extrabold text-[#111111] leading-none">
+      <div className="flex flex-col gap-2 items-center md:items-start">
+        <p className="md:text-xl font-extrabold text-[#111111] leading-none">
           {String(value).padStart(2, "0")}
         </p>
         <p className="text-xs text-[#6B7280] mt-0.5">{label}</p>
@@ -118,9 +116,7 @@ export default function AccountDashboardPage() {
         setRecentOrders(data.recentOrders);
         setPaymentMethods(data.paymentMethods);
       })
-      .catch(() => {
-        /* silent — show empty states */
-      })
+      .catch(() => {})
       .finally(() => setIsLoading(false));
   }, [accessToken]);
 
@@ -134,53 +130,49 @@ export default function AccountDashboardPage() {
 
   return (
     <AccountLayout>
-      {/* Greeting */}
-      <div className="mb-6">
-        <h1 className="text-xl font-bold text-[#111111]">
+      {/* ── Greeting ── */}
+      <div className="mb-5 sm:mb-6">
+        <h1 className="text-lg sm:text-xl font-bold text-[#111111]">
           Hello, {user?.firstName} {user?.lastName}
         </h1>
         <p className="text-sm text-[#6B7280] mt-1 leading-relaxed">
-          From your account dashboard. you can easily check & view your{" "}
-          <Link
-            href="/account/orders"
-            className="text-[#F5820A] hover:underline"
-          >
+          From your account dashboard you can check your{" "}
+          <Link href="/account/orders" className="text-[#F5820A] hover:underline">
             Recent Orders
           </Link>
           , manage your{" "}
-          <Link
-            href="/account/addresses"
-            className="text-[#F5820A] hover:underline"
-          >
+          <Link href="/account/addresses" className="text-[#F5820A] hover:underline">
             Shipping and Billing Addresses
           </Link>{" "}
           and edit your{" "}
-          <Link
-            href="/account/profile"
-            className="text-[#F5820A] hover:underline"
-          >
+          <Link href="/account/profile" className="text-[#F5820A] hover:underline">
             Password
           </Link>{" "}
           and{" "}
-          <Link
-            href="/account/profile"
-            className="text-[#F5820A] hover:underline"
-          >
+          <Link href="/account/profile" className="text-[#F5820A] hover:underline">
             Account Details
           </Link>
           .
         </p>
       </div>
 
-      {/* Account Info + Billing + Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      {/* ── Stats row — 3 cols on all sizes, stacks inside naturally ── */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-6 lg:hidden">
+        <StatCard icon={FiShoppingBag} value={stats.totalOrders}    label="Total Orders"     />
+        <StatCard icon={FiCheckCircle} value={stats.completedOrders} label="Completed"        />
+        <StatCard icon={FiStar}        value={stats.loyaltyPoints}   label="Loyalty Points"   />
+      </div>
+
+      {/* ── Account Info + Billing + Stats (desktop 3-col grid) ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5 sm:mb-6">
+
         {/* Account Info */}
-        <div className="bg-white border border-[#E5E7EB] rounded-card p-5">
-          <p className="text-xs font-bold uppercase tracking-wider text-[#6B7280] mb-4">
+        <div className="bg-white border border-[#E5E7EB] rounded-card p-4 sm:p-5">
+          <p className="text-xs font-bold uppercase tracking-wider text-[#6B7280] mb-3 sm:mb-4">
             Account Info
           </p>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-full bg-[#F5F5F5] overflow-hidden shrink-0">
+          <div className="flex items-center gap-3 mb-3 sm:mb-4">
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#F5F5F5] overflow-hidden shrink-0">
               {user?.avatarUrl ? (
                 <Image
                   src={user.avatarUrl}
@@ -190,21 +182,21 @@ export default function AccountDashboardPage() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-[#6B7280] font-bold text-lg">
+                <div className="w-full h-full flex items-center justify-center text-[#6B7280] font-bold text-base sm:text-lg">
                   {user?.firstName?.[0]}
                   {user?.lastName?.[0]}
                 </div>
               )}
             </div>
-            <div>
-              <p className="font-bold text-sm text-[#111111]">
+            <div className="min-w-0">
+              <p className="font-bold text-sm text-[#111111] truncate">
                 {user?.firstName} {user?.lastName}
               </p>
               <p className="text-xs text-[#6B7280]">Uyo, Akwaibom</p>
             </div>
           </div>
           <div className="space-y-1 text-xs text-[#6B7280]">
-            <p>
+            <p className="truncate">
               <span className="font-medium text-[#111111]">Email: </span>
               {user?.email}
             </p>
@@ -224,8 +216,8 @@ export default function AccountDashboardPage() {
         </div>
 
         {/* Billing Address */}
-        <div className="bg-white border border-[#E5E7EB] rounded-card p-5">
-          <p className="text-xs font-bold uppercase tracking-wider text-[#6B7280] mb-4">
+        <div className="bg-white border border-[#E5E7EB] rounded-card p-4 sm:p-5">
+          <p className="text-xs font-bold uppercase tracking-wider text-[#6B7280] mb-3 sm:mb-4">
             Billing Address
           </p>
           <div className="text-xs text-[#6B7280] space-y-1 leading-relaxed">
@@ -233,14 +225,14 @@ export default function AccountDashboardPage() {
               {user?.firstName} {user?.lastName}
             </p>
             <p>
-              East Tejturi Bazar, Word No. 04, Road No. 13/x, House no. 1320/C,
-              Flat No. 5D, Dhaka - 1200, Bangladesh
+              East Tejturi Bazar, Word No. 04, Road No. 13/x,
+              House no. 1320/C, Flat No. 5D, Dhaka - 1200, Bangladesh
             </p>
             <p>
-              <span className="font-medium text-[#111111]">Phone Number: </span>
+              <span className="font-medium text-[#111111]">Phone: </span>
               +1-202-555-0118
             </p>
-            <p>
+            <p className="truncate">
               <span className="font-medium text-[#111111]">Email: </span>
               {user?.email}
             </p>
@@ -253,29 +245,17 @@ export default function AccountDashboardPage() {
           </Link>
         </div>
 
-        {/* Stats column */}
-        <div className="flex flex-col gap-3">
-          <StatCard
-            icon={FiShoppingBag}
-            value={stats.totalOrders}
-            label="Total Orders"
-          />
-          <StatCard
-            icon={FiCheckCircle}
-            value={stats.completedOrders}
-            label="Completed Orders"
-          />
-          <StatCard
-            icon={FiStar}
-            value={stats.loyaltyPoints}
-            label="Loyalty Points"
-          />
+        {/* Stats column — desktop only (mobile stats are above) */}
+        <div className="hidden lg:flex flex-col gap-3">
+          <StatCard icon={FiShoppingBag} value={stats.totalOrders}    label="Total Orders"    />
+          <StatCard icon={FiCheckCircle} value={stats.completedOrders} label="Completed Orders" />
+          <StatCard icon={FiStar}        value={stats.loyaltyPoints}   label="Loyalty Points"  />
         </div>
       </div>
 
-      {/* Payment Options */}
-      <div className="bg-white border border-[#E5E7EB] rounded-card p-5 mb-6">
-        <div className="flex items-center justify-between mb-4">
+      {/* ── Payment Options ── */}
+      <div className="bg-white border border-[#E5E7EB] rounded-card p-4 sm:p-5 mb-5 sm:mb-6">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
           <p className="text-xs font-bold uppercase tracking-wider text-[#6B7280]">
             Payment Option
           </p>
@@ -287,15 +267,13 @@ export default function AccountDashboardPage() {
           </Link>
         </div>
 
-        <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-1">
+        <div className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide pb-1">
           {paymentMethods.map((card) => (
             <PaymentCard
               key={card.id}
               card={card}
               onDelete={handleDeleteCard}
-              onEdit={(id) => {
-                /* TODO: open edit modal */
-              }}
+              onEdit={() => {}}
             />
           ))}
           {paymentMethods.length === 0 && !isLoading && (
@@ -306,7 +284,7 @@ export default function AccountDashboardPage() {
         </div>
       </div>
 
-      {/* Recent Orders */}
+      {/* ── Recent Orders ── */}
       <DataTable
         title="Recent Order"
         columns={ORDER_COLUMNS}
@@ -321,12 +299,12 @@ export default function AccountDashboardPage() {
             View All →
           </Link>
         }
-        className="mb-6"
+        className="mb-5 sm:mb-6"
       />
 
-      {/* Browsing History — reuses ProductCard */}
-      <div className="bg-white border border-[#E5E7EB] rounded-card p-5">
-        <div className="flex items-center justify-between mb-4">
+      {/* ── Browsing History ── */}
+      <div className="bg-white border border-[#E5E7EB] rounded-card p-4 sm:p-5">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
           <p className="text-xs font-bold uppercase tracking-wider text-[#6B7280]">
             Browsing History
           </p>
