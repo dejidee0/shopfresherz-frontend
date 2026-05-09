@@ -67,13 +67,13 @@ export function ProductGridSection({
           <div className="flex items-center gap-4 flex-wrap">
             {/* Title with orange accent */}
             <div className="flex items-center gap-2">
-              <div className="w-1 h-7 bg-[#F5820A] rounded-full flex-shrink-0" />
+              <div className="w-1 h-7 bg-[#F5820A] rounded-full shrink-0" />
               <h2 className="text-xl font-bold text-[#111111]">{title}</h2>
             </div>
 
             {/* Tabs */}
             {tabs && tabs.length > 0 && (
-              <div className="flex items-center gap-1 bg-[#F5F5F5] rounded-btn p-1">
+              <div className="flex flex-wrap items-center gap-1 bg-[#F5F5F5] rounded-btn p-1">
                 {tabs.map((tab) => (
                   <button
                     key={tab.key}
@@ -96,7 +96,7 @@ export function ProductGridSection({
           {seeAllHref && (
             <Link
               href={seeAllHref}
-              className="text-sm text-[#F5820A] font-medium hover:underline flex items-center gap-1 flex-shrink-0"
+              className="text-sm text-[#F5820A] font-medium hover:underline flex items-center gap-1 shrink-0"
             >
               Browse All Product →
             </Link>

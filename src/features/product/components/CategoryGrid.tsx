@@ -9,14 +9,14 @@ import type { Category } from '@/lib/types/product'
 
 // Fallback static categories — replace with API data from /categories
 const DEFAULT_CATEGORIES: (Category & { imageUrl: string })[] = [
-  { id: 4, name: 'Computer & Laptop', slug: 'computer-laptop', imageUrl: '/images/categories/laptop.png' },
-  { id: 3, name: 'Electronic', slug: 'electronics', imageUrl: '/images/categories/electronic.png' },
-  { id: 10, name: 'Home', slug: 'home-kitchen-tech', imageUrl: '/images/categories/home.png' },
-  { id: 6, name: 'Accessories', slug: 'accessories', imageUrl: '/images/categories/accessories.png' },
+  { id: 4, name: 'Computer & Laptop', slug: 'computer-laptop', imageUrl: '/images/categories/pc.png' },
+  { id: 3, name: 'Electronic', slug: 'electronics', imageUrl: '/images/categories/tv.png' },
+  { id: 10, name: 'Home', slug: 'home-kitchen-tech', imageUrl: '/images/categories/home-theater.png' },
+  { id: 6, name: 'Accessories', slug: 'accessories', imageUrl: '/images/categories/keyboard.png' },
   { id: 7, name: 'Camera & Photo', slug: 'electronics/cameras', imageUrl: '/images/categories/camera.png' },
   { id: 8, name: 'TV & Homes', slug: 'electronics/tv', imageUrl: '/images/categories/tv.png' },
   { id: 2, name: 'Mobile Phones', slug: 'mobile-phones', imageUrl: '/images/categories/phone.png' },
-  { id: 1, name: 'Games & Consoles', slug: 'games-consoles', imageUrl: '/images/categories/gaming.png' },
+  { id: 1, name: 'Games & Consoles', slug: 'games-consoles', imageUrl: '/images/categories/xbox.png' },
 ]
 
 interface CategoryGridProps {

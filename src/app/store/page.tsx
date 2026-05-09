@@ -57,11 +57,11 @@ export default async function HomePage() {
           title="Best Deals"
           products={bestSellers}
           tabs={[
-            { label: 'All Product', key: 'all' },
-            { label: 'Smart Phone', key: 'mobile-phones' },
-            { label: 'Laptop', key: 'laptops-computers' },
-            { label: 'Headphone', key: 'accessories/headphones' },
-            { label: 'TV', key: 'electronics/tv' },
+            { label: 'All Products', key: 'all' },
+            { label: 'Smart Phones', key: 'mobile-phones' },
+            { label: 'Laptops', key: 'laptops-computers' },
+            { label: 'Headphones', key: 'accessories/headphones' },
+            { label: 'TVs', key: 'electronics/tv' },
           ]}
           seeAllHref="/category/best-sellers"
         />
