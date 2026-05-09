@@ -1,21 +1,35 @@
 import { Button } from "@/components/ui/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaArrowRight } from "react-icons/fa";
+import { usePathname, useRouter } from "next/navigation";
 
 const LoginForm = () => {
   const [authStatus, setAuthStatus] = useState("signin");
+  const path = usePathname();
+  const router = useRouter()
+
+  // write logic that will display form based on route
+ // Run only when path changes
+  useEffect(() => {
+    if (path.endsWith("login")) {
+      setAuthStatus("signin");
+    } else if (path.endsWith("register")) {
+      setAuthStatus("signup");
+    }
+  }, [path]);
+
   return (
     <>
       <div className="flex border-b border-b-border ">
         <div
-          onClick={() => setAuthStatus("signin")}
+          onClick={() => router.push("/auth/login")}
           className={`${authStatus === "signin" && "border-b-4"} flex items-center justify-center px-10 py-5 border-b-primary w-[50%] cursor-pointer`}
         >
           <p className="font-semibold">Sign In</p>
         </div>
 
         <div
-          onClick={() => setAuthStatus("signup")}
+          onClick={() => router.push("/auth/register")}
           className={`${authStatus === "signup" && "border-b-4"} flex items-center justify-center px-10 py-5 border-b-primary w-[50%] cursor-pointer`}
         >
           <p className="font-semibold">Sign Up</p>

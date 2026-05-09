@@ -163,7 +163,7 @@
 //                       >
 //                         <div className="w-10 h-10 bg-gray-100 rounded shrink-0 overflow-hidden">
 //                           <Image
-//                             src={product.images[0]?.thumb ?? '/images/placeholder.png'}
+//                             src={product.images[0]?.thumb ?? '/images/Rbag.png'}
 //                             alt={product.name}
 //                             width={40}
 //                             height={40}
@@ -436,7 +436,7 @@ export function Navbar() {
               >
                 <div className="w-10 h-10 bg-gray-100 rounded shrink-0 overflow-hidden">
                   <Image
-                    src={product.images[0]?.thumb ?? '/images/placeholder.png'}
+                    src={product.images[0]?.thumb ?? '/images/Rbag.png'}
                     alt={product.name}
                     width={40}
                     height={40}
@@ -471,7 +471,7 @@ export function Navbar() {
           {/* Logo */}
           <Link href="/" className="shrink-0">
             <Image
-              src="/icons/shopfresherz_logo_white_transparent.svg"
+              src="/icons/ShopFreshersV2LogoWhite.png"
               alt="ShopFresherz"
               width={160}
               height={40}

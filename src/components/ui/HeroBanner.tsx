@@ -31,7 +31,7 @@ const SLIDES: HeroSlide[] = [
     subtext: 'Save up to 50% on select Xbox games. Get 3 months of PC Game Pass for $2 USD.',
     ctaLabel: 'SHOP NOW',
     ctaHref: '/category/games-consoles',
-    image: '/images/banners/xbox.png',
+    image: '',
     imageAlt: 'Xbox Series X console',
     theme: 'light',
     bgColor: 'bg-[#F5F5F5]',
@@ -43,8 +43,8 @@ const SLIDES: HeroSlide[] = [
     headline: 'New Google Pixel 6 Pro',
     subtext: 'Experience the ultimate Android flagship. Available now.',
     ctaLabel: 'SHOP NOW',
-    ctaHref: '/product/google-pixel-6-pro',
-    image: '/images/banners/pixel6.png',
+    ctaHref: '/store/',
+    image: '',
     imageAlt: 'Google Pixel 6 Pro',
     theme: 'light',
     bgColor: 'bg-white',
@@ -56,8 +56,8 @@ const SLIDES: HeroSlide[] = [
     headline: 'Xiaomi FlipBuds Pro',
     subtext: 'Premium sound, all-day comfort. Starting at ₦10,000.',
     ctaLabel: 'SHOP NOW',
-    ctaHref: '/product/xiaomi-flipbuds-pro',
-    image: '/images/banners/flipbuds.png',
+    ctaHref: '/store/',
+    image: '',
     imageAlt: 'Xiaomi FlipBuds Pro',
     theme: 'dark',
     bgColor: 'bg-[#0D0D0D]',
@@ -163,7 +163,7 @@ export function HeroBanner() {
                 <div className="flex-1 flex items-center justify-center">
                   <div className="relative w-full max-w-105 aspect-4/3">
                     <Image
-                      src={s.image}
+                      src={s.image? s.image : "https://placehold.net/default.png"}
                       alt={s.imageAlt}
                       fill
                       sizes="(max-width: 768px) 100vw, 50vw"

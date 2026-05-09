@@ -89,7 +89,7 @@ function FlashDealCard({ deal }: { deal: FlashDeal }) {
   const soldPercent = Math.min(100, Math.round((soldCount / maxQuantity) * 100))
   const originalPrice = product.compareAtPrice ?? product.price
   const discountPercent = Math.round(((originalPrice - salePrice) / originalPrice) * 100)
-  const thumb = product.images[0]?.thumb ?? '/images/placeholder.png'
+  const thumb = product.images[0]?.thumb ?? '/images/Rbag.png'
 
   return (
     <Link

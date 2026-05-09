@@ -58,7 +58,7 @@ export function Footer() {
           <div className="lg:col-span-1">
             <Link href="/" className="block mb-5">
               <Image
-                src="/icons/shopfresherz_logo_white_transparent.svg"
+                src="/icons/ShopFreshersV2LogoOrange.png"
                 alt="ShopFresherz"
                 width={140}
                 height={36}

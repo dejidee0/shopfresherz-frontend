@@ -74,7 +74,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
       {/* Logo row */}
       <div className="flex items-center justify-between mb-8 px-1 shrink-0">
         <img
-          src="/icons/shopfresherz_logo_black.png"
+          src="/icons/ShopFreshersV2LogoBlack.png"
           alt="shopfresherz logo"
           className="h-8 w-auto"
         />

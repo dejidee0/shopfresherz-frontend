@@ -6,7 +6,8 @@ export interface User {
   lastName: string
   avatarUrl?: string
   role: 'Customer' | 'Admin' | 'SuperAdmin'
-  loyaltyPoints: number
+  loyaltyPoints: number,
+  hasRegisteredBilling: boolean //added this to verify if the user has registered billing info (maybe temporary)
 }
 
 

@@ -23,7 +23,7 @@ const LINE_ITEM_COLUMNS: ColumnDef<OrderLineItem>[] = [
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 bg-[#F5F5F5] rounded shrink-0 overflow-hidden">
           <Image
-            src={row.productImage || '/images/placeholder.png'}
+            src={row.productImage || '/images/Rbag.png'}
             alt={row.productName}
             width={48}
             height={48}

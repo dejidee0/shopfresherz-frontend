@@ -42,8 +42,8 @@ export function ProductCard({
     Date.now() - new Date(product.createdAt).getTime() < 30 * 24 * 60 * 60 * 1000 // 30 days
 
   const displayImage = imgError
-    ? '/images/placeholder.png'
-    : product.images[0]?.display ?? '/images/placeholder.png'
+    ? '/images/Rbag.png'
+    : product.images[0]?.display ?? '/images/Rbag.png'
 
   function handleAddToCart(e: React.MouseEvent) {
     e.preventDefault()

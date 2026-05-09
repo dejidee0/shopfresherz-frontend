@@ -41,7 +41,7 @@ export function PDPBottomProducts({
                     {/* Thumb */}
                     <div className="w-14 h-14 shrink-0 bg-[#F5F5F5] rounded-card overflow-hidden">
                       <Image
-                        src={product.images[0]?.thumb ?? '/images/placeholder.png'}
+                        src={product.images[0]?.thumb ?? '/images/Rbag.png'}
                         alt={product.name}
                         width={56}
                         height={56}
