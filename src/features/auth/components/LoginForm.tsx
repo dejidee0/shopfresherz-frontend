@@ -202,6 +202,7 @@ function SignUpForm() {
           lastName: data.lastName,
           email: data.email,
           password: data.password,
+          confirmPassword: data.password
         })
       )}
       className="flex flex-col gap-4 p-6"

@@ -80,11 +80,16 @@
 //   )
 // }
 
+import { redirect } from "next/navigation";
 
 const Homepage = () => {
-  return (
-    <div>page</div>
-  )
-}
+  // const { user } = useRequireAuth({ role: '', redirectTo: '/store' })
+  // const router = useRouter();
+  // useEffect(() => {
+  //   router.replace("/store");
+  // }, []);
+  // return <div>page</div>;
+  redirect("/store");
+};
 
-export default Homepage
+export default Homepage;

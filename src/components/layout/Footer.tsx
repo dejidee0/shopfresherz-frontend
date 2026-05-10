@@ -63,6 +63,7 @@ export function Footer() {
                 width={140}
                 height={36}
                 className="h-9 w-auto"
+                style={{ width: "auto", height: "auto" }} // ensures aspect ratio
               />
             </Link>
             <p className="text-[#6B7280] text-sm leading-relaxed mb-5">
