@@ -9,7 +9,7 @@ export function TopBar() {
         {/* Left: Free shipping */}
         <div className="flex items-center gap-2">
           <FaTruck className="text-[#F5820A]" size={14} />
-          <span>Free Shipping on orders over ₦500</span>
+          <span>Free Shipping on orders over ₦50,000</span>
         </div>
 
         {/* Center: Promo */}

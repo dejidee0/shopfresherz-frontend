@@ -31,7 +31,7 @@ function Crumb({
     return (
       <span
         className={cn(
-          'truncate max-w-[140px] sm:max-w-[200px]',
+          'truncate max-w-35 sm:max-w-50',
           isLast ? 'text-[#F5820A] font-medium' : 'text-[#6B7280]'
         )}
         aria-current={isLast ? 'page' : undefined}
@@ -43,7 +43,7 @@ function Crumb({
   return (
     <Link
       href={item.href}
-      className="text-[#6B7280] hover:text-[#F5820A] transition-colors truncate max-w-[140px] sm:max-w-[200px]"
+      className="text-[#6B7280] hover:text-[#F5820A] transition-colors truncate max-w-35 sm:max-w-50"
     >
       {item.label}
     </Link>
