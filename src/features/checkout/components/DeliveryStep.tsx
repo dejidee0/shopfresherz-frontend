@@ -15,6 +15,7 @@ interface Props {
   coupon: CouponState
   onCouponChange: (v: string) => void
   onApplyCoupon: () => void
+  onRemoveCoupon?: () => void
   deliveryFee: number
   onBack: () => void
   onContinue: () => void
@@ -26,6 +27,7 @@ export function DeliveryStep({
   coupon,
   onCouponChange,
   onApplyCoupon,
+  onRemoveCoupon,
   deliveryFee,
   onBack,
   onContinue,
@@ -37,6 +39,7 @@ export function DeliveryStep({
           coupon={coupon}
           onCouponChange={onCouponChange}
           onApplyCoupon={onApplyCoupon}
+          onRemoveCoupon={onRemoveCoupon}
           deliveryFee={deliveryFee}
         />
       }

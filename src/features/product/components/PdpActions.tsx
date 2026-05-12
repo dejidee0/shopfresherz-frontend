@@ -30,11 +30,19 @@ export function PDPActions({ product }: PDPActionsProps) {
   const addItem = useCartStore((s) => s.addItem)
   const openCart = useCartStore((s) => s.openCart)
 
-  // Group variants by type
-  const colorVariants = product.variants?.filter((v) => v.type === 'color') ?? []
-  const sizeVariants = product.variants?.filter((v) => v.type === 'size') ?? []
-  const memoryVariants = product.variants?.filter((v) => v.type === 'ram') ?? []
-  const storageVariants = product.variants?.filter((v) => v.type === 'storage') ?? []
+  // Group variants by type (from attributesJson if available)
+  const colorVariants = product.variants?.filter((v) => 
+    v.attributes?.some(a => a.name.toLowerCase() === 'color')
+  ) ?? []
+  const sizeVariants = product.variants?.filter((v) => 
+    v.attributes?.some(a => a.name.toLowerCase() === 'size')
+  ) ?? []
+  const memoryVariants = product.variants?.filter((v) => 
+    v.attributes?.some(a => a.name.toLowerCase() === 'ram' || a.name.toLowerCase() === 'memory')
+  ) ?? []
+  const storageVariants = product.variants?.filter((v) => 
+    v.attributes?.some(a => a.name.toLowerCase() === 'storage')
+  ) ?? []
 
   const [selectedColor, setSelectedColor] = useState<string | null>(
     colorVariants[0]?.id ?? null
@@ -52,22 +60,22 @@ export function PDPActions({ product }: PDPActionsProps) {
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [copyDone, setCopyDone] = useState(false)
 
-  const availableStock = product.stockQty - product.reservedQty
+  const availableStock = product.availableQty ?? product.stockQty ?? 0
   const stockStatus = getStockStatus(product)
   const discountPercent = getDiscountPercent(product.price, product.compareAtPrice)
   const isOutOfStock = stockStatus === 'out_of_stock'
 
-  function handleAddToCart() {
-    addItem({
-      productId: product.id,
-      variantId: selectedColor ?? selectedStorage ?? undefined,
-      name: product.name,
-      slug: product.slug,
-      image: product.images[0]?.thumb ?? '',
-      price: product.price,
-      quantity: qty,
-      stockQty: availableStock,
-    })
+   function handleAddToCart() {
+     addItem({
+        productId: product.id,
+        variantId: selectedColor ?? selectedStorage ?? undefined,
+        name: product.name,
+        slug: product.slug,
+        image: product.images?.[0]?.thumb ?? '',
+        price: product.price,
+        quantity: qty,
+        stockQty: availableStock,
+      })
     openCart()
   }
 
@@ -87,12 +95,12 @@ export function PDPActions({ product }: PDPActionsProps) {
 
       {/* ── Rating ── */}
       <div className="flex items-center gap-2">
-        <StarRating rating={product.averageRating} />
+        <StarRating rating={product.averageRating ?? 0} />
         <span className="text-sm text-[#6B7280]">
-          {product.averageRating.toFixed(1)} Star Rating
+          {(product.averageRating ?? 0).toFixed(1)} Star Rating
         </span>
         <span className="text-sm text-[#6B7280]">
-          ({product.reviewCount.toLocaleString()} User feedback)
+          ({(product.reviewCount ?? 0).toLocaleString()} User feedback)
         </span>
       </div>
 
@@ -103,7 +111,7 @@ export function PDPActions({ product }: PDPActionsProps) {
 
       {/* ── Meta row ── */}
       <div className="grid grid-cols-2 gap-x-8 gap-y-1.5 text-sm">
-        <MetaRow label="Sku:" value={product.sku} />
+        <MetaRow label="Sku:" value={product.sku ?? ''} />
         <MetaRow
           label="Availability:"
           value={
@@ -115,8 +123,8 @@ export function PDPActions({ product }: PDPActionsProps) {
             isOutOfStock ? 'text-[#EF4444]' : 'text-[#22C55E] font-semibold'
           }
         />
-        <MetaRow label="Brand:" value={product.brandName} />
-        <MetaRow label="Category:" value={product.categoryName} />
+        <MetaRow label="Brand:" value={product.brandName ?? product.brand?.name ?? ''} />
+        <MetaRow label="Category:" value={product.categoryName ?? product.category?.name ?? ''} />
       </div>
 
       {/* ── Price ── */}

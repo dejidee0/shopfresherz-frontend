@@ -1,15 +1,19 @@
+"use client";
+
 import { IoWarningOutline } from "react-icons/io5";
 import { Button } from "@/components/ui/Button";
 import { ColumnDef, DataTable } from "@/components/ui/DataTable";
 import { HiMagnifyingGlass } from "react-icons/hi2";
+import { useLowStock } from "@/lib/hooks/useAdmin";
+import { useMemo } from "react";
 
+// Using low stock data from API
 interface InventoryEntry {
   id: string;
   productName: string;
   sku: string;
-  category: string;
-  stock: string;
-  threshold: string;
+  availableQty: number;
+  threshold: number;
 }
 
 const roleColors: Record<string, string> = {
@@ -17,19 +21,17 @@ const roleColors: Record<string, string> = {
   Customer: "bg-yellow-100 text-yellow-600",
 };
 
-const customerColumns: ColumnDef<InventoryEntry>[] = [
+const customerColumns: ColumnDef<any>[] = [
   {
     key: "productName",
     header: "PRODUCT",
     render: (row) => (
       <div className="font-medium text-gray-700">
         <p>{row.productName}</p>
-        {parseInt(row.stock) < parseInt(row.threshold) && (
-          <div className="p-0.5 px-2 flex gap-1.5 text-xs text-center w-fit rounded-md items-center text-red-600 bg-red-100 ">
-            <IoWarningOutline />
-            <p>LOW STOCK</p>
-          </div>
-        )}
+        <div className="p-0.5 px-2 flex gap-1.5 text-xs text-center w-fit rounded-md items-center text-red-600 bg-red-100 ">
+          <IoWarningOutline />
+          <p>LOW STOCK</p>
+        </div>
       </div>
     ),
   },
@@ -38,16 +40,14 @@ const customerColumns: ColumnDef<InventoryEntry>[] = [
     header: "SKU",
   },
   {
-    key: "category",
-    header: "CATEGORY",
-  },
-  {
-    key: "stock",
-    header: "STOCK",
+    key: "availableQty",
+    header: "AVAILABLE STOCK",
+    render: (row) => <span>{row.availableQty}</span>,
   },
   {
     key: "threshold",
     header: "THRESHOLD",
+    render: (row) => <span>{row.threshold}</span>,
   },
   {
     key: "adjust",
@@ -65,55 +65,32 @@ const customerColumns: ColumnDef<InventoryEntry>[] = [
   },
 ];
 
-const inventory = [
-  {
-    id: "1",
-    productName: "Dell Inspiron 15",
-    sku: "W-13-RD-NUM",
-    category: "Computers & Laptop",
-    stock: "2",
-    threshold: "10",
-  },
-  {
-    id: "2",
-    productName: "Dell Inspiron 15",
-    sku: "W-13-RD-NUM",
-    category: "Computers & Laptop",
-    stock: "28",
-    threshold: "10",
-  },
-  {
-    id: "3",
-    productName: "Dell Inspiron 15",
-    sku: "W-13-RD-NUM",
-    category: "Computers & Laptop",
-    stock: "32",
-    threshold: "10",
-  },
-  {
-    id: "4",
-    productName: "Dell Inspiron 15",
-    sku: "W-13-RD-NUM",
-    category: "Computers & Laptop",
-    stock: "40",
-    threshold: "10",
-  },
-  {
-    id: "5",
-    productName: "Dell Inspiron 15",
-    sku: "W-13-RD-NUM",
-    category: "Computers & Laptop",
-    stock: "20",
-    threshold: "10",
-  },
-];
-
 const AdminInventoryPage = () => {
+  const { data: lowStockData, isLoading } = useLowStock();
+
+  const inventory = useMemo(() => {
+    if (!lowStockData) return [];
+    return lowStockData.map(item => ({
+      id: item.productId,
+      productName: item.productName,
+      sku: item.sku || 'N/A',
+      availableQty: item.availableQty,
+      threshold: item.threshold || 5,
+    }));
+  }, [lowStockData]);
+
   return (
-    <div className="flex flex-col gap-6 md:flex-row p-2 md:p-4 lg:p-6">
+    <div className="flex flex-col gap-6 p-2 md:p-4 lg:p-6">
+      <div className="flex flex-col gap-3">
+        <p className="font-bold">Low Stock Inventory</p>
+        <p className="text-xs text-text-muted">
+          {isLoading ? 'Loading...' : `${inventory.length} low stock items`}
+        </p>
+      </div>
+
       <div className="flex flex-col md:flex-row justify-between">
         <div className="flex flex-col md:flex-row gap-3 mb-6">
-          {/* Search */}
+          {/* Search - placeholder since API doesn't support search */}
           <div className="relative">
             <HiMagnifyingGlass
               className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -121,22 +98,11 @@ const AdminInventoryPage = () => {
             />
             <input
               type="text"
-              placeholder="Search name or sku"
+              placeholder="Search (not implemented)"
+              disabled
               className="pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] w-64 transition-all"
             />
           </div>
-
-          {/* Sort */}
-          <select
-            name=""
-            id=""
-            className="border border-border rounded-2xl text-xs lg:text-sm text-gray-400 h-10 px-2"
-          >
-            <option value="">All Statuses</option>
-            <option value="">Active</option>
-            <option value="">Out of Stock</option>
-            <option value="">Draft</option>
-          </select>
         </div>
 
         {/* Buttons */}
@@ -148,12 +114,17 @@ const AdminInventoryPage = () => {
       </div>
 
       {/* Table */}
-      <DataTable
-        title=""
-        columns={customerColumns}
-        data={inventory}
-        rowKey="id"
-      />
+      {isLoading ? (
+        <div className="text-center py-8">Loading low stock items...</div>
+      ) : (
+        <DataTable
+          title=""
+          columns={customerColumns}
+          data={inventory}
+          rowKey="id"
+          emptyMessage="No low stock items"
+        />
+      )}
     </div>
   );
 };

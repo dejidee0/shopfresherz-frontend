@@ -1,37 +1,26 @@
 "use client"
 import AddContentModal from "@/components/admin/AddContentModal";
 import { Button } from "@/components/ui/Button";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { LuImage, LuPencil } from "react-icons/lu";
 import { RiDeleteBinLine } from "react-icons/ri";
-
-interface ContetntEntry {
-  id: string;
-  title: string;
-  cta: string;
-  imgUrl: string;
-  live: boolean;
-}
-
-const contentData: ContetntEntry[] = [
-  {
-    id: "1",
-    title: "Massive Discount",
-    cta: "Buy now",
-    imgUrl: "",
-    live: true,
-  },
-  {
-    id: "2",
-    title: "Sales Spree",
-    cta: "Buy now",
-    imgUrl: "",
-    live: false,
-  },
-];
+import { useBanners } from "@/lib/hooks/useAdmin";
 
 const AdminContentPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const { data: banners, isLoading } = useBanners();
+
+    const contentData = useMemo(() => {
+      if (!banners) return [];
+      return banners.map(banner => ({
+        id: banner.id,
+        title: banner.title || 'Untitled',
+        cta: banner.ctaText || 'Learn More',
+        imgUrl: banner.imageUrl,
+        live: banner.isActive || false,
+      }));
+    }, [banners]);
+
   return (
     <div className="flex flex-col p-2 md:p-4 lg:p-6 gap-4 lg:gap-6">
         <div className="flex flex-col gap-4 md:gap-0 md:flex-row justify-between items-start md:items-center">
@@ -39,7 +28,12 @@ const AdminContentPage = () => {
             <Button onClick={()=> setIsModalOpen(true)} className="text-xs md:text-sm rounded-md cursor-pointer">Add Banner</Button>
         </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
-        {contentData.map((content) => (
+        {isLoading ? (
+          <div className="col-span-full text-center py-8">Loading banners...</div>
+        ) : contentData.length === 0 ? (
+          <div className="col-span-full text-center py-8">No banners found</div>
+        ) : (
+          contentData.map((content) => (
           <div key={content.id} className="flex flex-col md:w-[90%] lg:w-full rounded-md bg-white">
             {content.imgUrl ? (
               <img
@@ -67,7 +61,8 @@ const AdminContentPage = () => {
               </div>
             </div>
           </div>
-        ))}
+          ))
+        )}
       </div>
 
       {

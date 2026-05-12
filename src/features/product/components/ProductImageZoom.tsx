@@ -35,10 +35,20 @@ const SCROLL_MIN = 1
 const SCROLL_MAX = 3
 const LIGHTBOX_MIN = 0.5
 const LIGHTBOX_MAX = 5
+const FALLBACK_IMAGE = '/images/device-placeholder.jpg'
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function ProductImageZoom({ images, productName, isOutOfStock = false }: ProductImageZoomProps) {
+  const productImages = images.length > 0
+    ? images
+    : [{
+        thumb: FALLBACK_IMAGE,
+        display: FALLBACK_IMAGE,
+        zoom: FALLBACK_IMAGE,
+        original: FALLBACK_IMAGE,
+      }]
+
   const [activeIndex, setActiveIndex] = useState(0)
   const [zoomImageLoaded, setZoomImageLoaded] = useState<Record<number, boolean>>({})
 
@@ -69,17 +79,17 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
   const mainRef = useRef<HTMLDivElement>(null)
   const lightboxRef = useRef<HTMLDivElement>(null)
 
-  const activeImage = images[activeIndex]
+  const activeImage = productImages[activeIndex] ?? productImages[0]
 
   // ── Lazy-load zoom image on first hover/touch ────────────────────────────
   const loadZoomImage = useCallback(
     (index: number) => {
       if (zoomImageLoaded[index]) return
       const img = new window.Image()
-      img.src = images[index].zoom
+      img.src = productImages[index]?.zoom ?? FALLBACK_IMAGE
       img.onload = () => setZoomImageLoaded((prev) => ({ ...prev, [index]: true }))
     },
-    [images, zoomImageLoaded]
+    [productImages, zoomImageLoaded]
   )
 
   // ── Hover lens (desktop only) ────────────────────────────────────────────
@@ -245,15 +255,15 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
     function handleKey(e: KeyboardEvent) {
       switch (e.key) {
         case 'Escape': closeLightbox(); break
-        case 'ArrowLeft': setActiveIndex((i) => (i - 1 + images.length) % images.length); break
-        case 'ArrowRight': setActiveIndex((i) => (i + 1) % images.length); break
+        case 'ArrowLeft': setActiveIndex((i) => (i - 1 + productImages.length) % productImages.length); break
+        case 'ArrowRight': setActiveIndex((i) => (i + 1) % productImages.length); break
         case '+': lightboxZoomIn(); break
         case '-': lightboxZoomOut(); break
       }
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [isLightboxOpen, images.length])
+  }, [isLightboxOpen, productImages.length])
 
   // Lock scroll when lightbox open
   useEffect(() => {
@@ -265,16 +275,16 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
   useEffect(() => {
     const timer = setTimeout(() => {
       const adjacent = [
-        (activeIndex + 1) % images.length,
-        (activeIndex - 1 + images.length) % images.length,
+        (activeIndex + 1) % productImages.length,
+        (activeIndex - 1 + productImages.length) % productImages.length,
       ]
       adjacent.forEach((i) => {
         const img = new window.Image()
-        img.src = images[i].display
+        img.src = productImages[i]?.display ?? FALLBACK_IMAGE
       })
     }, 3000)
     return () => clearTimeout(timer)
-  }, [activeIndex, images])
+  }, [activeIndex, productImages])
 
   // ── Preview lens position math ───────────────────────────────────────────
   const containerSize = 540
@@ -406,7 +416,7 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
 
         {/* ── Thumbnail strip ── */}
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1" role="tablist" aria-label="Product images">
-          {images.map((img, i) => (
+          {productImages.map((img, i) => (
             <button
               key={i}
               role="tab"
@@ -510,17 +520,17 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
           </div>
 
           {/* Prev / Next arrows */}
-          {images.length > 1 && (
+          {productImages.length > 1 && (
             <>
               <button
-                onClick={() => setActiveIndex((i) => (i - 1 + images.length) % images.length)}
+                onClick={() => setActiveIndex((i) => (i - 1 + productImages.length) % productImages.length)}
                 className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 text-white hover:bg-[#F5820A] flex items-center justify-center transition-colors"
                 aria-label="Previous image"
               >
                 <FiChevronLeft size={20} />
               </button>
               <button
-                onClick={() => setActiveIndex((i) => (i + 1) % images.length)}
+                onClick={() => setActiveIndex((i) => (i + 1) % productImages.length)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 text-white hover:bg-[#F5820A] flex items-center justify-center transition-colors"
                 aria-label="Next image"
               >
@@ -531,7 +541,7 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
 
           {/* Thumbnail strip */}
           <div className="flex items-center justify-center gap-2 p-4 shrink-0">
-            {images.map((img, i) => (
+            {productImages.map((img, i) => (
               <button
                 key={i}
                 onClick={() => { setActiveIndex(i); setLightboxZoom(1); setLightboxPan({ x: 0, y: 0 }) }}

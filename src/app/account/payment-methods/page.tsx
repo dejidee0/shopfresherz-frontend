@@ -1,4 +1,5 @@
 "use client"
+import AddCardModal from "@/components/account/AddCardModal";
 import { AccountLayout } from "@/features/account/components/AccountLayout";
 import { PaymentCard } from "@/features/account/components/PaymentCard";
 import { PaymentMethod } from "@/lib/api/account";
@@ -38,6 +39,7 @@ const paymentMethods: PaymentMethod[] = [
 export default function AccountAddressPage() {
 
   const [isLoading, setIsLoading] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   function handleDeleteCard(id: string): void {
     throw new Error("Function not implemented.");
@@ -51,9 +53,9 @@ export default function AccountAddressPage() {
     >
       <div className="flex flex-col gap-3">
         <div className="flex flex-col border border-border w-full lg:w-[80%]">
-          <div className="flex flex-col md:flex-row justify-between p-4 border-b border-border">
+          <div className="flex flex-col gap-3 md:gap-0 md:flex-row justify-between p-4 border-b border-border">
             <p className="text-sm font-semibold text-gray-600">PAYMENTS OPTIONS</p>
-            <button className="text-primary text-sm cursor-pointer flex gap-2"> Add Card <FaArrowRight/></button>
+            <button onClick={()=> setIsModalOpen(true)} className="text-primary text-sm cursor-pointer flex items-center gap-2"> Add Card <FaArrowRight/></button>
           </div>
 
           <div className="flex p-4 gap-4 flex-wrap scrollbar-hide pb-1">
@@ -75,6 +77,9 @@ export default function AccountAddressPage() {
             </div>
         </div>
       </div>
+      {
+        isModalOpen && <AddCardModal isOpen={isModalOpen} onClose={()=> setIsModalOpen(false)}/>
+      }
     </AccountLayout>
   );
 }

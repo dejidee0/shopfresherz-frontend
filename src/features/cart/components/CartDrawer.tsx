@@ -97,7 +97,7 @@ export function CartDrawer() {
                 <li key={item.id} className="py-4 flex gap-3">
                   {/* Image */}
                   <Link
-                    href={`/product/${item.slug}`}
+                    href={`/store/product/${item.slug}`}
                     onClick={closeCart}
                     className="w-18 h-18 shrink-0 bg-[#F5F5F5] rounded-card overflow-hidden"
                   >
@@ -113,7 +113,7 @@ export function CartDrawer() {
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <Link
-                      href={`/product/${item.slug}`}
+                      href={`/store/product/${item.slug}`}
                       onClick={closeCart}
                       className="text-sm text-[#111111] leading-snug line-clamp-2 hover:text-[#F5820A] transition-colors"
                     >
@@ -219,7 +219,7 @@ export function CartDrawer() {
             {/* Actions */}
             <div className="flex flex-col gap-2 pt-1">
               <Link
-                href="/checkout"
+                href="/store/checkout"
                 onClick={closeCart}
                 className="w-full h-11 bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white font-semibold rounded-btn flex items-center justify-center text-sm hover:shadow-lg hover:shadow-orange-200 transition-all active:scale-[0.98]"
               >

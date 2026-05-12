@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 
 /** Format NGN price — e.g. ₦45,000 */
 export function formatPrice(amount: number): string {
-  return `₦${amount.toLocaleString('en-NG')}`
+  return `₦${amount?.toLocaleString('en-NG')}`
 }
 
 /** Format date to readable string */

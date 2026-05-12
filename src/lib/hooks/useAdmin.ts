@@ -1,0 +1,274 @@
+'use client'
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { adminApi, type DashboardStatsDto, type PagedResult, type OrderDto, type AdminUserDto, type LowStockDto, type BannerDto, type AdminOrdersFilters, type AdminUsersFilters, type UpdateOrderStatusRequest, type AdjustLoyaltyRequest, type CreateBannerRequest, type UpdateBannerRequest, type AdminProductsFilters, type CreateProductRequest, type UpdateProductRequest, type ProductDto } from '@/lib/api/admin'
+import { productsApi } from '@/lib/api/products'
+import { useAuthStore } from '@/store/auth'
+import { toast } from '@/store/toast'
+
+// ─── useDashboard ──────────────────────────────────────────────────────────────
+
+export function useDashboard() {
+  const { accessToken } = useAuthStore()
+
+  return useQuery({
+    queryKey: ['admin', 'dashboard'],
+    queryFn: () => adminApi.getDashboard(accessToken!),
+    enabled: !!accessToken,
+  })
+}
+
+// ─── useOrders ─────────────────────────────────────────────────────────────────
+
+export function useOrders(filters: AdminOrdersFilters = {}) {
+  const { accessToken } = useAuthStore()
+
+  return useQuery({
+    queryKey: ['admin', 'orders', filters],
+    queryFn: () => adminApi.getOrders(accessToken!, filters),
+    enabled: !!accessToken,
+  })
+}
+
+// ─── useUsers ──────────────────────────────────────────────────────────────────
+
+export function useUsers(filters: AdminUsersFilters = {}) {
+  const { accessToken } = useAuthStore()
+
+  return useQuery({
+    queryKey: ['admin', 'users', filters],
+    queryFn: () => adminApi.getUsers(accessToken!, filters),
+    enabled: !!accessToken,
+  })
+}
+
+// ─── useLowStock ───────────────────────────────────────────────────────────────
+
+export function useLowStock(threshold = 5) {
+  const { accessToken } = useAuthStore()
+
+  return useQuery({
+    queryKey: ['admin', 'low-stock', threshold],
+    queryFn: () => adminApi.getLowStock(accessToken!, threshold),
+    enabled: !!accessToken,
+  })
+}
+
+// ─── useBanners ────────────────────────────────────────────────────────────────
+
+export function useBanners() {
+  const { accessToken } = useAuthStore()
+
+  return useQuery({
+    queryKey: ['admin', 'banners'],
+    queryFn: () => adminApi.getBanners(accessToken!),
+    enabled: !!accessToken,
+  })
+}
+
+// ─── useUpdateOrderStatus ──────────────────────────────────────────────────────
+
+export function useUpdateOrderStatus() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ orderNumber, payload }: { orderNumber: string; payload: UpdateOrderStatusRequest }) =>
+      adminApi.updateOrderStatus(accessToken!, orderNumber, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'orders'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'dashboard'] })
+      toast.success('Order status updated successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to update order status', error.message ?? 'Please try again')
+    },
+  })
+}
+
+// ─── useAdjustUserLoyalty ──────────────────────────────────────────────────────
+
+export function useAdjustUserLoyalty() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ userId, payload }: { userId: string; payload: AdjustLoyaltyRequest }) =>
+      adminApi.adjustUserLoyalty(accessToken!, userId, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
+      toast.success('User loyalty adjusted successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to adjust user loyalty', error.message ?? 'Please try again')
+    },
+  })
+}
+
+// ─── useCreateBanner ───────────────────────────────────────────────────────────
+
+export function useCreateBanner() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (payload: CreateBannerRequest) =>
+      adminApi.createBanner(accessToken!, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'banners'] })
+      toast.success('Banner created successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to create banner', error.message ?? 'Please try again')
+    },
+  })
+}
+
+// ─── useUpdateBanner ───────────────────────────────────────────────────────────
+
+export function useUpdateBanner() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateBannerRequest }) =>
+      adminApi.updateBanner(accessToken!, id, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'banners'] })
+      toast.success('Banner updated successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to update banner', error.message ?? 'Please try again')
+    },
+  })
+}
+
+// ─── useDeleteBanner ───────────────────────────────────────────────────────────
+
+export function useDeleteBanner() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) =>
+      adminApi.deleteBanner(accessToken!, id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'banners'] })
+      toast.success('Banner deleted successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to delete banner', error.message ?? 'Please try again')
+    },
+  })
+}
+
+// ─── Product Management ──────────────────────────────────────────────────────
+
+export function useProducts(filters: AdminProductsFilters = {}) {
+  const { accessToken } = useAuthStore()
+
+  return useQuery({
+    queryKey: ['admin', 'products', filters],
+    queryFn: () => adminApi.getProducts(accessToken!, filters),
+    enabled: !!accessToken,
+  })
+}
+
+export function useCategories() {
+  return useQuery({
+    queryKey: ['categories'],
+    queryFn: () => productsApi.getCategories(),
+  })
+}
+
+export function useCreateProduct() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (payload: any) => {
+      // Transform the payload to match the API specification
+      const apiPayload = {
+        sku: payload.sku,
+        name: payload.name,
+        slug: payload.slug,
+        brandId: payload.brandId,
+        categoryId: payload.categoryId,
+        description: payload.description,
+        shortDescription: payload.shortDescription,
+        price: payload.price,
+        compareAtPrice: payload.compareAtPrice,
+        costPrice: payload.costPrice,
+        stockQty: payload.stockQty,
+        weightKg: payload.weightKg,
+        attributesJson: payload.attributesJson,
+        tagsJson: payload.tagsJson,
+        isActive: payload.isActive,
+        isFeatured: payload.isFeatured,
+        metaTitle: payload.metaTitle,
+        metaDescription: payload.metaDescription,
+      }
+      return adminApi.createProduct(accessToken!, apiPayload)
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'products'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'dashboard'] })
+      toast.success('Product created successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to create product', error.message ?? 'Please try again')
+    },
+  })
+}
+
+export function useUpdateProduct() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateProductRequest }) =>
+      adminApi.updateProduct(accessToken!, id, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'products'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'dashboard'] })
+      toast.success('Product updated successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to update product', error.message ?? 'Please try again')
+    },
+  })
+}
+
+export function useDeleteProduct() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) =>
+      adminApi.deleteProduct(accessToken!, id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'products'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'dashboard'] })
+      toast.success('Product deleted successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to delete product', error.message ?? 'Please try again')
+    },
+  })
+}

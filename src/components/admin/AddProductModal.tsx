@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { HiXMark, HiArrowUpTray, HiChevronDown } from "react-icons/hi2";
+import { useCreateProduct, useUpdateProduct } from "@/lib/hooks/useAdmin";
+import { uploadToCloudinary } from "@/lib/utils/cloudinary";
 
 interface AddProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit?: (data: ProductFormData) => void;
+  editingProduct?: any;
+  categories?: { id: number; name: string }[];
 }
 
 export interface ProductFormData {
@@ -22,9 +25,11 @@ export interface ProductFormData {
   slug: string;
   active: boolean;
   featured: boolean;
+  images: File[];
+  imageUrls: string[];
 }
 
-const categories = ["Electronics", "Phones", "Laptops", "Accessories", "Audio", "Wearables"];
+// Categories will be passed as props
 
 const Toggle = ({
   checked,
@@ -48,7 +53,8 @@ const Toggle = ({
   </button>
 );
 
-export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProductModalProps) {
+export default function AddProductModal({ isOpen, onClose, editingProduct, categories }: AddProductModalProps) {
+  const isEditing = !!editingProduct;
   const [form, setForm] = useState<ProductFormData>({
     name: "",
     description: "",
@@ -62,15 +68,126 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
     slug: "",
     active: true,
     featured: false,
+    images: [],
+    imageUrls: [],
   });
+
+  const [isUploading, setIsUploading] = useState(false);
+  const createProductMutation = useCreateProduct();
+  const updateProductMutation = useUpdateProduct();
+
+  // Initialize form with editing product data
+  useEffect(() => {
+    if (editingProduct) {
+      setForm({
+        name: editingProduct.name || "",
+        description: editingProduct.description || "",
+        category: editingProduct.categoryId?.toString() || "",
+        price: editingProduct.price?.toString() || "",
+        compareAtPrice: editingProduct.compareAtPrice?.toString() || "",
+        stockQuantity: editingProduct.stockQty?.toString() || "",
+        sku: editingProduct.sku || "",
+        metaTitle: editingProduct.metaTitle || "",
+        metaDescription: editingProduct.metaDescription || "",
+        slug: editingProduct.slug || "",
+        active: editingProduct.isActive ?? true,
+        featured: editingProduct.isFeatured ?? false,
+        images: [],
+        imageUrls: editingProduct.images?.map((img: any) => img.original || img.display) || [],
+      });
+    } else {
+      // Reset form for new product
+      setForm({
+        name: "",
+        description: "",
+        category: "",
+        price: "",
+        compareAtPrice: "",
+        stockQuantity: "",
+        sku: "",
+        metaTitle: "",
+        metaDescription: "",
+        slug: "",
+        active: true,
+        featured: false,
+        images: [],
+        imageUrls: [],
+      });
+    }
+  }, [editingProduct]);
 
   const set = (key: keyof ProductFormData, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
-  const handleSubmit = () => {
-    if (!form.name || !form.price) return;
-    onSubmit?.(form);
-    onClose();
+  const generateSKU = () => {
+    const timestamp = Date.now().toString().slice(-6);
+    const random = Math.random().toString(36).substring(2, 5).toUpperCase();
+    return `SKU-${random}${timestamp}`;
+  };
+
+  const generateSlug = (name: string) => {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  };
+
+  const handleImageUpload = async (files: FileList) => {
+    setIsUploading(true);
+    try {
+      const uploadPromises = Array.from(files).map(file => uploadToCloudinary(file));
+      const urls = await Promise.all(uploadPromises);
+      setForm(prev => ({
+        ...prev,
+        images: [...prev.images, ...Array.from(files)],
+        imageUrls: [...prev.imageUrls, ...urls],
+      }));
+    } catch (error) {
+      console.error('Failed to upload images:', error);
+      alert('Failed to upload images. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!form.name || !form.price) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      // Auto-generate SKU and slug if not provided
+      const sku = form.sku || generateSKU();
+      const slug = form.slug || generateSlug(form.name);
+
+      const productData = {
+        sku,
+        name: form.name,
+        slug,
+        categoryId: form.category ? parseInt(form.category) : undefined,
+        description: form.description,
+        price: parseFloat(form.price),
+        compareAtPrice: form.compareAtPrice ? parseFloat(form.compareAtPrice) : undefined,
+        stockQty: parseInt(form.stockQuantity) || 0,
+        metaTitle: form.metaTitle,
+        metaDescription: form.metaDescription,
+        isActive: form.active,
+        isFeatured: form.featured,
+      };
+
+      if (isEditing && editingProduct) {
+        await updateProductMutation.mutateAsync({ id: editingProduct.id, payload: productData as any });
+      } else {
+        await createProductMutation.mutateAsync(productData);
+      }
+
+      onClose();
+    } catch (error) {
+      console.error('Failed to save product:', error);
+    }
   };
 
   if (!isOpen) return null;
@@ -87,7 +204,9 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto mx-4">
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100 sticky top-0 bg-white z-10">
-          <h2 className="text-lg font-bold text-gray-900">Add New Product</h2>
+          <h2 className="text-lg font-bold text-gray-900">
+            {isEditing ? 'Edit Product' : 'Add New Product'}
+          </h2>
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
@@ -133,9 +252,9 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
                 className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 appearance-none focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all bg-white"
               >
                 <option value="">Select category</option>
-                {categories.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
+                {categories?.map((c) => (
+                  <option key={c.id} value={c.id.toString()}>
+                    {c.name}
                   </option>
                 ))}
               </select>
@@ -147,7 +266,7 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
           </div>
 
           {/* Price + Compare */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Price <span className="text-red-500">*</span>
@@ -172,35 +291,89 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
             </div>
           </div>
 
-          {/* Stock + SKU */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Stock Quantity</label>
-              <input
-                type="number"
-                value={form.stockQuantity}
-                onChange={(e) => set("stockQuantity", e.target.value)}
-                placeholder="0"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">SKU</label>
-              <input
-                type="text"
-                value={form.sku}
-                onChange={(e) => set("sku", e.target.value)}
-                placeholder="SKU-001"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
-              />
-            </div>
-          </div>
+            {/* Stock + SKU */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+             <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1.5">Stock Quantity</label>
+               <input
+                 type="number"
+                 value={form.stockQuantity}
+                 onChange={(e) => set("stockQuantity", e.target.value)}
+                 placeholder="0"
+                 className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
+               />
+             </div>
+             <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1.5">SKU</label>
+               <div className="flex flex-col md:flex-row gap-2">
+                 <input
+                   type="text"
+                   value={form.sku}
+                   onChange={(e) => set("sku", e.target.value)}
+                   placeholder="SKU-001"
+                   className="flex-1 border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
+                 />
+                 <button
+                   type="button"
+                   onClick={() => set("sku", generateSKU())}
+                   className="px-3 py-2.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                 >
+                   Generate
+                 </button>
+               </div>
+             </div>
+           </div>
 
           {/* Images */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Images</label>
-            <div className="border-2 border-dashed border-gray-200 rounded-lg w-16 h-16 flex items-center justify-center cursor-pointer hover:border-[#F97316] hover:bg-orange-50 transition-all group">
-              <HiArrowUpTray size={20} className="text-gray-400 group-hover:text-[#F97316]" />
+            <div className="space-y-3">
+              {/* Image upload area */}
+              <div>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => e.target.files && handleImageUpload(e.target.files)}
+                  className="hidden"
+                  id="image-upload"
+                  disabled={isUploading}
+                />
+                <label
+                  htmlFor="image-upload"
+                  className="border-2 border-dashed border-gray-200 rounded-lg w-16 h-16 flex items-center justify-center cursor-pointer hover:border-[#F97316] hover:bg-orange-50 transition-all group"
+                >
+                  <HiArrowUpTray size={20} className="text-gray-400 group-hover:text-[#F97316]" />
+                </label>
+                {isUploading && <p className="text-sm text-gray-500 mt-1">Uploading...</p>}
+              </div>
+
+              {/* Display uploaded images */}
+              {form.imageUrls.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {form.imageUrls.map((url, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={url}
+                        alt={`Product image ${index + 1}`}
+                        className="w-16 h-16 object-cover rounded-lg border"
+                      />
+                      <button
+                        onClick={() => {
+                          setForm(prev => ({
+                            ...prev,
+                            images: prev.images.filter((_, i) => i !== index),
+                            imageUrls: prev.imageUrls.filter((_, i) => i !== index),
+                          }));
+                        }}
+                        className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -227,15 +400,25 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Slug</label>
-                <input
-                  type="text"
-                  value={form.slug}
-                  onChange={(e) => set("slug", e.target.value)}
-                  placeholder="auto-generated"
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
-                />
-              </div>
+                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Slug</label>
+                 <div className="flex flex-col md:flex-row gap-2">
+                   <input
+                     type="text"
+                     value={form.slug}
+                     onChange={(e) => set("slug", e.target.value)}
+                     placeholder="auto-generated"
+                     className="flex-1 border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
+                   />
+                   <button
+                     type="button"
+                     onClick={() => set("slug", generateSlug(form.name))}
+                     className="px-3 py-2.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                     disabled={!form.name}
+                   >
+                     Generate
+                   </button>
+                 </div>
+               </div>
             </div>
           </div>
 
@@ -262,9 +445,13 @@ export default function AddProductModal({ isOpen, onClose, onSubmit }: AddProduc
           </button>
           <button
             onClick={handleSubmit}
-            className="px-6 py-2.5 text-sm font-bold bg-[#F97316] text-white rounded-lg hover:bg-orange-500 transition-colors shadow-sm shadow-orange-200"
+            disabled={createProductMutation.isPending || updateProductMutation.isPending}
+            className="px-6 py-2.5 text-sm font-bold bg-[#F97316] text-white rounded-lg hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm shadow-orange-200"
           >
-            Publish
+            {createProductMutation.isPending || updateProductMutation.isPending
+              ? (isEditing ? 'Updating...' : 'Creating...')
+              : (isEditing ? 'Update' : 'Publish')
+            }
           </button>
         </div>
       </div>

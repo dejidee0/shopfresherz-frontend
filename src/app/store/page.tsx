@@ -30,7 +30,7 @@ export default async function HomePage() {
   const sessionEndTime =
     flashDeals.length > 0
       ? flashDeals.reduce((earliest, d) =>
-          d.endTime < earliest ? d.endTime : earliest, flashDeals[0].endTime)
+          d.endsAt < earliest ? d.endsAt : earliest, flashDeals[0].endsAt)
       : new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString() // fallback: 6h from now
 
   return (
@@ -39,7 +39,7 @@ export default async function HomePage() {
       <HeroBanner />
 
       {/* 2. Trust signals */}
-      <div className="max-w-content mx-auto px-10 py-8">
+      <div className="max-w-content mx-auto px-4 sm:px-6 md:px-10 py-6 sm:py-8">
         <TrustSignals />
       </div>
 

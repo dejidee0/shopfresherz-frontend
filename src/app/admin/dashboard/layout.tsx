@@ -3,11 +3,16 @@
 import AdminNavbar from "@/components/admin/Navbar";
 import Sidebar from "@/components/admin/Sidebar";
 import { SidebarProvider } from "@/components/admin/SidebarContext";
+import { useRequireAuth } from "@/lib/hooks/useRequireAuth";
 import { usePathname } from "next/navigation";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const pageTitle = path.split(/[\\\/]/).at(-1) ?? "";
+  const { user, isAuthenticated } = useRequireAuth({
+      role: "SuperAdmin",
+      redirectTo: "/",
+    });
 
   return (
     <SidebarProvider>

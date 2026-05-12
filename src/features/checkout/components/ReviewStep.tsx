@@ -2,7 +2,9 @@
 
 import Image from 'next/image'
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi'
-import { OrderSummary, CheckoutLayout } from './CheckoutShared'
+import { useCartStore } from '@/store/cart'
+import { cn, formatPrice } from '@/lib/utils/format'
+import { OrderSummary, CheckoutLayout, StepIndicator } from './CheckoutShared'
 import {
   type BillingForm,
   type DeliveryMethod,
@@ -10,17 +12,6 @@ import {
   type CouponState,
   DELIVERY_OPTIONS,
 } from '../types/checkout'
-import { cn } from '@/lib/utils/format'
-
-// ─── Mock cart items — replace with useCartStore() ────────────────────────────
-
-const MOCK_ITEMS = [
-  { id: '1', name: 'Canon EOS', variant: 'White / L', qty: 1, price: 28500, thumb: '/images/Rbag.png' },
-  { id: '2', name: 'Canon EOS', variant: 'White / L', qty: 1, price: 28500, thumb: '/images/Rbag.png' },
-  { id: '3', name: 'Canon EOS', variant: 'White / L', qty: 1, price: 28500, thumb: '/images/Rbag.png' },
-]
-
-// ─── Detail row ───────────────────────────────────────────────────────────────
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
@@ -33,8 +24,6 @@ function DetailRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-// ─── ReviewStep ───────────────────────────────────────────────────────────────
-
 interface Props {
   billing: BillingForm
   delivery: DeliveryMethod
@@ -42,6 +31,7 @@ interface Props {
   coupon: CouponState
   onCouponChange: (v: string) => void
   onApplyCoupon: () => void
+  onRemoveCoupon?: () => void
   deliveryFee: number
   onBack: () => void
   onPlaceOrder: () => void
@@ -54,14 +44,18 @@ export function ReviewStep({
   coupon,
   onCouponChange,
   onApplyCoupon,
+  onRemoveCoupon,
   deliveryFee,
   onBack,
   onPlaceOrder,
 }: Props) {
-  const deliveryLabel =
-    DELIVERY_OPTIONS.find((d) => d.id === delivery)?.label ?? delivery
+  const items = useCartStore((s) => s.items)
+  const subtotal = useCartStore((s) => s.subtotal())
+  const discountAmount = useCartStore((s) => s.discountAmount)
+  const total = Math.max(0, subtotal - discountAmount) + deliveryFee + Math.max(0, subtotal - discountAmount) * 0.075
+  const deliveryLabel = DELIVERY_OPTIONS.find((d) => d.id === delivery)?.label ?? delivery
 
-  const paymentLabel: Record<string, string> = {
+  const paymentLabel: Record<PaymentMethod, string> = {
     card: 'Debit/Credit Card',
     bank_transfer: 'Bank Transfer',
     pay_on_delivery: 'Pay on Delivery',
@@ -69,9 +63,7 @@ export function ReviewStep({
 
   const deliveryDetail = (() => {
     const opt = DELIVERY_OPTIONS.find((d) => d.id === delivery)
-    if (!opt) return deliveryLabel
-    const days = opt.subtitle // e.g. "3-5 business days"
-    return `${opt.label} — ${days}`
+    return opt ? `${opt.label} - ${opt.subtitle}` : deliveryLabel
   })()
 
   return (
@@ -81,25 +73,30 @@ export function ReviewStep({
           coupon={coupon}
           onCouponChange={onCouponChange}
           onApplyCoupon={onApplyCoupon}
+          onRemoveCoupon={onRemoveCoupon}
           deliveryFee={deliveryFee}
         />
       }
     >
+      <StepIndicator step={4} />
       <h2 className="text-lg font-bold text-[#111111] mb-5">Review Your Order</h2>
 
-      {/* ── Cart items ── */}
       <div className="bg-white border border-[#E5E7EB] rounded-lg overflow-hidden mb-4">
-        {MOCK_ITEMS.map((item, i) => (
+        {items.length === 0 && (
+          <p className="p-4 text-sm text-[#6B7280]">Your cart is empty.</p>
+        )}
+
+        {items.map((item, i) => (
           <div
             key={item.id}
             className={cn(
               'flex items-center gap-4 px-4 py-3',
-              i < MOCK_ITEMS.length - 1 && 'border-b border-[#F5F5F5]'
+              i < items.length - 1 && 'border-b border-[#F5F5F5]'
             )}
           >
             <div className="w-14 h-14 rounded bg-[#F5F5F5] shrink-0 overflow-hidden">
               <Image
-                src={item.thumb}
+                src={item.image || '/images/device-placeholder.jpg'}
                 alt={item.name}
                 width={56}
                 height={56}
@@ -107,35 +104,30 @@ export function ReviewStep({
               />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-[#111111]">{item.name}</p>
+              <p className="text-sm font-semibold text-[#111111] line-clamp-1">{item.name}</p>
               <p className="text-xs text-[#6B7280] mt-0.5">
-                {item.variant} × {item.qty}
+                Qty {item.quantity} x {formatPrice(item.price)}
               </p>
             </div>
             <p className="text-sm font-bold text-[#111111] shrink-0">
-              ₦{item.price.toLocaleString()}
+              {formatPrice(item.price * item.quantity)}
             </p>
           </div>
         ))}
       </div>
 
-      {/* ── Delivery details ── */}
       <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 sm:p-5 mb-6">
         <p className="text-sm font-bold text-[#111111] mb-1">Delivery Details</p>
         <div className="mt-2">
-          <DetailRow
-            label="Name"
-            value={`${billing.firstName} ${billing.lastName}`.trim() || '—'}
-          />
-          <DetailRow label="Email"    value={billing.email   || '—'} />
-          <DetailRow label="Phone"    value={billing.phone   || '—'} />
-          <DetailRow label="Address"  value={billing.address || '—'} />
+          <DetailRow label="Name" value={`${billing.firstName} ${billing.lastName}`.trim() || '-'} />
+          <DetailRow label="Email" value={billing.email || '-'} />
+          <DetailRow label="Phone" value={billing.phone || '-'} />
+          <DetailRow label="Address" value={billing.address || '-'} />
           <DetailRow label="Delivery" value={deliveryDetail} />
-          <DetailRow label="Payment"  value={paymentLabel[payment] ?? payment} />
+          <DetailRow label="Payment" value={paymentLabel[payment]} />
         </div>
       </div>
 
-      {/* ── Nav buttons ── */}
       <div className="flex gap-3">
         <button
           onClick={onBack}
@@ -145,9 +137,10 @@ export function ReviewStep({
         </button>
         <button
           onClick={onPlaceOrder}
-          className="flex-1 h-12 rounded bg-[#F5820A] text-white font-bold flex items-center justify-center gap-2 hover:bg-[#E06B00] transition-colors"
+          disabled={items.length === 0}
+          className="flex-1 h-12 rounded bg-[#F5820A] text-white font-bold flex items-center justify-center gap-2 hover:bg-[#E06B00] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          PLACE ORDER. ₦112,500 <FiArrowRight size={15} />
+          PLACE ORDER - {formatPrice(total)} <FiArrowRight size={15} />
         </button>
       </div>
     </CheckoutLayout>

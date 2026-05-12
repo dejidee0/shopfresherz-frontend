@@ -3,6 +3,7 @@
 import Sidebar from "@/components/admin/Sidebar";
 import Navbar from "@/components/admin/Navbar";
 import StatsCard from "@/components/admin/StatsCard";
+import { useDashboard, useLowStock } from "@/lib/hooks/useAdmin";
 import {
   BarChart,
   Bar,
@@ -16,6 +17,7 @@ import {
   Cell,
 } from "recharts";
 
+// Keep mock data for revenue chart since API doesn't provide monthly breakdown
 const revenueData = [
   { month: "Jan", profit: 85000, loss: 60000 },
   { month: "Feb", profit: 72000, loss: 50000 },
@@ -28,20 +30,7 @@ const revenueData = [
   { month: "Sep", profit: 68000, loss: 52000 },
 ];
 
-const orderStatusData = [
-  { name: "Pending", value: 28, color: "#F97316" },
-  { name: "Processing", value: 18, color: "#FB923C" },
-  { name: "Shipped", value: 10, color: "#FDBA74" },
-  { name: "Delivered", value: 9, color: "#FED7AA" },
-  { name: "Cancelled", value: 8, color: "#FFEDD5" },
-];
-
-const lowStockItems = [
-  { name: "Smart Watch", sku: "AV-8821", units: 12, restockLevel: 50 },
-  { name: "Power Bank", sku: "OR-1294", units: 4, restockLevel: 40 },
-  { name: "Phone", sku: "KL-0043", units: 22, restockLevel: 30 },
-];
-
+// Mock logistics data - no API available
 const logistics = [
   { fleetId: "#TX-990", destination: "Downtown Hub", status: "IN TRANSIT", eta: "14:45" },
   { fleetId: "#TX-114", destination: "Eastside Storage", status: "LOADING", eta: "16:10" },
@@ -62,8 +51,27 @@ const statusColors: Record<string, string> = {
 };
 
 export default function DashboardPage() {
+  const { data: dashboardData, isLoading: dashboardLoading } = useDashboard();
+  const { data: lowStockData, isLoading: lowStockLoading } = useLowStock();
+
+  // Transform dashboard stats for order status pie chart
+  const orderStatusData = dashboardData ? [
+    { name: "Pending", value: dashboardData.pendingOrders || 0, color: "#F97316" },
+    { name: "Processing", value: dashboardData.totalOrders ? Math.round(dashboardData.totalOrders * 0.3) : 0, color: "#FB923C" },
+    { name: "Completed", value: dashboardData.completedOrders || 0, color: "#FDBA74" },
+    { name: "Cancelled", value: dashboardData.cancelledOrders || 0, color: "#FED7AA" },
+  ] : [];
+
   const total = orderStatusData.reduce((s, d) => s + d.value, 0);
-  const pct = Math.round((orderStatusData[0].value / total) * 100);
+  const pct = total > 0 ? Math.round((orderStatusData[0]?.value / total) * 100) : 0;
+
+  // Transform low stock data
+  const lowStockItems = lowStockData?.map(item => ({
+    name: item.productName,
+    sku: item.sku || '',
+    units: item.availableQty,
+    restockLevel: item.threshold || 10,
+  })) || [];
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -74,10 +82,38 @@ export default function DashboardPage() {
         <main className="p-2 md:p-4 lg:p-8 space-y-8">
           {/* Stats Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-            <StatsCard title="Total Revenue" value="₦10,000" change="+22%" positive sparkData={sparkRevenue} sparkColor="#10B981" />
-            <StatsCard title="Total Orders" value="920" change="-25%" positive={false} sparkData={sparkOrders} sparkColor="#EF4444" />
-            <StatsCard title="Pending Products" value="10" change="+49%" positive sparkData={sparkPending} sparkColor="#10B981" />
-            <StatsCard title="Total Product" value="100" change="+1.9%" positive sparkData={sparkProduct} sparkColor="#F97316" />
+            <StatsCard
+              title="Total Revenue"
+              value={dashboardLoading ? "Loading..." : `₦${(dashboardData?.totalRevenue || 0).toLocaleString()}`}
+              change="+22%"
+              positive
+              sparkData={sparkRevenue}
+              sparkColor="#10B981"
+            />
+            <StatsCard
+              title="Total Orders"
+              value={dashboardLoading ? "Loading..." : (dashboardData?.totalOrders || 0).toString()}
+              change="-25%"
+              positive={false}
+              sparkData={sparkOrders}
+              sparkColor="#EF4444"
+            />
+            <StatsCard
+              title="Pending Orders"
+              value={dashboardLoading ? "Loading..." : (dashboardData?.pendingOrders || 0).toString()}
+              change="+49%"
+              positive
+              sparkData={sparkPending}
+              sparkColor="#10B981"
+            />
+            <StatsCard
+              title="Total Products"
+              value={dashboardLoading ? "Loading..." : (dashboardData?.totalProducts || 0).toString()}
+              change="+1.9%"
+              positive
+              sparkData={sparkProduct}
+              sparkColor="#F97316"
+            />
           </div>
 
           {/* Charts Row */}
@@ -87,7 +123,9 @@ export default function DashboardPage() {
               <div className="flex flex-col md:flex-row items-start justify-between mb-2">
                 <div>
                   <h3 className="font-bold text-gray-900">Total Revenue</h3>
-                  <p className="text-3xl font-black text-gray-900 mt-1">₦5,000,000</p>
+                  <p className="text-3xl font-black text-gray-900 mt-1">
+                    ₦{dashboardLoading ? "Loading..." : (dashboardData?.totalRevenue || 0).toLocaleString()}
+                  </p>
                   <p className="text-sm text-[#F97316] font-medium mt-0.5">5% than last month</p>
                 </div>
                 <div className="flex items-center gap-4 text-sm">
@@ -156,21 +194,27 @@ export default function DashboardPage() {
             <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
               <h3 className="font-bold text-gray-900 mb-4">Low Stock Alerts</h3>
               <div className="space-y-6 md:space-y-4">
-                {lowStockItems.map((item) => (
-                  <div key={item.sku} className="flex flex-col md:flex-row md:items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-lg">📦</div>
-                      <div>
-                        <p className="text-sm font-semibold text-gray-800">{item.name}</p>
-                        <p className="text-xs text-gray-400">SKU: {item.sku}</p>
+                {lowStockLoading ? (
+                  <p className="text-gray-500">Loading low stock items...</p>
+                ) : lowStockItems.length === 0 ? (
+                  <p className="text-gray-500">No low stock items</p>
+                ) : (
+                  lowStockItems.map((item) => (
+                    <div key={item.sku} className="flex flex-col md:flex-row md:items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-lg">📦</div>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-800">{item.name}</p>
+                          <p className="text-xs text-gray-400">SKU: {item.sku}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-[#F97316]">{item.units} units</p>
+                        <p className="text-xs text-gray-400">RESTOCK LEVEL: {item.restockLevel}</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-bold text-[#F97316]">{item.units} units</p>
-                      <p className="text-xs text-gray-400">RESTOCK LEVEL: {item.restockLevel}</p>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
 

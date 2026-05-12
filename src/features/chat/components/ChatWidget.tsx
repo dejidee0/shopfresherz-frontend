@@ -87,7 +87,7 @@ function BotBubble({ message }: { message: Message }) {
                 {message.product.description}
               </p>
               <Link
-                href={`/product/${message.product.slug}`}
+                href={`/store/product/${message.product.slug}`}
                 className="text-xs text-[#F5820A] font-semibold hover:underline mt-1 inline-block"
               >
                 View Product →

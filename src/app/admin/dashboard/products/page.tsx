@@ -4,15 +4,12 @@ import { ColumnDef, DataTable } from "@/components/ui/DataTable";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { LuPencil } from "react-icons/lu";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import AddProductModal from "@/components/admin/AddProductModal";
+import { useProducts, useDeleteProduct, useCategories } from "@/lib/hooks/useAdmin";
+import type { AdminProductsFilters } from "@/lib/api/admin";
 
-// Usage — Logistics Feed
-const statusColors: Record<string, string> = {
-  Active: "bg-green-100 text-green-700",
-  "Out Of Stock": "bg-red-100 text-red-600",
-  Draft: "bg-gray-100 text-gray-500",
-};
+// Status colors will be defined inside the component
 
 interface ProductEntry {
   productId: string;
@@ -24,62 +21,12 @@ interface ProductEntry {
   status: string;
 }
 
-const productColumns: ColumnDef<ProductEntry>[] = [
-  {
-    key: "productId",
-    header: "PRODUCT",
-    render: (row) => (
-      <span className="font-medium text-gray-700">{row.product}</span>
-    ),
-  },
-  {
-    key: "sku",
-    header: "SKU",
-  },
-  {
-    key: "category",
-    header: "CATEGORY",
-    render: (row) => <span>{row.category}</span>,
-  },
-  {
-    key: "price",
-    header: "PRICE",
-    render: (row) => (
-      <span className=" px-2 py-1 text-green-600">{row.price}</span>
-    ),
-  },
-  {
-    key: "stock",
-    header: "STOCK",
-    render: (row) => <span className={`px-2 py-1`}>{row.stock}</span>,
-  },
-  {
-    key: "status",
-    header: "Status",
-    render: (row) => (
-      <span
-        className={`text-xs font-bold px-2 py-1 rounded-md ${statusColors[row.status]}`}
-      >
-        {row.status}
-      </span>
-    ),
-  },
-  {
-    key: "actions",
-    header: "ACTIONS",
-    render: (row) => (
-      <span className="flex gap-3">
-        <button>
-          <LuPencil />
-        </button>
-
-        <button>
-          <RiDeleteBinLine className="text-danger" />
-        </button>
-      </span>
-    ),
-  },
-];
+// Status colors defined outside component
+const statusColors: Record<string, string> = {
+  Active: "bg-green-100 text-green-700",
+  "Out Of Stock": "bg-red-100 text-red-600",
+  Draft: "bg-gray-100 text-gray-500",
+};
 
 const products = [
   {
@@ -113,8 +60,110 @@ const products = [
 
 const AdminProductsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [filters, setFilters] = useState<AdminProductsFilters>({});
+  const { data: productsData, isLoading } = useProducts(filters);
+  const { data: categoriesData } = useCategories();
+  const deleteProductMutation = useDeleteProduct();
+
+  const products = useMemo(() => {
+    if (!productsData?.items) return [];
+    return productsData.items.map((product: any) => ({
+      productId: product.id,
+      product: product.name,
+      sku: product.sku || "N/A",
+      category: product.categoryName || "Uncategorized",
+      price: `₦${product.price?.toLocaleString() || "0"}`,
+      stock:
+        product.availableQty?.toString() || product.stockQty?.toString() || "0",
+      status: product.isActive ? "Active" : "Draft",
+    }));
+  }, [productsData]);
+
+  const handleDeleteProduct = (productId: string) => {
+    if (confirm('Are you sure you want to delete this product?')) {
+      deleteProductMutation.mutate(productId);
+    }
+  };
+
+  const handleEditProduct = (product: any) => {
+    setEditingProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingProduct(null);
+  };
+
+  const productColumns: ColumnDef<any>[] = [
+    {
+      key: "productId",
+      header: "PRODUCT",
+      render: (row) => (
+        <span className="font-medium text-gray-700">{row.product}</span>
+      ),
+    },
+    {
+      key: "sku",
+      header: "SKU",
+    },
+    {
+      key: "category",
+      header: "CATEGORY",
+      render: (row) => <span>{row.category}</span>,
+    },
+    {
+      key: "price",
+      header: "PRICE",
+      render: (row) => (
+        <span className=" px-2 py-1 text-green-600">{row.price}</span>
+      ),
+    },
+    {
+      key: "stock",
+      header: "STOCK",
+      render: (row) => <span className={`px-2 py-1`}>{row.stock}</span>,
+    },
+    {
+      key: "status",
+      header: "Status",
+      render: (row) => (
+        <span
+          className={`text-xs font-bold px-2 py-1 rounded-md ${statusColors[row.status]}`}
+        >
+          {row.status}
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      header: "ACTIONS",
+      render: (row) => (
+        <span className="flex gap-3">
+          <button onClick={() => handleEditProduct(productsData?.items.find(p => p.id === row.productId))}>
+            <LuPencil />
+          </button>
+
+          <button onClick={() => handleDeleteProduct(row.productId)}>
+            <RiDeleteBinLine className="text-danger" />
+          </button>
+        </span>
+      ),
+    },
+  ];
+
   return (
     <div className="p-2 md:p-4 lg:p-6 flex flex-col gap-6">
+      <div className="flex flex-col gap-3">
+        <p className="font-bold">Products</p>
+        <p className="text-xs text-text-muted">
+          {isLoading
+            ? "Loading..."
+            : `${productsData?.totalCount || 0} total products`}
+        </p>
+      </div>
+
       <div className="flex flex-col md:flex-row justify-between">
         <div className="flex flex-col md:flex-row gap-3 mb-2 lg:mb-6">
           {/* Search */}
@@ -125,46 +174,70 @@ const AdminProductsPage = () => {
             />
             <input
               type="text"
-              placeholder="Search name or sku"
+              placeholder="Search products..."
+              value={filters.search || ""}
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  search: e.target.value || undefined,
+                }))
+              }
               className="pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] w-64 transition-all"
             />
           </div>
 
-          {/* Sort */}
+          {/* Status Filter */}
           <select
-            name=""
-            id=""
+            value={filters.status || ""}
+            onChange={(e) =>
+              setFilters((prev) => ({
+                ...prev,
+                status: e.target.value || undefined,
+              }))
+            }
             className="border border-border rounded-2xl text-xs lg:text-sm text-gray-400 h-10 px-2"
           >
             <option value="">All Statuses</option>
-            <option value="">Active</option>
-            <option value="">Out of Stock</option>
-            <option value="">Draft</option>
+            <option value="active">Active</option>
+            <option value="draft">Draft</option>
           </select>
         </div>
 
         {/* Buttons */}
         <div className="flex gap-3 ">
-          <Button variant="ghost" className="text-xs md:text-sm rounded-md text-gray-500">
+          <Button
+            variant="ghost"
+            className="text-xs md:text-sm rounded-md text-gray-500"
+          >
             Import CSV
           </Button>{" "}
-          <Button className="text-xs md:text-sm rounded-md" onClick={() => setIsModalOpen(true)}>
+          <Button
+            className="text-xs md:text-sm rounded-md"
+            onClick={() => setIsModalOpen(true)}
+          >
             ADD PRODUCT
           </Button>
         </div>
       </div>
-      <DataTable
-        title=""
-        columns={productColumns}
-        data={products}
-        rowKey="productId"
-      />
+
+      {isLoading ? (
+        <div className="text-center py-8">Loading products...</div>
+      ) : (
+        <DataTable
+          title=""
+          columns={productColumns}
+          data={products}
+          rowKey="productId"
+          emptyMessage="No products found"
+        />
+      )}
 
       {isModalOpen && (
         <AddProductModal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={() => ""}
+          onClose={handleCloseModal}
+          editingProduct={editingProduct}
+          categories={categoriesData}
         />
       )}
     </div>

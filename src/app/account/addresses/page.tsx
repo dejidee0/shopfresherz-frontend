@@ -1,5 +1,8 @@
+"use client"
+import AddAddressModal from "@/components/account/AddAddressModal";
 import { Button } from "@/components/ui/Button";
 import { AccountLayout } from "@/features/account/components/AccountLayout";
+import { useState } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa6";
 
@@ -26,6 +29,7 @@ const addressArray = [
 ];
 
 export default function AccountAddressPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <AccountLayout
       breadcrumbItems={[{ label: "Addresses", href: "/account/addresses" }]}
@@ -38,7 +42,7 @@ export default function AccountAddressPage() {
               Manage your delivery addresses
             </p>
           </div>
-          <Button>Add Address</Button>
+          <Button onClick={()=> setIsModalOpen(true)}>Add Address</Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -72,6 +76,9 @@ export default function AccountAddressPage() {
           ))}
         </div>
       </div>
+      {
+        isModalOpen && <AddAddressModal isOpen={isModalOpen} onClose={()=> setIsModalOpen(false)}/>
+      }
     </AccountLayout>
   );
 }

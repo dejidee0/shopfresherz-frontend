@@ -1,15 +1,14 @@
 'use client'
 
-import { FiCheckCircle, FiChevronRight, FiArrowRight } from 'react-icons/fi'
+import { FiArrowRight, FiCheckCircle, FiChevronRight } from 'react-icons/fi'
 import { FiMapPin, FiTruck, FiCreditCard } from 'react-icons/fi'
 import { OrderSummary, CheckoutLayout } from './CheckoutShared'
 import type { CouponState } from '../types/checkout'
 import { useAuthStore } from '@/store/auth'
-
-// ─── Summary section wrapper ──────────────────────────────────────────────────
+import { useCartStore } from '@/store/cart'
+import { formatPrice } from '@/lib/utils/format'
 
 function SummarySection({
-  icon: Icon,
   title,
   onEdit,
   children,
@@ -42,12 +41,14 @@ function SummarySection({
   )
 }
 
-// ─── RegisteredCheckout ───────────────────────────────────────────────────────
-
 interface Props {
   coupon: CouponState
   onCouponChange: (v: string) => void
   onApplyCoupon: () => void
+  onRemoveCoupon?: () => void
+  deliveryFee: number
+  onEditDelivery: () => void
+  onEditPayment: () => void
   onPlaceOrder: () => void
 }
 
@@ -55,9 +56,17 @@ export function RegisteredCheckout({
   coupon,
   onCouponChange,
   onApplyCoupon,
+  onRemoveCoupon,
+  deliveryFee,
+  onEditDelivery,
+  onEditPayment,
   onPlaceOrder,
 }: Props) {
   const { user } = useAuthStore()
+  const subtotal = useCartStore((s) => s.subtotal())
+  const discountAmount = useCartStore((s) => s.discountAmount)
+  const taxableAmount = Math.max(0, subtotal - discountAmount)
+  const total = taxableAmount + deliveryFee + taxableAmount * 0.075
 
   return (
     <CheckoutLayout
@@ -66,13 +75,13 @@ export function RegisteredCheckout({
           coupon={coupon}
           onCouponChange={onCouponChange}
           onApplyCoupon={onApplyCoupon}
-          deliveryFee={0}
+          onRemoveCoupon={onRemoveCoupon}
+          deliveryFee={deliveryFee}
         />
       }
     >
       <div className="flex flex-col gap-4">
-        {/* Customer address */}
-        <SummarySection icon={FiMapPin} title="Customer Address" onEdit={() => {}}>
+        <SummarySection icon={FiMapPin} title="Customer Address">
           <p className="text-sm font-semibold text-[#111111]">
             {user?.firstName} {user?.lastName}
           </p>
@@ -83,49 +92,27 @@ export function RegisteredCheckout({
           <p className="text-xs text-[#6B7280] mt-1">+234 802 345 6789</p>
         </SummarySection>
 
-        {/* Delivery details */}
-        <SummarySection icon={FiTruck} title="Delivery Details" onEdit={() => {}}>
-          <p className="text-sm font-semibold text-[#111111]">Pick-up Station</p>
+        <SummarySection icon={FiTruck} title="Delivery Details" onEdit={onEditDelivery}>
+          <p className="text-sm font-semibold text-[#111111]">Standard Delivery</p>
           <p className="text-xs text-[#6B7280] mt-0.5">
-            Delivery between{' '}
-            <span className="font-semibold text-[#111111]">17 April</span> and{' '}
-            <span className="font-semibold text-[#111111]">20 April.</span>
+            Delivery fee is calculated from your current cart and delivery choice.
           </p>
-          <div className="mt-3 border border-[#E5E7EB] rounded p-3">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-bold uppercase tracking-wide text-[#6B7280]">
-                Pickup Station
-              </p>
-              <button className="text-xs text-[#F5820A] hover:underline flex items-center gap-0.5">
-                Change <FiChevronRight size={11} />
-              </button>
-            </div>
-            <p className="text-sm font-semibold text-[#111111] mt-1">
-              ShopFresherz Pickup Station Oron Road
-            </p>
-            <p className="text-xs text-[#6B7280] mt-0.5 leading-relaxed">
-              411 Oron Road, Opposite Elitok's Mall, by Obikason Filling Station,
-              Uyo, Akwa Ibom State, Nigeria., opposite Gifty supermarket | Akwa Ibom – Uyo
-            </p>
-          </div>
         </SummarySection>
 
-        {/* Payment method */}
-        <SummarySection icon={FiCreditCard} title="Payment Method" onEdit={() => {}}>
+        <SummarySection icon={FiCreditCard} title="Payment Method" onEdit={onEditPayment}>
           <p className="text-sm font-semibold text-[#111111]">
-            Pay with Cards, Bank Transfer or USSD
+            Pay with Cards, Bank Transfer or Pay on Delivery
           </p>
           <p className="text-xs text-[#6B7280] mt-0.5">
-            You will be redirected to our secure checkout page.
+            You will confirm payment before placing the order.
           </p>
         </SummarySection>
 
-        {/* Place order CTA */}
         <button
           onClick={onPlaceOrder}
           className="w-full h-12 rounded bg-[#F5820A] text-white font-bold flex items-center justify-center gap-2 hover:bg-[#E06B00] transition-colors"
         >
-          PLACE ORDER ₦112,500 <FiArrowRight size={16} />
+          PLACE ORDER - {formatPrice(total)} <FiArrowRight size={16} />
         </button>
       </div>
     </CheckoutLayout>

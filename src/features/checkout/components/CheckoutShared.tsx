@@ -1,11 +1,18 @@
 'use client'
 
 import Image from 'next/image'
-import { FiCheckCircle, FiChevronRight, FiTag } from 'react-icons/fi'
-import { cn } from '@/lib/utils/format'
+import {
+  FiArrowLeft,
+  FiArrowRight,
+  FiCheckCircle,
+  FiChevronRight,
+  FiTag,
+} from 'react-icons/fi'
+import { useCartStore } from '@/store/cart'
+import { cn, formatPrice } from '@/lib/utils/format'
 import type { CheckoutStep, CouponState } from '../types/checkout'
 
-// ─── Field ────────────────────────────────────────────────────────────────────
+const VAT_RATE = 0.075
 
 export function Field({
   label,
@@ -26,9 +33,7 @@ export function Field({
 }) {
   return (
     <div className={cn('flex flex-col gap-1', className)}>
-      {label && (
-        <label className="text-sm font-medium text-[#374151]">{label}</label>
-      )}
+      {label && <label className="text-sm font-medium text-[#374151]">{label}</label>}
       <input
         type={type}
         placeholder={placeholder}
@@ -36,9 +41,7 @@ export function Field({
         onChange={(e) => onChange(e.target.value)}
         className={cn(
           'h-10 px-3 rounded border text-sm text-[#111111] outline-none transition-colors placeholder:text-[#9CA3AF]',
-          error
-            ? 'border-red-400 focus:border-red-400'
-            : 'border-[#E5E7EB] focus:border-[#F5820A]'
+          error ? 'border-red-400 focus:border-red-400' : 'border-[#E5E7EB] focus:border-[#F5820A]'
         )}
       />
       {error && <p className="text-xs text-red-500 mt-0.5">{error}</p>}
@@ -46,14 +49,13 @@ export function Field({
   )
 }
 
-// ─── SelectField ──────────────────────────────────────────────────────────────
-
 export function SelectField({
   label,
   value,
   onChange,
   options,
   placeholder = 'Select...',
+  error,
   className,
 }: {
   label?: string
@@ -61,29 +63,31 @@ export function SelectField({
   onChange: (v: string) => void
   options: string[]
   placeholder?: string
+  error?: string
   className?: string
 }) {
   return (
     <div className={cn('flex flex-col gap-1', className)}>
-      {label && (
-        <label className="text-sm font-medium text-[#374151]">{label}</label>
-      )}
+      {label && <label className="text-sm font-medium text-[#374151]">{label}</label>}
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-10 px-3 rounded border border-[#E5E7EB] text-sm text-[#111111] bg-white outline-none focus:border-[#F5820A] transition-colors"
+        className={cn(
+          'h-10 px-3 rounded border text-sm text-[#111111] bg-white outline-none transition-colors',
+          error ? 'border-red-400 focus:border-red-400' : 'border-[#E5E7EB] focus:border-[#F5820A]'
+        )}
       >
         <option value="">{placeholder}</option>
-        {options.map((o) => (
-          <option key={o} value={o}>{o}</option>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
         ))}
       </select>
+      {error && <p className="text-xs text-red-500 mt-0.5">{error}</p>}
     </div>
   )
 }
-
-// ─── RadioOption ──────────────────────────────────────────────────────────────
-// Reusable pill used by both DeliveryStep and PaymentStep
 
 export function RadioOption({
   label,
@@ -94,7 +98,7 @@ export function RadioOption({
 }: {
   label: string
   subtitle: string
-  price?: string | null   // null = free, undefined = no price shown
+  price?: string | null
   selected: boolean
   onSelect: () => void
 }) {
@@ -103,9 +107,7 @@ export function RadioOption({
       onClick={onSelect}
       className={cn(
         'w-full flex items-center justify-between p-4 rounded-lg border text-left transition-colors',
-        selected
-          ? 'border-[#F5820A] bg-orange-50/40'
-          : 'border-[#E5E7EB] bg-white hover:border-[#F5820A]/40'
+        selected ? 'border-[#F5820A] bg-orange-50/40' : 'border-[#E5E7EB] bg-white hover:border-[#F5820A]/40'
       )}
     >
       <div className="flex-1 min-w-0">
@@ -115,46 +117,35 @@ export function RadioOption({
 
       <div className="flex items-center gap-3 shrink-0 ml-4">
         {price !== undefined && (
-          <span
-            className={cn(
-              'text-sm font-semibold',
-              price === null || price === 'Free'
-                ? 'text-green-500'
-                : 'text-[#111111]'
-            )}
-          >
+          <span className={cn('text-sm font-semibold', price === null || price === 'Free' ? 'text-green-500' : 'text-[#111111]')}>
             {price === null ? 'Free' : price}
           </span>
         )}
-        {/* Custom radio dot */}
         <div
           className={cn(
             'w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors',
             selected ? 'border-green-500' : 'border-[#D1D5DB]'
           )}
         >
-          {selected && (
-            <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-          )}
+          {selected && <div className="w-2.5 h-2.5 rounded-full bg-green-500" />}
         </div>
       </div>
     </button>
   )
 }
 
-// ─── StepIndicator ────────────────────────────────────────────────────────────
-
 const STEPS: { n: CheckoutStep; label: string }[] = [
   { n: 1, label: 'Billing Info' },
   { n: 2, label: 'Delivery' },
   { n: 3, label: 'Payment' },
+  { n: 4, label: 'Review' },
 ]
 
 export function StepIndicator({ step }: { step: CheckoutStep }) {
   return (
-    <div className="flex items-center gap-2 mb-6">
+    <div className="flex items-center gap-2 mb-6 overflow-x-auto">
       {STEPS.map(({ n, label }, i) => {
-        const done   = n < step
+        const done = n < step
         const active = n === step
         return (
           <div key={n} className="flex items-center gap-2">
@@ -162,19 +153,15 @@ export function StepIndicator({ step }: { step: CheckoutStep }) {
               <div
                 className={cn(
                   'w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
-                  done   ? 'bg-green-500 text-white'   :
-                  active ? 'bg-[#F5820A] text-white'   :
-                           'bg-[#E5E7EB] text-[#6B7280]'
+                  done ? 'bg-green-500 text-white' : active ? 'bg-[#F5820A] text-white' : 'bg-[#E5E7EB] text-[#6B7280]'
                 )}
               >
                 {done ? <FiCheckCircle size={13} /> : n}
               </div>
               <span
                 className={cn(
-                  'text-xs font-medium hidden sm:block transition-colors',
-                  active ? 'text-[#F5820A]'  :
-                  done   ? 'text-green-600'  :
-                           'text-[#6B7280]'
+                  'text-xs font-medium hidden sm:block whitespace-nowrap transition-colors',
+                  active ? 'text-[#F5820A]' : done ? 'text-green-600' : 'text-[#6B7280]'
                 )}
               >
                 {label}
@@ -189,10 +176,6 @@ export function StepIndicator({ step }: { step: CheckoutStep }) {
     </div>
   )
 }
-
-// ─── StepNavButtons ───────────────────────────────────────────────────────────
-
-import { FiArrowLeft, FiArrowRight } from 'react-icons/fi'
 
 export function StepNavButtons({
   onBack,
@@ -221,41 +204,41 @@ export function StepNavButtons({
   )
 }
 
-// ─── OrderSummary ─────────────────────────────────────────────────────────────
-
-// Mock items — swap for useCartStore() in production
-const MOCK_ITEMS = [
-  { id: '1', name: 'Canon EOS 1500D DSLR Camera Body+ 18-...', qty: 1, price: 70,  thumb: '/images/Rbag.png' },
-  { id: '2', name: 'Wired Over-Ear Gaming Headphones with U...', qty: 3, price: 250, thumb: '/images/Rbag.png' },
-]
-const SUBTOTAL  = 28500
-const DISCOUNT  = 39000
-const TAX       = 61.99
-const TOTAL_USD = 357.99
-
 export function OrderSummary({
   coupon,
   onCouponChange,
   onApplyCoupon,
+  onRemoveCoupon,
   deliveryFee,
 }: {
   coupon: CouponState
   onCouponChange: (v: string) => void
   onApplyCoupon: () => void
+  onRemoveCoupon?: () => void
   deliveryFee: number
 }) {
+  const items = useCartStore((s) => s.items)
+  const discountAmount = useCartStore((s) => s.discountAmount)
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const taxableAmount = Math.max(0, subtotal - discountAmount)
+  const tax = taxableAmount * VAT_RATE
+  const total = taxableAmount + deliveryFee + tax
+
   return (
     <div className="flex flex-col gap-4">
-      {/* Items + totals */}
       <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 sm:p-5">
         <p className="text-sm font-bold text-[#111111] mb-4">Order Summary</p>
 
         <div className="flex flex-col gap-4 mb-4">
-          {MOCK_ITEMS.map((item) => (
+          {items.length === 0 && (
+            <p className="text-sm text-[#6B7280]">Your cart is empty.</p>
+          )}
+
+          {items.map((item) => (
             <div key={item.id} className="flex items-center gap-3">
               <div className="w-12 h-12 rounded bg-[#F5F5F5] shrink-0 overflow-hidden">
                 <Image
-                  src={item.thumb}
+                  src={item.image || '/images/device-placeholder.jpg'}
                   alt={item.name}
                   width={48}
                   height={48}
@@ -265,28 +248,24 @@ export function OrderSummary({
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-[#111111] truncate">{item.name}</p>
                 <p className="text-xs text-[#6B7280] mt-0.5">
-                  {item.qty} ×{' '}
-                  <span className="text-[#F5820A] font-semibold">${item.price}</span>
+                  {item.quantity} x{' '}
+                  <span className="text-[#F5820A] font-semibold">{formatPrice(item.price)}</span>
                 </p>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Totals */}
         <div className="border-t border-[#F5F5F5] pt-3 space-y-2">
           {[
-            { label: 'Sub-total', value: `₦${SUBTOTAL.toLocaleString()}` },
-            {
-              label: 'Shipping',
-              value: deliveryFee === 0 ? 'Free' : `₦${deliveryFee.toLocaleString()}`,
-            },
+            { label: 'Sub-total', value: formatPrice(subtotal) },
+            { label: 'Shipping', value: deliveryFee === 0 ? 'Free' : formatPrice(deliveryFee) },
             {
               label: 'Discount',
-              value: `-₦${DISCOUNT.toLocaleString()}`,
+              value: discountAmount > 0 ? `-${formatPrice(discountAmount)}` : formatPrice(0),
               accent: 'text-red-500',
             },
-            { label: 'Tax', value: `$${TAX}` },
+            { label: 'VAT (7.5%)', value: formatPrice(tax) },
           ].map(({ label, value, accent }) => (
             <div key={label} className="flex justify-between text-sm">
               <span className="text-[#6B7280]">{label}</span>
@@ -296,21 +275,30 @@ export function OrderSummary({
 
           <div className="flex justify-between text-sm font-bold pt-2 border-t border-[#F5F5F5]">
             <span className="text-[#111111]">Total</span>
-            <span className="text-[#111111]">${TOTAL_USD} USD</span>
+            <span className="text-[#111111]">{formatPrice(total)}</span>
           </div>
         </div>
       </div>
 
-      {/* Coupon */}
       <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 sm:p-5">
         <div className="flex items-center gap-2 mb-3">
           <FiTag size={14} className="text-[#F5820A]" />
           <p className="text-sm font-bold text-[#111111]">Coupon Code</p>
         </div>
         {coupon.applied ? (
-          <div className="flex items-center gap-2 text-sm text-green-600 font-medium">
-            <FiCheckCircle size={14} />
-            Coupon applied successfully!
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-sm text-green-600 font-medium">
+              <FiCheckCircle size={14} />
+              <span>{coupon.code.toUpperCase()} applied</span>
+            </div>
+            {onRemoveCoupon && (
+              <button
+                onClick={onRemoveCoupon}
+                className="text-xs font-semibold text-[#F5820A] hover:underline"
+              >
+                Remove
+              </button>
+            )}
           </div>
         ) : (
           <div className="flex flex-col gap-2">
@@ -323,19 +311,18 @@ export function OrderSummary({
             />
             <button
               onClick={onApplyCoupon}
-              className="h-10 rounded bg-[#6B21A8] text-white text-sm font-semibold hover:bg-[#581C87] transition-colors"
+              disabled={!coupon.code.trim()}
+              className="h-10 rounded bg-[#6B21A8] text-white text-sm font-semibold hover:bg-[#581C87] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               APPLY COUPON
             </button>
+            {coupon.error && <p className="text-xs text-red-500">{coupon.error}</p>}
           </div>
         )}
       </div>
     </div>
   )
 }
-
-// ─── CheckoutLayout ──────────────────────────────────────────────────────────
-// Wraps left-form + right-sidebar consistently across all steps
 
 export function CheckoutLayout({
   children,

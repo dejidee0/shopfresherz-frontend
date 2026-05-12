@@ -39,11 +39,11 @@ export function ProductCard({
   const isOutOfStock = stockStatus === 'out_of_stock'
   const isLowStock = stockStatus === 'low_stock'
   const isNew =
-    Date.now() - new Date(product.createdAt).getTime() < 30 * 24 * 60 * 60 * 1000 // 30 days
+    product.createdAt ? Date.now() - new Date(product.createdAt).getTime() < 30 * 24 * 60 * 60 * 1000 : false
 
-  const displayImage = imgError
-    ? '/images/Rbag.png'
-    : product.images[0]?.display ?? '/images/Rbag.png'
+   const displayImage = imgError
+     ? '/images/device-placeholder.jpg'
+     : product.images?.[0]?.display ?? '/images/device-placeholder.jpg'
 
   function handleAddToCart(e: React.MouseEvent) {
     e.preventDefault()
@@ -51,15 +51,15 @@ export function ProductCard({
 
     if (isOutOfStock) return
 
-    addItem({
-      productId: product.id,
-      name: product.name,
-      slug: product.slug,
-      image: product.images[0]?.thumb ?? '',
-      price: product.price,
-      quantity: 1,
-      stockQty: product.stockQty - product.reservedQty,
-    })
+addItem({
+        productId: product.id,
+        name: product.name,
+        slug: product.slug,
+        image: product.images?.[0]?.thumb ?? '',
+        price: product.price,
+        quantity: 1,
+        stockQty: product.availableQty ?? product.stockQty ?? 0,
+      })
     openCart()
   }
 
@@ -71,7 +71,7 @@ export function ProductCard({
 
   return (
     <Link
-      href={`/product/${product.slug}`}
+      href={`/store/product/${product.slug}`}
       className={cn(
         'group relative flex flex-col bg-white border border-[#E5E7EB] rounded-card overflow-hidden',
         'transition-all duration-200 hover:border-[#F5820A] hover:shadow-md',
@@ -194,7 +194,7 @@ export function ProductCard({
         {/* Low stock warning */}
         {isLowStock && (
           <p className="text-[11px] text-[#F59E0B] font-medium">
-            Only {product.stockQty - product.reservedQty} left!
+            Only {(product.availableQty ?? product.stockQty ?? 0) - (product.reservedQty ?? 0)} left!
           </p>
         )}
 

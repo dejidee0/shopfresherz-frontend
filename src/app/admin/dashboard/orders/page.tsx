@@ -1,17 +1,12 @@
+"use client";
+
 import { IoEyeOutline, IoWarningOutline } from "react-icons/io5";
 import { Button } from "@/components/ui/Button";
 import { ColumnDef, DataTable } from "@/components/ui/DataTable";
 import { HiMagnifyingGlass } from "react-icons/hi2";
-
-interface OrderEntry {
-  orderId: string;
-  customer: string;
-  date: string;
-  items: string;
-  total: string;
-  payment: string;
-  status: string;
-}
+import { useOrders } from "@/lib/hooks/useAdmin";
+import { useState, useMemo } from "react";
+import type { AdminOrdersFilters } from "@/lib/api/admin";
 
 const paymentAndStatusColors: Record<string, string> = {
   Paid: "bg-green-100 text-green-700",
@@ -22,7 +17,7 @@ const paymentAndStatusColors: Record<string, string> = {
   Cancelled: "bg-red-100 text-red-600",
 };
 
-const orderColumns: ColumnDef<OrderEntry>[] = [
+const orderColumns: ColumnDef<any>[] = [
   {
     key: "orderId",
     header: "ORDER ID",
@@ -86,28 +81,34 @@ const orderColumns: ColumnDef<OrderEntry>[] = [
   },
 ];
 
-const orders = [
-  {
-    orderId: "1",
-    customer: "Emeka Nwosu",
-    date: "4-07-1999",
-    items: "Samsung s24",
-    total: "#824,000",
-    payment: "Paid",
-    status: "Processing",
-  },
-];
-
 const AdminOrderPage = () => {
+  const [filters, setFilters] = useState<AdminOrdersFilters>({});
+  const { data: ordersData, isLoading } = useOrders(filters);
+
+  const orders = useMemo(() => {
+    if (!ordersData?.items) return [];
+    return ordersData.items.map((order: any) => ({
+      orderId: order.orderNumber || order.id,
+      customer: order.customerName || 'Unknown Customer',
+      date: order.createdAt ? new Date(order.createdAt).toLocaleDateString() : '',
+      items: 'N/A items', // API doesn't provide items count
+      total: `₦${order.total?.toLocaleString() || '0'}`,
+      payment: order.paymentStatus || 'Unknown',
+      status: order.status || 'Unknown',
+    }));
+  }, [ordersData]);
+
   return (
     <div className="flex flex-col gap-4 md:gap-2 p-2 md:p-4 lg:p-6">
       <div className="mb-6 flex flex-col gap-3">
         <p className="font-bold">Order Details</p>
-        <p className="text-xs text-text-muted">{orders.length} total orders</p>
+        <p className="text-xs text-text-muted">
+          {isLoading ? 'Loading...' : `${ordersData?.totalCount || 0} total orders`}
+        </p>
       </div>
       <div className="flex flex-col md:flex-row justify-between">
         <div className="flex flex-col md:flex-row gap-3 mb-6">
-          {/* Search */}
+          {/* Search - for now just placeholder since API doesn't have search for orders */}
           <div className="relative">
             <HiMagnifyingGlass
               className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -115,21 +116,36 @@ const AdminOrderPage = () => {
             />
             <input
               type="text"
-              placeholder="Search name or sku"
+              placeholder="Search orders (not implemented)"
+              disabled
               className="pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] w-64 transition-all"
             />
           </div>
 
-          {/* Sort */}
+          {/* Status Filter */}
           <select
-            name=""
-            id=""
+            value={filters.status || ''}
+            onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value || undefined }))}
             className="border border-border rounded-2xl text-xs lg:text-sm text-gray-400 h-10 px-2"
           >
             <option value="">All Statuses</option>
-            <option value="">Active</option>
-            <option value="">Out of Stock</option>
-            <option value="">Draft</option>
+            <option value="pending">Pending</option>
+            <option value="processing">Processing</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+
+          {/* Payment Status Filter */}
+          <select
+            value={filters.paymentStatus || ''}
+            onChange={(e) => setFilters(prev => ({ ...prev, paymentStatus: e.target.value || undefined }))}
+            className="border border-border rounded-2xl text-xs lg:text-sm text-gray-400 h-10 px-2"
+          >
+            <option value="">All Payment Status</option>
+            <option value="paid">Paid</option>
+            <option value="unpaid">Unpaid</option>
+            <option value="refunded">Refunded</option>
           </select>
         </div>
 
@@ -142,12 +158,17 @@ const AdminOrderPage = () => {
       </div>
 
       {/* Table */}
-      <DataTable
-        title=""
-        columns={orderColumns}
-        data={orders}
-        rowKey="orderId"
-      />
+      {isLoading ? (
+        <div className="text-center py-8">Loading orders...</div>
+      ) : (
+        <DataTable
+          title=""
+          columns={orderColumns}
+          data={orders}
+          rowKey="orderId"
+          emptyMessage="No orders found"
+        />
+      )}
     </div>
   );
 };

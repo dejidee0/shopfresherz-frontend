@@ -49,7 +49,7 @@ const COLUMNS: ColumnDef<Order>[] = [
     header: "Action",
     render: (row) => (
       <Link
-        href={`/account/orders/${row.id}`}
+        href={`/account/order-detail/${row.id}`}
         className="text-sm text-[#F5820A] font-medium hover:underline whitespace-nowrap"
       >
         View Details →

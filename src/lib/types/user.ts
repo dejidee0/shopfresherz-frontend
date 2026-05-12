@@ -45,10 +45,13 @@ export interface Order {
  
 export interface PaginatedResponse<T> {
   data: T[]
-  total: number
+  totalCount: number
   page: number
-  limit: number
+  // limit: number
   totalPages: number
+  pageSize: number,
+  hasPreviousPage: boolean
+  hasNextPage: boolean
 }
  
 export interface ApiError {

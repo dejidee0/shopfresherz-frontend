@@ -1,28 +1,27 @@
-"use client"
+"use client";
 import { Button } from "@/components/ui/Button";
 import { AccountLayout } from "@/features/account/components/AccountLayout";
+import Link from "next/link";
 import { useState } from "react";
 import { FaArrowRight } from "react-icons/fa";
 
 interface TrackOrderData {
-    orderId: string;
-    billingEmail: string;
+  orderId: string;
+  billingEmail: string;
 }
 
 export default function OrderTrackingPage() {
-    const [form, setForm] = useState<TrackOrderData>({
-        orderId: "",
-        billingEmail: ""
-    })
+  const [form, setForm] = useState<TrackOrderData>({
+    orderId: "",
+    billingEmail: "",
+  });
 
-      const set = (key: keyof TrackOrderData, value: string) =>
-        setForm((prev) => ({ ...prev, [key]: value }));
+  const set = (key: keyof TrackOrderData, value: string) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
 
   return (
     <AccountLayout
-      breadcrumbItems={[
-        { label: "Track Order", href: "/account/track" },
-      ]}
+      breadcrumbItems={[{ label: "Track Order", href: "/account/track" }]}
     >
       <div className="flex flex-col gap-6 ">
         <p className="text-2xl font-semibold">Track Order</p>
@@ -33,33 +32,37 @@ export default function OrderTrackingPage() {
         </p>
 
         <div className="flex flex-col md:flex-row gap-2 lg:w-[60%]">
-            <div className="w-full">
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Order ID:
-              </label>
-              <input
-                type="text"
-                value={form.orderId}
-                onChange={(e) => set("orderId", e.target.value)}
-                placeholder="ID..."
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
-              />
-            </div>
-
-            <div className="w-full">
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Billing Email:
-              </label>
-              <input
-                type="email"
-                value={form.billingEmail}
-                onChange={(e) => set("billingEmail", e.target.value)}
-                placeholder="Email Address"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
-              />
-            </div>
+          <div className="w-full">
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Order ID:
+            </label>
+            <input
+              type="text"
+              value={form.orderId}
+              onChange={(e) => set("orderId", e.target.value)}
+              placeholder="ID..."
+              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
+            />
           </div>
-          <Button className="text-sm w-fit">Track Order <FaArrowRight/></Button>
+
+          <div className="w-full">
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Billing Email:
+            </label>
+            <input
+              type="email"
+              value={form.billingEmail}
+              onChange={(e) => set("billingEmail", e.target.value)}
+              placeholder="Email Address"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
+            />
+          </div>
+        </div>
+        <Link href={`/account/order-detail/${form.orderId}`}>
+          <Button className="text-sm w-fit">
+            Track Order <FaArrowRight />
+          </Button>
+        </Link>
       </div>
     </AccountLayout>
   );

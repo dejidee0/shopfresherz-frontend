@@ -134,14 +134,14 @@ export function Navbar() {
             {suggestions.products.map((product) => (
               <Link
                 key={product.id}
-                href={`/product/${product.slug}`}
+                href={`/store/product/${product.slug}`}
                 onClick={() => setIsSuggestionsOpen(false)}
                 className="flex items-center gap-3 p-1.5 rounded hover:bg-gray-50 transition-colors"
               >
                 <div className="w-10 h-10 bg-gray-100 rounded shrink-0 overflow-hidden">
-                  <Image
-                    src={product.images[0]?.thumb ?? '/images/Rbag.png'}
-                    alt={product.name}
+                   <Image
+                     src={product.images?.[0]?.thumb ?? '/images/Rbag.png'}
+                     alt={product.name}
                     width={40}
                     height={40}
                     className="w-full h-full object-contain"

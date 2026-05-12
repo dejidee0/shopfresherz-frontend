@@ -25,11 +25,11 @@ export function ActiveFilters({
     filters.tags.length > 0
 
   return (
-    <div className={cn('flex items-center justify-between gap-3 flex-wrap', className)}>
+    <div className={cn('flex items-center justify-between gap-2 flex-wrap', className)}>
       {/* Left: chips */}
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-1.5 flex-wrap">
         {hasAnyFilter && (
-          <span className="text-xs font-semibold text-[#6B7280] mr-1 shrink-0">
+          <span className="text-[10px] sm:text-xs font-semibold text-[#6B7280] mr-0.5 sm:mr-1 shrink-0">
             Active Filters:
           </span>
         )}
@@ -60,7 +60,7 @@ export function ActiveFilters({
         {hasAnyFilter && (
           <button
             onClick={onClearAll}
-            className="text-xs text-[#EF4444] hover:underline font-medium ml-1"
+            className="text-[10px] sm:text-xs text-[#EF4444] hover:underline font-medium ml-0.5"
           >
             Clear all
           </button>
@@ -68,11 +68,11 @@ export function ActiveFilters({
       </div>
 
       {/* Right: result count */}
-      <p className="text-xs text-[#6B7280] shrink-0">
+      <p className="text-[10px] sm:text-xs text-[#6B7280] shrink-0">
         <span className="font-bold text-[#111111]">
-          {resultCount.toLocaleString()}
+          {resultCount?.toLocaleString()}
         </span>{' '}
-        Results found.
+        Results
       </p>
     </div>
   )
@@ -80,14 +80,14 @@ export function ActiveFilters({
 
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#F5F5F5] border border-[#E5E7EB] rounded-full text-xs font-medium text-[#111111]">
-      {label}
+    <span className="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2.5 py-0.5 sm:py-1 bg-[#F5F5F5] border border-[#E5E7EB] rounded-full text-[10px] sm:text-xs font-medium text-[#111111]">
+      <span className="truncate max-w-[80px] sm:max-w-none">{label}</span>
       <button
         onClick={onRemove}
         className="text-[#6B7280] hover:text-[#EF4444] transition-colors ml-0.5"
         aria-label={`Remove ${label} filter`}
       >
-        <FiX size={11} />
+        <FiX size={10} />
       </button>
     </span>
   )

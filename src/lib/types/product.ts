@@ -1,71 +1,104 @@
 export interface ProductImage {
-  thumb: string      // 80px WebP
-  display: string    // 540px WebP
-  zoom: string       // 1600px WebP
-  original: string   // Full res
+  id: string
+  thumb: string
+  display: string
+  zoom: string
+  original: string
+  sortOrder?: number
+  isVideo?: boolean
 }
- 
+
+export interface ProductVariantAttribute {
+  name: string
+  value: string
+}
+
 export interface ProductVariant {
   id: string
-  label: string       // e.g. "256GB", "Midnight Black"
-  type: 'color' | 'storage' | 'ram' | 'size'
-  inStock: boolean
+  sku: string
+  label?: string
+  type?: 'color' | 'storage' | 'ram' | 'size'
+  attributes?: ProductVariantAttribute[]
+  price?: number
+  stockQty?: number
+  availableQty?: number
+  inStock?: boolean
   priceModifier?: number
 }
- 
-export interface Product {
+
+export interface Brand {
   id: string
-  sku: string
   name: string
-  slug: string
-  brandId: string
-  brandName: string
-  categoryId: number
-  categoryName: string
-  description: string
-  price: number
-  compareAtPrice?: number    // RRP — shows strikethrough + discount badge
-  images: ProductImage[]
-  variants?: ProductVariant[]
-  attributes?: Record<string, string>  // spec key-values
-  tags?: string[]
-  isActive: boolean
-  isFeatured: boolean
-  averageRating: number
-  reviewCount: number
-  soldCount: number
-  stockQty: number
-  reservedQty: number
-  metaTitle?: string
-  metaDescription?: string
-  createdAt: string
+  slug?: string
+  logoUrl?: string
 }
 
+export interface CategoryWithImage extends CategoryItem {
+  imageUrl: string
+}
 
-
-// ─── Category ───────────────────────────────────────────────────────────────
- 
-export interface Category {
+export interface CategoryItem {
   id: number
   name: string
   slug: string
   icon?: string
   imageUrl?: string
   parentId?: number
-  children?: Category[]
+  children?: CategoryItem[]
 }
 
-
+export interface Product {
+  id: string
+  sku?: string
+  name: string
+  slug: string
+  brandId?: string
+  brandName?: string
+  brand?: Brand
+  categoryId?: number
+  categoryName?: string
+  category?: CategoryWithImage
+  description: string
+  price: number
+  compareAtPrice?: number
+  primaryImageUrl?: string
+  images: ProductImage[]
+  variants?: ProductVariant[]
+  attributes?: Record<string, string>
+  tags?: string[]
+  isActive: boolean
+  isFeatured: boolean
+  averageRating: number
+  reviewCount: number
+  soldCount?: number
+  stockQty?: number
+  reservedQty?: number
+  availableQty?: number
+  metaTitle?: string
+  metaDescription?: string
+  shortDescription?: string
+  weightKg?: number
+  attributesJson?: string
+  tagsJson?: string
+  createdAt?: string
+}
 
 // ─── Flash Deal ─────────────────────────────────────────────────────────────
- 
+
 export interface FlashDeal {
   id: string
-  product: Product
+  productId: string
+  productName: string
+  productSlug: string
+  productImageUrl: string | null
   salePrice: number
-  startTime: string
-  endTime: string
+  originalPrice: number
+  discountPercent: number
+  startsAt: string
+  endsAt: string
   maxQuantity: number
-  soldCount: number
-  isActive: boolean
+  soldQuantity: number
+  remainingQuantity: number
+  isLive: boolean
+  timeRemaining?: string
 }

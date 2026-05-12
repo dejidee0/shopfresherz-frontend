@@ -1,27 +1,33 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { FiArrowRight } from 'react-icons/fi'
+import { useState } from "react";
+import { FiArrowRight } from "react-icons/fi";
 import {
   Field,
   SelectField,
   StepIndicator,
   OrderSummary,
   CheckoutLayout,
-} from '../components/CheckoutShared'
-import { COUNTRIES, REGIONS, type BillingForm, type CouponState } from '../types/checkout'
+} from "../components/CheckoutShared";
+import {
+  COUNTRIES,
+  REGIONS,
+  type BillingForm,
+  type CouponState,
+} from "../types/checkout";
 
 interface Props {
-  form: BillingForm
-  setForm: (f: BillingForm) => void
-  coupon: CouponState
-  onCouponChange: (v: string) => void
-  onApplyCoupon: () => void
-  deliveryFee: number
-  onContinue: () => void
+  form: BillingForm;
+  setForm: (f: BillingForm) => void;
+  coupon: CouponState;
+  onCouponChange: (v: string) => void;
+  onApplyCoupon: () => void;
+  onRemoveCoupon?: () => void;
+  deliveryFee: number;
+  onContinue: () => void;
 }
 
-type Errors = Partial<Record<keyof BillingForm, string>>
+type Errors = Partial<Record<keyof BillingForm, string>>;
 
 export function BillingStep({
   form,
@@ -29,29 +35,32 @@ export function BillingStep({
   coupon,
   onCouponChange,
   onApplyCoupon,
+  onRemoveCoupon,
   deliveryFee,
   onContinue,
 }: Props) {
-  const [errors, setErrors] = useState<Errors>({})
+  const [errors, setErrors] = useState<Errors>({});
 
   const set = (key: keyof BillingForm, value: string | boolean) =>
-    setForm({ ...form, [key]: value })
+    setForm({ ...form, [key]: value });
 
   const clearError = (key: keyof BillingForm) =>
-    setErrors((prev) => ({ ...prev, [key]: undefined }))
+    setErrors((prev) => ({ ...prev, [key]: undefined }));
 
   const validate = (): boolean => {
-    const e: Errors = {}
-    if (!form.firstName.trim())  e.firstName = 'Required'
-    if (!form.lastName.trim())   e.lastName  = 'Required'
-    if (!form.address.trim())    e.address   = 'Required'
-    if (!form.country)           e.country   = 'Required'
-    if (!form.email.trim())      e.email     = 'Required'
-    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Invalid email'
-    if (!form.phone.trim())      e.phone     = 'Required'
-    setErrors(e)
-    return Object.keys(e).length === 0
-  }
+    const e: Errors = {};
+    if (!form.firstName.trim()) e.firstName = "Required";
+    if (!form.lastName.trim()) e.lastName = "Required";
+    if (!form.address.trim()) e.address = "Required";
+    if (!form.country) e.country = "Required";
+    if (!form.region) e.region = "Required";
+    if (!form.city.trim()) e.city = "Required";
+    if (!form.email.trim()) e.email = "Required";
+    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = "Invalid email";
+    if (!form.phone.trim()) e.phone = "Required";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
 
   return (
     <CheckoutLayout
@@ -60,12 +69,15 @@ export function BillingStep({
           coupon={coupon}
           onCouponChange={onCouponChange}
           onApplyCoupon={onApplyCoupon}
+          onRemoveCoupon={onRemoveCoupon}
           deliveryFee={deliveryFee}
         />
       }
     >
       <StepIndicator step={1} />
-      <h2 className="text-lg font-bold text-[#111111] mb-5">Billing Information</h2>
+      <h2 className="text-lg font-bold text-[#111111] mb-5">
+        Billing Information
+      </h2>
 
       <div className="flex flex-col gap-4">
         {/* Full name + company */}
@@ -76,13 +88,19 @@ export function BillingStep({
               <Field
                 placeholder="First name"
                 value={form.firstName}
-                onChange={(v) => { set('firstName', v); clearError('firstName') }}
+                onChange={(v) => {
+                  set("firstName", v);
+                  clearError("firstName");
+                }}
                 error={errors.firstName}
               />
               <Field
                 placeholder="Last name"
                 value={form.lastName}
-                onChange={(v) => { set('lastName', v); clearError('lastName') }}
+                onChange={(v) => {
+                  set("lastName", v);
+                  clearError("lastName");
+                }}
                 error={errors.lastName}
               />
             </div>
@@ -90,7 +108,7 @@ export function BillingStep({
           <Field
             label="Company Name (Optional)"
             value={form.companyName}
-            onChange={(v) => set('companyName', v)}
+            onChange={(v) => set("companyName", v)}
             className="sm:col-span-2"
           />
         </div>
@@ -99,7 +117,10 @@ export function BillingStep({
         <Field
           label="Address"
           value={form.address}
-          onChange={(v) => { set('address', v); clearError('address') }}
+          onChange={(v) => {
+            set("address", v);
+            clearError("address");
+          }}
           error={errors.address}
         />
 
@@ -108,25 +129,38 @@ export function BillingStep({
           <SelectField
             label="Country"
             value={form.country}
-            onChange={(v) => { set('country', v); set('region', ''); clearError('country') }}
+            onChange={(v) => {
+              setForm({ ...form, country: v, region: "", city: "" });
+              clearError("country");
+              clearError("region");
+              clearError("city");
+            }}
             options={COUNTRIES}
+            error={errors.country}
           />
           <SelectField
             label="Region/State"
             value={form.region}
-            onChange={(v) => set('region', v)}
+            onChange={(v) => {
+              set("region", v);
+              clearError("region");
+            }}
             options={REGIONS[form.country] ?? []}
+            error={errors.region}
           />
-          <SelectField
+          <Field
             label="City"
             value={form.city}
-            onChange={(v) => set('city', v)}
-            options={REGIONS[form.country] ?? []}
+            onChange={(v) => {
+              set("city", v);
+              clearError("city");
+            }}
+            error={errors.city}
           />
           <Field
             label="Zip Code"
             value={form.zipCode}
-            onChange={(v) => set('zipCode', v)}
+            onChange={(v) => set("zipCode", v)}
           />
         </div>
 
@@ -136,14 +170,20 @@ export function BillingStep({
             label="Email"
             type="email"
             value={form.email}
-            onChange={(v) => { set('email', v); clearError('email') }}
+            onChange={(v) => {
+              set("email", v);
+              clearError("email");
+            }}
             error={errors.email}
           />
           <Field
             label="Phone Number"
             type="tel"
             value={form.phone}
-            onChange={(v) => { set('phone', v); clearError('phone') }}
+            onChange={(v) => {
+              set("phone", v);
+              clearError("phone");
+            }}
             error={errors.phone}
           />
         </div>
@@ -153,7 +193,7 @@ export function BillingStep({
           <input
             type="checkbox"
             checked={form.saveAddress}
-            onChange={(e) => set('saveAddress', e.target.checked)}
+            onChange={(e) => set("saveAddress", e.target.checked)}
             className="w-4 h-4 accent-[#F5820A]"
           />
           <span className="text-sm text-[#374151]">Save this address</span>
@@ -161,12 +201,14 @@ export function BillingStep({
 
         {/* CTA */}
         <button
-          onClick={() => { if (validate()) onContinue() }}
+          onClick={() => {
+            if (validate()) onContinue();
+          }}
           className="w-full h-12 rounded bg-[#F5820A] text-white font-semibold flex items-center justify-center gap-2 hover:bg-[#E06B00] transition-colors mt-2"
         >
           CONTINUE TO DELIVERY <FiArrowRight size={16} />
         </button>
       </div>
     </CheckoutLayout>
-  )
+  );
 }

@@ -136,7 +136,7 @@ export function MegaMenu({ isOpen, onClose }: MegaMenuProps) {
               {FEATURED_PHONES.map((product) => (
                 <Link
                   key={product.id}
-                  href={`/product/${product.slug}`}
+                  href={`/store/product/${product.slug}`}
                   onClick={onClose}
                   className="flex items-center gap-3 p-2 rounded hover:bg-gray-50 transition-colors group"
                 >

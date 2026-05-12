@@ -5,10 +5,10 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { cn } from '@/lib/utils/format'
-import type { Category } from '@/lib/types/product'
+import type { CategoryWithImage } from '@/lib/types/product'
 
 // Fallback static categories — replace with API data from /categories
-const DEFAULT_CATEGORIES: (Category & { imageUrl: string })[] = [
+const DEFAULT_CATEGORIES: CategoryWithImage[] = [
   { id: 4, name: 'Computer & Laptop', slug: 'computer-laptop', imageUrl: '/images/categories/pc.png' },
   { id: 3, name: 'Electronic', slug: 'electronics', imageUrl: '/images/categories/tv.png' },
   { id: 10, name: 'Home', slug: 'home-kitchen-tech', imageUrl: '/images/categories/home-theater.png' },
@@ -20,7 +20,7 @@ const DEFAULT_CATEGORIES: (Category & { imageUrl: string })[] = [
 ]
 
 interface CategoryGridProps {
-  categories?: (Category & { imageUrl: string })[]
+  categories?: CategoryWithImage[]
 }
 
 export function CategoryGrid({ categories = DEFAULT_CATEGORIES }: CategoryGridProps) {
@@ -75,7 +75,7 @@ export function CategoryGrid({ categories = DEFAULT_CATEGORIES }: CategoryGridPr
   )
 }
 
-function CategoryItem({ category }: { category: Category & { imageUrl: string } }) {
+function CategoryItem({ category }: { category: CategoryWithImage }) {
   return (
     <Link
       href={`/category/${category.slug}`}
