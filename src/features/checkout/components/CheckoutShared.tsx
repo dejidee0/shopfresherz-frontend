@@ -190,13 +190,13 @@ export function StepNavButtons({
     <div className="flex gap-3 mt-6">
       <button
         onClick={onBack}
-        className="flex-1 sm:flex-none h-12 px-6 rounded border border-[#E5E7EB] text-sm font-semibold text-[#374151] flex items-center justify-center gap-2 hover:border-[#F5820A] hover:text-[#F5820A] transition-colors"
+        className="flex-1 sm:flex-none h-12 md:px-6 rounded border border-[#E5E7EB] text-sm font-semibold text-[#374151] flex items-center justify-center gap-2 hover:border-[#F5820A] hover:text-[#F5820A] transition-colors"
       >
         <FiArrowLeft size={15} /> BACK
       </button>
       <button
         onClick={onContinue}
-        className="flex-1 h-12 rounded bg-[#F5820A] text-white font-semibold flex items-center justify-center gap-2 hover:bg-[#E06B00] transition-colors"
+        className="flex-1 h-12 text-xs md:text-base rounded bg-[#F5820A] text-white font-semibold flex items-center justify-center gap-2 hover:bg-[#E06B00] transition-colors"
       >
         {continueLabel} <FiArrowRight size={15} />
       </button>

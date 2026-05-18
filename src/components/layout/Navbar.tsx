@@ -32,11 +32,13 @@ export function Navbar() {
     products: Product[]
     categories: { id: number; name: string; slug: string }[]
   } | null>(null)
+  const [allCategories, setAllCategories] = useState<{ id: number; name: string; slug: string }[]>([])
   const [isMegaOpen, setIsMegaOpen] = useState(false)
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   const searchRef = useRef<HTMLDivElement>(null)
   const mobileSearchRef = useRef<HTMLDivElement>(null)
@@ -45,6 +47,26 @@ export function Navbar() {
   const totalItems = useCartStore((s) => s.totalItems())
   const openCart = useCartStore((s) => s.openCart)
   const { isAuthenticated, user } = useAuthStore()
+
+  // Handle hydration - only show cart badge after client-side mount
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Fetch all categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categories = await productsApi.getCategories()
+        setAllCategories(categories.map(c => ({ id: c.id, name: c.name, slug: c.slug })))
+      } catch {
+        // silent
+      }
+    }
+    fetchCategories()
+  }, [])
+
+
 
   // Debounced instant search
   useEffect(() => {
@@ -56,8 +78,14 @@ export function Navbar() {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(async () => {
       try {
-        const data = await productsApi.instantSearch(query)
-        setSuggestions(data)
+        const instantData = await productsApi.instantSearch(query)
+        const filteredCategories = allCategories.filter(cat =>
+          cat.name.toLowerCase().includes(query.toLowerCase())
+        ).slice(0, 3) // limit to 3
+        setSuggestions({
+          products: instantData.products,
+          categories: filteredCategories
+        })
         setIsSuggestionsOpen(true)
       } catch {
         // silent
@@ -66,7 +94,7 @@ export function Navbar() {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
     }
-  }, [query])
+  }, [query, allCategories])
 
   // Close suggestions on outside click
   useEffect(() => {
@@ -113,17 +141,17 @@ export function Navbar() {
             <p className="text-[10px] font-bold uppercase text-[#6B7280] mb-1 tracking-wide">
               Categories
             </p>
-            {suggestions.categories.map((cat) => (
-              <Link
-                key={cat.id}
-                href={`/category/${cat.slug}`}
-                onClick={() => { setQuery(cat.name); setIsSuggestionsOpen(false) }}
-                className="flex items-center gap-2 px-1 py-1.5 text-sm text-[#111111] hover:text-[#F5820A] transition-colors"
-              >
-                <FiSearch size={12} className="text-[#6B7280]" />
-                {cat.name}
-              </Link>
-            ))}
+             {suggestions.categories.map((cat) => (
+               <Link
+                 key={cat.id}
+                 href={`/store/category/${cat.id}`}
+                //  onClick={() => { setQuery(cat.name); setIsSuggestionsOpen(false) }}
+                 className="flex items-center gap-2 px-1 py-1.5 text-sm text-[#111111] hover:text-[#F5820A] transition-colors"
+               >
+                 <FiSearch size={12} className="text-[#6B7280]" />
+                 {cat.name}
+               </Link>
+             ))}
           </div>
         )}
         {suggestions.products.length > 0 && (
@@ -225,10 +253,10 @@ export function Navbar() {
             <button
               onClick={openCart}
               className="relative text-white hover:text-white/80 transition-colors"
-              aria-label={`Cart, ${totalItems} items`}
+              aria-label={`Cart, ${mounted ? totalItems : 0} items`}
             >
               <FiShoppingCart size={21} />
-              {totalItems > 0 && (
+              {mounted && totalItems > 0 && (
                 <span className="absolute -top-2 -right-2 bg-[#0D0D0D] text-white text-[10px] font-bold min-w-4.5 h-4.5 rounded-full flex items-center justify-center leading-none px-1">
                   {totalItems > 99 ? '99+' : totalItems}
                 </span>
@@ -420,14 +448,14 @@ export function Navbar() {
               {/* Nav links */}
               <nav className="py-2">
                 {[
-                  { href: '/store',               icon: FiHome,        label: 'Home'             },
-                  { href: '/category/all',   icon: FiChevronDown, label: 'All Categories'   },
-                  { href: '/support',        icon: FiHeadphones,  label: 'Customer Support' },
-                  { href: '/help',           icon: FiHelpCircle,  label: 'Need Help'        },
-                  { href: '/account/orders', icon: FiMapPin,      label: 'Track Order'      },
-                ].map(({ href, icon: Icon, label }) => (
+                  { id: 1, href: '/store',               icon: FiHome,        label: 'Home'             },
+                  { id: 2, href: '/store/category/all',   icon: FiChevronDown, label: 'All Categories'   },
+                  { id: 3, href: '',        icon: FiHeadphones,  label: 'Customer Support' },
+                  { id: 4, href: '',           icon: FiHelpCircle,  label: 'Need Help'        },
+                  { id: 5, href: '/account/orders', icon: FiMapPin,      label: 'Track Order'      },
+                ].map(({id, href, icon: Icon, label }) => (
                   <Link
-                    key={href}
+                    key={id}
                     href={href}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center gap-3 px-5 py-3 text-sm text-[#111111] hover:bg-orange-50 hover:text-[#F5820A] transition-colors"
@@ -447,7 +475,7 @@ export function Navbar() {
               >
                 <FiShoppingCart size={16} />
                 View Cart
-                {totalItems > 0 && (
+                {mounted && totalItems > 0 && (
                   <span className="bg-white text-[#F5820A] text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
                     {totalItems}
                   </span>

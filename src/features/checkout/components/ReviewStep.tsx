@@ -138,9 +138,9 @@ export function ReviewStep({
         <button
           onClick={onPlaceOrder}
           disabled={items.length === 0}
-          className="flex-1 h-12 rounded bg-[#F5820A] text-white font-bold flex items-center justify-center gap-2 hover:bg-[#E06B00] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 text-xs md:text-base h-12 rounded bg-[#F5820A] text-white font-bold flex items-center justify-center gap-2 hover:bg-[#E06B00] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          PLACE ORDER - {formatPrice(total)} <FiArrowRight size={15} />
+          PLACE ORDER - {formatPrice(total)} <FiArrowRight className='hidden md:flex' size={15} />
         </button>
       </div>
     </CheckoutLayout>

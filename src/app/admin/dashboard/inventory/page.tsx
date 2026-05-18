@@ -6,6 +6,7 @@ import { ColumnDef, DataTable } from "@/components/ui/DataTable";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { useLowStock } from "@/lib/hooks/useAdmin";
 import { useMemo } from "react";
+import { Spinner } from "@/components/ui/Spinner";
 
 // Using low stock data from API
 interface InventoryEntry {
@@ -115,7 +116,7 @@ const AdminInventoryPage = () => {
 
       {/* Table */}
       {isLoading ? (
-        <div className="text-center py-8">Loading low stock items...</div>
+        <div className="text-center py-8"><Spinner/></div>
       ) : (
         <DataTable
           title=""

@@ -1,38 +1,96 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { HiXMark } from "react-icons/hi2";
+import { useCreateFlashDeal, useUpdateFlashDeal } from "@/lib/hooks/useAdmin";
 
-interface AddCouponModalProps {
+interface AddFlashDealModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit?: (data: CouponFormData) => void;
+  editingDeal?: any;
 }
 
-export interface CouponFormData {
+export interface FlashDealFormData {
+  productId: string;
   productName: string;
   originalPrice: string;
   salePrice: string;
   startDate: string;
-  endDate: number;
+  endDate: string;
   maxQuantity: string;
 }
 
-const AddFlashDealModal = ({ isOpen, onSubmit, onClose }: AddCouponModalProps) => {
-  const [form, setForm] = useState<CouponFormData>({
+const AddFlashDealModal = ({ isOpen, onClose, editingDeal }: AddFlashDealModalProps) => {
+  const isEditing = !!editingDeal;
+  const [form, setForm] = useState<FlashDealFormData>({
+    productId: "",
     productName: "",
     originalPrice: "",
     salePrice: "",
     startDate: "",
-    endDate: 1,
+    endDate: "",
     maxQuantity: "",
   });
 
-  const set = (key: keyof CouponFormData, value: string | boolean) =>
+  const createFlashDealMutation = useCreateFlashDeal();
+  const updateFlashDealMutation = useUpdateFlashDeal();
+
+  // Populate form when editing
+  useEffect(() => {
+    if (editingDeal) {
+      setForm({
+        productId: editingDeal.productId,
+        productName: editingDeal.productName,
+        originalPrice: editingDeal.originalPrice.toString(),
+        salePrice: editingDeal.salePrice.toString(),
+        startDate: new Date(editingDeal.startsAt).toISOString().split('T')[0],
+        endDate: new Date(editingDeal.endsAt).toISOString().split('T')[0],
+        maxQuantity: editingDeal.maxQuantity.toString(),
+      });
+    } else {
+      // Reset form for new deal
+      setForm({
+        productId: "",
+        productName: "",
+        originalPrice: "",
+        salePrice: "",
+        startDate: "",
+        endDate: "",
+        maxQuantity: "",
+      });
+    }
+  }, [editingDeal]);
+
+  const set = (key: keyof FlashDealFormData, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
-  const handleSubmit = () => {
-    if (!form.productName || !form.endDate || form.startDate) return;
-    onSubmit?.(form);
-    onClose();
+  const handleSubmit = async () => {
+    if (!form.productName || !form.salePrice || !form.startDate || !form.endDate) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      const dealData = {
+        productId: form.productId,
+        salePrice: parseFloat(form.salePrice),
+        originalPrice: parseFloat(form.originalPrice),
+        startsAt: new Date(form.startDate).toISOString(),
+        endsAt: new Date(form.endDate).toISOString(),
+        maxQuantity: parseInt(form.maxQuantity),
+      };
+
+      if (isEditing && editingDeal) {
+        await updateFlashDealMutation.mutateAsync({
+          id: editingDeal.id,
+          payload: dealData
+        });
+      } else {
+        await createFlashDealMutation.mutateAsync(dealData);
+      }
+
+      onClose();
+    } catch (error) {
+      console.error('Failed to save flash deal:', error);
+    }
   };
 
   if (!isOpen) return null;
@@ -49,7 +107,9 @@ const AddFlashDealModal = ({ isOpen, onSubmit, onClose }: AddCouponModalProps) =
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto mx-4">
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100 sticky top-0 bg-white z-10">
-          <h2 className="text-lg font-bold text-gray-900">Create Flash Deal</h2>
+          <h2 className="text-lg font-bold text-gray-900">
+            {isEditing ? 'Edit Flash Deal' : 'Create Flash Deal'}
+          </h2>
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
@@ -59,20 +119,24 @@ const AddFlashDealModal = ({ isOpen, onSubmit, onClose }: AddCouponModalProps) =
         </div>
 
         <div className="px-6 py-5 space-y-5">
-          {/* Prod Name */}
-          <div className="flex gap-3 w-full items-end justify-between">
-            <div className="w-full">
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Product Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={form.productName}
-                onChange={(e) => set("productName", e.target.value)}
-                placeholder=""
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
-              />
-            </div>
+          {/* Product Selection */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Product <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={form.productName}
+              onChange={(e) => set("productName", e.target.value)}
+              placeholder="Search and select a product..."
+              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
+              disabled={isEditing} // Can't change product when editing
+            />
+            <input
+              type="hidden"
+              value={form.productId}
+              onChange={(e) => set("productId", e.target.value)}
+            />
           </div>
 
           {/* Orig & Sale Price */}
@@ -121,7 +185,7 @@ const AddFlashDealModal = ({ isOpen, onSubmit, onClose }: AddCouponModalProps) =
 
             <div className="w-full">
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                End Date
+                End Date <span className="text-red-500">*</span>
               </label>
               <input
                 type="date"
@@ -158,9 +222,13 @@ const AddFlashDealModal = ({ isOpen, onSubmit, onClose }: AddCouponModalProps) =
           </button>
           <button
             onClick={handleSubmit}
-            className="px-6 py-2.5 text-sm font-bold bg-[#F97316] text-white rounded-lg hover:bg-orange-500 transition-colors shadow-sm shadow-orange-200"
+            disabled={createFlashDealMutation.isPending || updateFlashDealMutation.isPending}
+            className="px-6 py-2.5 text-sm font-bold bg-[#F97316] text-white rounded-lg hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm shadow-orange-200"
           >
-            Save
+            {createFlashDealMutation.isPending || updateFlashDealMutation.isPending
+              ? (isEditing ? 'Updating...' : 'Creating...')
+              : (isEditing ? 'Update' : 'Create')
+            }
           </button>
         </div>
       </div>

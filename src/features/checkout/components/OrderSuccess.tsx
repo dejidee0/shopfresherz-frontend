@@ -21,7 +21,7 @@ export default function OrderSuccessPage() {
         {/* Copy */}
         <div className="flex flex-col gap-1.5">
           <h1 className="text-xl sm:text-2xl font-bold text-[#111111]">
-            Your order is successfully place
+            Your order is successfully placed
           </h1>
           <p className="text-sm text-[#6B7280]">
             Thank you for your purchase. Your order is being processed.

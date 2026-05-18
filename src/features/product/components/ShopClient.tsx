@@ -1,34 +1,43 @@
-'use client'
+"use client";
 
-import { useState, useMemo, useTransition } from 'react'
-import { FiSearch, FiGrid, FiChevronDown, FiFilter, FiX } from 'react-icons/fi'
-import { Breadcrumb } from '@/components/ui/BreadCrumbs'
-import { Pagination } from '@/components/ui/Pagination'
-import { ProductCard } from '@/features/product/components/ProductCard'
-import { ShopSidebar } from '@/features/product/components/ShopSideBar'
-import { ActiveFilters } from '@/features/product/components/ActiveFilters'
-import type { ShopFilters } from '@/features/product/components/ShopSideBar'
-import type { Product } from '@/lib/types/product'
+import { useState, useEffect } from "react";
+import { FiSearch, FiGrid, FiChevronDown, FiFilter, FiX } from "react-icons/fi";
+import { Breadcrumb } from "@/components/ui/BreadCrumbs";
+import { Pagination } from "@/components/ui/Pagination";
+import { ProductCard } from "@/features/product/components/ProductCard";
+import { ShopSidebar } from "@/features/product/components/ShopSideBar";
+import { ActiveFilters } from "@/features/product/components/ActiveFilters";
+import { productsApi } from "@/lib/api/products";
+import type { ShopFilters } from "@/features/product/components/ShopSideBar";
+import type { Product } from "@/lib/types/product";
 
 const SORT_OPTIONS = [
-  { label: 'Most Popular', value: 'best_selling' },
-  { label: 'Newest First', value: 'newest' },
-  { label: 'Price: Low to High', value: 'price_asc' },
-  { label: 'Price: High to Low', value: 'price_desc' },
-  { label: 'Best Rated', value: 'best_rated' },
-]
+  { label: "Relevance", value: "relevance" },
+  { label: "Most Popular", value: "best_selling" },
+  { label: "Newest First", value: "newest" },
+  { label: "Price: Low to High", value: "price_asc" },
+  { label: "Price: High to Low", value: "price_desc" },
+  { label: "Best Rated", value: "best_rated" },
+];
 
 const DEFAULT_FILTERS: ShopFilters = {
+  categoryId: null,
   categorySlug: null,
-  priceRange: [0, 80_000],
+  priceRange: [0, 10_000_000],
   brands: [],
   tags: [],
-}
+  rating: null,
+  inStock: null,
+  sortBy: "",
+};
 
 interface ShopClientProps {
-  initialProducts: Product[]
-  categoryName?: string
-  categorySlug?: string
+  initialProducts: Product[];
+  categoryName?: string;
+  categorySlug?: string;
+  categoryId?: number;
+  isSearchPage?: boolean;
+  initialQuery?: string
 }
 
 // This is the interactive client shell.
@@ -36,107 +45,162 @@ interface ShopClientProps {
 export function ShopClient({
   initialProducts,
   categoryName,
-  categorySlug,
+  categoryId,
+  isSearchPage = false,
+  initialQuery = '',
 }: ShopClientProps) {
-  const [isPending, startTransition] = useTransition()
-
   const [filters, setFilters] = useState<ShopFilters>({
     ...DEFAULT_FILTERS,
-    categorySlug: categorySlug ?? null,
+    categoryId: categoryId ?? null,
   })
-  const [sort, setSort] = useState('best_selling')
+  const [sort, setSort] = useState(isSearchPage ? 'relevance' : 'best_selling')
   const [sortOpen, setSortOpen] = useState(false)
   const [page, setPage] = useState(1)
-  const [localSearch, setLocalSearch] = useState('')
+  const [localSearch, setLocalSearch] = useState(initialQuery)  // seed with server query
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const [products, setProducts] = useState<Product[]>(initialProducts)  // start with server data
+  const [isLoading, setIsLoading] = useState(false)
+  const [totalCount, setTotalCount] = useState(initialProducts.length)
+  const [hasInteracted, setHasInteracted] = useState(false)
+  const [sidebarCategories, setSidebarCategories] = useState<
+    {
+      label: string;
+      slug: string;
+      children?: { label: string; slug: string }[];
+    }[]
+  >([]);
+  const [sidebarBrands, setSidebarBrands] = useState<string[]>([]);
 
-   const breadcrumbs = [
-     { label: 'Shop', href: '/shop' },
-     ...(categoryName ? [{ label: categoryName }] : []),
-   ]
-
-   // ── Derived filtered & sorted products ─────────────────────────────────────
-   const { filteredProducts, filteredTotalCount } = useMemo(() => {
-     let result = initialProducts
-
-     // Search filter (name or description)
-     if (localSearch.trim()) {
-       const q = localSearch.toLowerCase().trim()
-       result = result.filter(
-         (p) =>
-           p.name.toLowerCase().includes(q) ||
-           p.description?.toLowerCase().includes(q)
-       )
-     }
-
-     // Price range filter
-     const [minPrice, maxPrice] = filters.priceRange
-     result = result?.filter((p) => p.price >= minPrice && p.price <= maxPrice)
-
-// Brand filter
-      if (filters.brands.length > 0) {
-        result = result.filter((p) => filters.brands.includes(p.brandName ?? p.brand?.name ?? ''))
+  // Replace the brands useEffect:
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const brands = await productsApi.getBrands();
+        setSidebarBrands(brands.map((b) => b.name));
+      } catch (error) {
+        console.error("Failed to fetch brands:", error);
       }
+    };
+    fetchBrands();
+  }, []);
 
-     // Tags filter
-     if (filters.tags.length > 0 && result.length > 0) {
-       result = result.filter((p) => p.tags && filters.tags.some((tag) => p.tags!.includes(tag)))
-     }
+  // Fetch categories for sidebar
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const allCats = await productsApi.getCategories();
+        const topCats = allCats.filter((c) => c.parentId === null);
+        const catsWithChildren = topCats.map((cat) => ({
+          label: cat.name,
+          slug: cat.slug,
+          children: allCats
+            .filter((c) => c.parentId === cat.id)
+            .map((c) => ({ label: c.name, slug: c.slug })),
+        }));
+        setSidebarCategories(catsWithChildren);
+      } catch (error) {
+        console.error("Failed to fetch categories for sidebar:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
-// Sorting
-      const sorted = [...result].sort((a, b) => {
-        switch (sort) {
-          case 'price_asc':
-            return a.price - b.price
-          case 'price_desc':
-            return b.price - a.price
-          case 'newest':
-            return new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime()
-          case 'best_rated':
-            return (b.averageRating ?? 0) - (a.averageRating ?? 0)
-          case 'best_selling':
-            return (b.soldCount ?? 0) - (a.soldCount ?? 0)
-          case 'relevance':
-          default:
-            return 0
+  // Fetch products from API when search or filters change
+    useEffect(() => {
+    // ✅ Skip the very first render — use initialProducts from server instead
+    // Only fetch when the user actually changes something
+    if (!hasInteracted) return
+
+    const fetchProducts = async () => {
+      setIsLoading(true)
+      try {
+        let resolvedCategoryId = categoryId ?? undefined
+
+        if (filters.categorySlug && filters.categorySlug !== 'all') {
+          const allCats = await productsApi.getCategories()
+          const matched = allCats.find(c => c.slug === filters.categorySlug)
+          resolvedCategoryId = matched?.id ? Number(matched.id) : resolvedCategoryId
         }
-      })
 
-     return { filteredProducts: sorted, filteredTotalCount: sorted.length }
-   }, [initialProducts, localSearch, filters, sort])
+        const apiCall = isSearchPage ? productsApi.search : productsApi.list
+        const response = await apiCall({
+          categoryId: resolvedCategoryId,
+          q: localSearch || undefined,
+          priceMin: filters.priceRange[0] || undefined,
+          priceMax: filters.priceRange[1] === 10_000_000 ? undefined : filters.priceRange[1],
+          rating: filters.rating || undefined,
+          inStock: filters.inStock || undefined,
+          sortBy: sort as any,
+          page,
+          pageSize: 24,
+          brandId: filters.brands.length > 0 ? filters.brands.join(',') : undefined,
+        })
 
-   const totalPages = Math.ceil(filteredTotalCount / 24)
+        let filteredData = response.data
+        if (filters.tags.length > 0) {
+          filteredData = filteredData.filter(
+            p => p.tags && filters.tags.some(tag => p.tags!.includes(tag))
+          )
+        }
+
+        setProducts(filteredData)
+        setTotalCount(response.totalCount)
+      } catch (error) {
+        console.error('Failed to fetch products:', error)
+        setProducts([])
+        setTotalCount(0)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchProducts()
+  }, [localSearch, filters, sort, page, categoryId, isSearchPage, hasInteracted])
+
+
+  const breadcrumbs = [
+    { label: "Shop", href: "/shop" },
+    ...(categoryName ? [{ label: categoryName }] : []),
+  ];
+
+  // ── Products from API (already filtered and sorted) ─────────────────────────────────────
+  const filteredProducts = products;
+  const filteredTotalCount = totalCount;
+
+  const totalPages = Math.ceil(filteredTotalCount / 24);
 
   // ── Filter helpers ────────────────────────────────────────────────────────
 
+ //handleFilterChange now marks that user has interacted
   function handleFilterChange(next: ShopFilters) {
+    setHasInteracted(true)
     setFilters(next)
     setPage(1)
-    // TODO: sync to URL params for shareable filter links
   }
 
-  function handleRemoveFilter(key: keyof ShopFilters, value?: string) {
-    if (key === 'categorySlug') {
-      setFilters((f) => ({ ...f, categorySlug: null }))
+   function handleRemoveFilter(key: keyof ShopFilters, value?: string) {
+    setHasInteracted(true)
+    if (key === 'categoryId') {
+      setFilters(f => ({ ...f, categorySlug: null }))
     } else if (key === 'brands' && value) {
-      setFilters((f) => ({ ...f, brands: f.brands.filter((b) => b !== value) }))
+      setFilters(f => ({ ...f, brands: f.brands.filter(b => b !== value) }))
     } else if (key === 'tags' && value) {
-      setFilters((f) => ({ ...f, tags: f.tags.filter((t) => t !== value) }))
+      setFilters(f => ({ ...f, tags: f.tags.filter(t => t !== value) }))
     }
     setPage(1)
   }
 
   function handleClearAll() {
-    setFilters({ ...DEFAULT_FILTERS, categorySlug: categorySlug ?? null })
+    setHasInteracted(true)
+    setFilters({ ...DEFAULT_FILTERS, categoryId: categoryId ?? null })
     setPage(1)
   }
+  // ── Client-side filter/search (placeholder until API filtering is wired) ──
+  // In production, these params get sent to productsApi.list() and the server
+  // does the heavy lifting. For now, we filter the initial product set locally
+  // so the UI is immediately interactive.
 
-   // ── Client-side filter/search (placeholder until API filtering is wired) ──
-   // In production, these params get sent to productsApi.list() and the server
-   // does the heavy lifting. For now, we filter the initial product set locally
-   // so the UI is immediately interactive.
-
-const activeSort = SORT_OPTIONS.find((o) => o.value === sort)
+  const activeSort = SORT_OPTIONS.find((o) => o.value === sort);
 
   return (
     <div className="max-w-content mx-auto px-4 sm:px-6 md:px-10 py-4 sm:py-6">
@@ -158,14 +222,22 @@ const activeSort = SORT_OPTIONS.find((o) => o.value === sort)
         {/* ── Sidebar ── */}
         {/* Desktop sidebar */}
         <div className="hidden sm:block">
-          <ShopSidebar filters={filters} onChange={handleFilterChange} />
+          <ShopSidebar
+            filters={filters}
+            onChange={handleFilterChange}
+            categories={sidebarCategories}
+            brands={sidebarBrands}
+          />
         </div>
 
         {/* Mobile sidebar overlay */}
         {mobileSidebarOpen && (
           <div className="fixed inset-0 z-50 sm:hidden">
-            <div className="absolute inset-0 bg-black/50" onClick={() => setMobileSidebarOpen(false)} />
-            <div className="absolute left-0 top-0 h-full w-[280px] max-w-[85vw] bg-white overflow-y-auto">
+            <div
+              className="absolute inset-0 bg-black/50"
+              onClick={() => setMobileSidebarOpen(false)}
+            />
+            <div className="absolute left-0 top-0 h-full w-70 max-w-[85vw] bg-white overflow-y-auto">
               <div className="flex items-center justify-between p-4 border-b border-[#E5E7EB]">
                 <h2 className="text-lg font-bold text-[#111111]">Filters</h2>
                 <button
@@ -176,7 +248,12 @@ const activeSort = SORT_OPTIONS.find((o) => o.value === sort)
                 </button>
               </div>
               <div className="p-4">
-                <ShopSidebar filters={filters} onChange={handleFilterChange} />
+                <ShopSidebar
+                  filters={filters}
+                  onChange={handleFilterChange}
+                  categories={sidebarCategories}
+                  brands={sidebarBrands}
+                />
               </div>
             </div>
           </div>
@@ -184,7 +261,6 @@ const activeSort = SORT_OPTIONS.find((o) => o.value === sort)
 
         {/* ── Main content ── */}
         <div className="flex-1 min-w-0">
-
           {/* Top bar: inline search + sort */}
           <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
             {/* Inline search */}
@@ -192,7 +268,7 @@ const activeSort = SORT_OPTIONS.find((o) => o.value === sort)
               <input
                 type="text"
                 value={localSearch}
-                onChange={(e) => setLocalSearch(e.target.value)}
+                onChange={(e) => { setHasInteracted(true); setLocalSearch(e.target.value) }}
                 placeholder="Search for anything..."
                 className="w-full h-9 sm:h-10 pl-3 sm:pl-4 pr-9 sm:pr-10 text-sm border border-[#E5E7EB] rounded-btn outline-none focus:border-[#F5820A] focus:ring-2 focus:ring-[#F5820A]/20 transition-all"
               />
@@ -208,11 +284,15 @@ const activeSort = SORT_OPTIONS.find((o) => o.value === sort)
                 onClick={() => setSortOpen((v) => !v)}
                 className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-2 sm:px-3 border border-[#E5E7EB] rounded-btn text-xs sm:text-sm text-[#111111] hover:border-[#F5820A] transition-colors bg-white"
               >
-                <span className="text-[#6B7280] text-[10px] sm:text-xs mr-0.5 sm:mr-1 hidden xs:inline">Sort by:</span>
-                <span className="max-w-[80px] sm:max-w-none truncate">{activeSort?.label}</span>
+                <span className="text-[#6B7280] text-[10px] sm:text-xs mr-0.5 sm:mr-1 hidden xs:inline">
+                  Sort by:
+                </span>
+                <span className="max-w-20 sm:max-w-none truncate">
+                  {activeSort?.label}
+                </span>
                 <FiChevronDown
                   size={11}
-                  className={`transition-transform duration-200 ${sortOpen ? 'rotate-180' : ''}`}
+                  className={`transition-transform duration-200 ${sortOpen ? "rotate-180" : ""}`}
                 />
               </button>
 
@@ -226,9 +306,15 @@ const activeSort = SORT_OPTIONS.find((o) => o.value === sort)
                     {SORT_OPTIONS.map((opt) => (
                       <button
                         key={opt.value}
-                        onClick={() => { setSort(opt.value); setSortOpen(false); setPage(1) }}
+                        onClick={() => {
+                          setSort(opt.value);
+                          setSortOpen(false);
+                          setPage(1);
+                        }}
                         className={`w-full text-left px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm transition-colors hover:bg-orange-50 hover:text-[#F5820A] ${
-                          sort === opt.value ? 'text-[#F5820A] font-medium' : 'text-[#111111]'
+                          sort === opt.value
+                            ? "text-[#F5820A] font-medium"
+                            : "text-[#111111]"
                         }`}
                       >
                         {opt.label}
@@ -255,9 +341,10 @@ const activeSort = SORT_OPTIONS.find((o) => o.value === sort)
           ) : (
             <div
               className={`grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 transition-opacity duration-300 ${
-                isPending ? 'opacity-50' : 'opacity-100'
+                isLoading ? "opacity-50" : "opacity-100"
               }`}
             >
+              {/* {<button onClick={()=> console.log(filteredProducts)}>show</button>} */}
               {filteredProducts?.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -276,7 +363,7 @@ const activeSort = SORT_OPTIONS.find((o) => o.value === sort)
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function EmptyState({ onClear }: { onClear: () => void }) {
@@ -285,8 +372,12 @@ function EmptyState({ onClear }: { onClear: () => void }) {
       <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-[#F5F5F5] flex items-center justify-center mb-3 sm:mb-4">
         <FiGrid size={20} className="text-[#D1D5DB]" />
       </div>
-      <h3 className="text-sm sm:text-base font-bold text-[#111111] mb-1.5 sm:mb-2">No products found</h3>
-      <p className="text-xs sm:text-sm text-[#6B7280] mb-4 sm:mb-6 max-w-xs">Try adjusting your filters or search terms.</p>
+      <h3 className="text-sm sm:text-base font-bold text-[#111111] mb-1.5 sm:mb-2">
+        No products found
+      </h3>
+      <p className="text-xs sm:text-sm text-[#6B7280] mb-4 sm:mb-6 max-w-xs">
+        Try adjusting your filters or search terms.
+      </p>
       <button
         onClick={onClear}
         className="h-9 sm:h-10 px-4 sm:px-6 bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white font-semibold rounded-btn text-xs sm:text-sm hover:shadow-md transition-all"
@@ -294,5 +385,5 @@ function EmptyState({ onClear }: { onClear: () => void }) {
         Clear Filters
       </button>
     </div>
-  )
+  );
 }

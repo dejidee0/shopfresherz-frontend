@@ -1,58 +1,45 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { FiChevronRight, FiX } from 'react-icons/fi'
 import { FiShoppingCart } from 'react-icons/fi'
 import { PriceRangeSlider } from '@/components/ui/PriceRangeSlider'
 import { cn, formatPrice } from '@/lib/utils/format'
+import { productsApi } from '@/lib/api/products'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface ShopFilters {
-  categorySlug: string | null
+  categoryId: number | null
+  categorySlug: string | null,
   priceRange: [number, number]
   brands: string[]
-  tags: string[]
+  tags: string[],
+  rating: number | null,
+  inStock: boolean | null
+  sortBy: string
 }
 
 interface ShopSidebarProps {
   filters: ShopFilters
   onChange: (filters: ShopFilters) => void
+  categories?: { label: string;  slug: string; children?: { label: string; slug: string }[] }[]
+  brands?: string[]
 }
 
 // ─── Static data (swap with API when ready) ───────────────────────────────────
 
-const CATEGORIES = [
-  { label: 'Computer & Laptop', slug: 'computer-laptop', children: [
-    { label: 'Computer Accessories', slug: 'computer-accessories' },
-    { label: 'Smartphone', slug: 'mobile-phones' },
-    { label: 'Headphone', slug: 'accessories/headphones' },
-    { label: 'Mobile Accessories', slug: 'accessories/mobile' },
-    { label: 'Gaming Console', slug: 'games-consoles' },
-    { label: 'Camera & Photo', slug: 'electronics/cameras' },
-    { label: 'Romoss', slug: 'romoss' },
-    { label: 'TV & Homes Appliances', slug: 'electronics/tv' },
-    { label: 'Watchs & Accessories', slug: 'smart-watches' },
-    { label: 'GPS & Navigation', slug: 'gps-navigation' },
-    { label: 'Warable Technology', slug: 'wearables' },
-  ]},
-]
-
 const PRICE_PRESETS: { label: string; range: [number, number] }[] = [
-  { label: 'All Price', range: [0, 80_000] },
-  { label: 'Under ₦5,000', range: [0, 5_000] },
-  { label: '₦5,000 to ₦10,000', range: [5_000, 10_000] },
-  { label: '₦10,000 to ₦20,000', range: [10_000, 20_000] },
-  { label: '₦20,000 to ₦30,000', range: [20_000, 30_000] },
-  { label: '₦30,000 to ₦40,000', range: [30_000, 40_000] },
-  { label: '₦50,000 to ₦80,000', range: [50_000, 80_000] },
-]
-
-const BRANDS = [
-  'Apple', 'Microsoft', 'Dell', 'Symphony', 'Sony', 'LG', 'One Plus',
-  'Google', 'Samsung', 'HP', 'Xiaomi', 'Panasonic', 'Intel',
+  { label: 'All Price', range: [0, 10_000_000] },
+  { label: 'Under ₦20,000', range: [0, 20_000] },
+  { label: '₦20,000 to ₦50,000', range: [20_000, 50_000] },
+  { label: '₦50,000 to ₦100,000', range: [50_000, 100_000] },
+  { label: '₦100,000 to ₦500,000', range: [100_000, 500_000] },
+  { label: '₦500,000 to ₦1,000,000', range: [500_000, 1_000_000] },
+  { label: '₦2,000,000 to ₦5,000,000', range: [2_000_000, 5_000_000] },
+  { label: '₦5,000,000 to ₦10,000,000', range: [5_000_000, 10_000_000] },
 ]
 
 const POPULAR_TAGS = [
@@ -61,6 +48,7 @@ const POPULAR_TAGS = [
   'Power Bank', 'Smart TV', 'Speaker',
   'Tablet', 'Microwave', 'Samsung',
 ]
+
 
 // ─── Featured promo product (bottom of sidebar) ───────────────────────────────
 // const PROMO = {
@@ -78,7 +66,7 @@ const POPULAR_TAGS = [
 const PROMO = {
   tag: 'Smartwatches',
   name: 'Apple and Android Smartwatches',
-  headline: 'Heavy on Features.',
+  headline: 'Heav  y on Features.',
   subtext: 'Light on Price.',
   label: 'Starting from:',
   price: 20000,
@@ -102,7 +90,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 // ─── Main sidebar ─────────────────────────────────────────────────────────────
 
-export function ShopSidebar({ filters, onChange }: ShopSidebarProps) {
+export function ShopSidebar({ filters, onChange, categories, }: ShopSidebarProps) {
    function set<K extends keyof ShopFilters>(key: K, value: ShopFilters[K]) {
      onChange({ ...filters, [key]: value })
    }
@@ -121,71 +109,87 @@ export function ShopSidebar({ filters, onChange }: ShopSidebarProps) {
      set('tags', next)
    }
 
+  const [loadedBrands, setLoadedBrands] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const response = await productsApi.getBrands();
+        const data = response;
+        setLoadedBrands(data.map((banner: any) => banner.title));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchBrands();
+  }, []);
+
    return (
      <aside className="w-52 sm:w-56 md:w-60 shrink-0 space-y-0 max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-hide">
 
-       {/* ── Category ── */}
-       <Section title="Category">
-         <ul className="space-y-0.5 max-h-64 overflow-y-auto scrollbar-hide">
-           {CATEGORIES.map((cat) => (
-             <li key={cat.slug}>
-               {/* Parent */}
-               <button
-                 onClick={() => set('categorySlug', cat.slug)}
-                 className={cn(
-                   'flex items-center gap-2 w-full text-left text-xs sm:text-sm py-1 sm:py-1.5 px-1 rounded transition-colors',
-                   filters.categorySlug === cat.slug
-                     ? 'text-[#F5820A] font-semibold'
-                     : 'text-[#111111] hover:text-[#F5820A]'
-                 )}
-               >
-                 <span
-                   className={cn(
-                     'w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 shrink-0 transition-colors',
-                     filters.categorySlug === cat.slug
-                       ? 'border-[#F5820A] bg-[#F5820A]'
-                       : 'border-[#D1D5DB]'
-                   )}
-                 />
-                 <span className="truncate">{cat.label}</span>
-               </button>
+        {/* ── Category ── */}
+        <Section title="Category">
+          <ul className="space-y-0.5 max-h-64 overflow-y-auto scrollbar-hide flex flex-col md:hidden">
+            {categories?.map((cat, index) => (
+              <li key={`${cat.slug}-${index}`}>
+                {/* Parent */}
+                <button
+                  onClick={() => set('categorySlug', cat.slug)}
+                  className={cn(
+                    'flex items-center gap-2 w-full text-left text-xs sm:text-sm py-1 sm:py-1.5 px-1 rounded transition-colors',
+                    filters.categorySlug === cat.slug
+                      ? 'text-[#F5820A] font-semibold'
+                      : 'text-[#111111] hover:text-[#F5820A]'
+                  )}
+                >
+                  <span
+                    className={cn(
+                      'w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 shrink-0 transition-colors',
+                      filters.categorySlug === cat.slug
+                        ? 'border-[#F5820A] bg-[#F5820A]'
+                        : 'border-[#D1D5DB]'
+                    )}
+                  />
+                  <span className="truncate">{cat.label}</span>
+                </button>
 
-               {/* Children */}
-               <ul className="ml-4 sm:ml-5 space-y-0.5">
-                 {cat.children.map((child) => (
-                   <li key={child.slug}>
-                     <button
-                       onClick={() => set('categorySlug', child.slug)}
-                       className={cn(
-                         'flex items-center gap-2 w-full text-left text-xs py-0.5 sm:py-1 px-1 rounded transition-colors',
-                         filters.categorySlug === child.slug
-                           ? 'text-[#F5820A] font-semibold'
-                           : 'text-[#6B7280] hover:text-[#F5820A]'
-                       )}
-                     >
-                       <span
-                         className={cn(
-                           'w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border-2 shrink-0 transition-colors',
-                           filters.categorySlug === child.slug
-                             ? 'border-[#F5820A] bg-[#F5820A]'
-                             : 'border-[#D1D5DB]'
-                         )}
-                       />
-                       <span className="truncate">{child.label}</span>
-                     </button>
-                   </li>
-                 ))}
-               </ul>
-             </li>
-           ))}
-         </ul>
-       </Section>
+                {/* Children */}
+                <ul className="ml-4 sm:ml-5 space-y-0.5">
+                  {cat.children?.map((child, childIndex) => (
+                    <li key={`${child.slug}-${childIndex}`}>
+                      <button
+                        onClick={() => set('categorySlug', child.slug)}
+                        className={cn(
+                          'flex items-center gap-2 w-full text-left text-xs py-0.5 sm:py-1 px-1 rounded transition-colors',
+                          filters.categorySlug === child.slug
+                            ? 'text-[#F5820A] font-semibold'
+                            : 'text-[#6B7280] hover:text-[#F5820A]'
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            'w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border-2 shrink-0 transition-colors',
+                            filters.categorySlug === child.slug
+                              ? 'border-[#F5820A] bg-[#F5820A]'
+                              : 'border-[#D1D5DB]'
+                          )}
+                        />
+                        <span className="truncate">{child.label}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
+        </Section>
 
 {/* ── Price Range ── */}
        <Section title="Price Range">
          <PriceRangeSlider
            min={0}
-           max={80_000}
+           max={10_000_000}
            value={filters.priceRange}
            onChange={(range) => set('priceRange', range)}
          />
@@ -219,14 +223,14 @@ export function ShopSidebar({ filters, onChange }: ShopSidebarProps) {
 
 {/* ── Popular Brands ── */}
        <Section title="Popular Brands">
-         <div className="grid grid-cols-2 gap-x-2 sm:gap-x-4 gap-y-1 sm:gap-y-1.5">
-           {BRANDS.map((brand) => {
+          <div className="grid grid-cols-2 gap-x-2 sm:gap-x-4 gap-y-1 sm:gap-y-1.5">
+            {loadedBrands.map((brand, index) => {
              const checked = filters.brands.includes(brand)
              return (
                <label
-                 key={brand}
+                 key={`${brand}-${index}`}
                  className="flex items-center gap-1 sm:gap-2 cursor-pointer group"
-               >
+               > 
                  <span
                    onClick={() => toggleBrand(brand)}
                    className={cn(
@@ -309,7 +313,7 @@ export function ShopSidebar({ filters, onChange }: ShopSidebarProps) {
 
           <div className="flex flex-col gap-1.5 sm:gap-2 mt-3 sm:mt-4">
              <Link
-              href={"/store/categories"}
+              href={"/store/category/all"}
               className="flex items-center justify-center gap-1.5 sm:gap-2 h-8 sm:h-9 bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white text-[10px] sm:text-xs font-semibold rounded-btn hover:shadow-md transition-all"
             >
               <FiShoppingCart size={11} />

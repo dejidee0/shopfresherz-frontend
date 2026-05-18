@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { adminApi, type DashboardStatsDto, type PagedResult, type OrderDto, type AdminUserDto, type LowStockDto, type BannerDto, type AdminOrdersFilters, type AdminUsersFilters, type UpdateOrderStatusRequest, type AdjustLoyaltyRequest, type CreateBannerRequest, type UpdateBannerRequest, type AdminProductsFilters, type CreateProductRequest, type UpdateProductRequest, type ProductDto } from '@/lib/api/admin'
+import { adminApi, type DashboardStatsDto, type PagedResult, type OrderDto, type AdminUserDto, type LowStockDto, type BannerDto, type AdminOrdersFilters, type AdminUsersFilters, type UpdateOrderStatusRequest, type AdjustLoyaltyRequest, type CreateBannerRequest, type UpdateBannerRequest, type AdminProductsFilters, type CreateProductRequest, type UpdateProductRequest, type ProductDto, type FlashDealDto, type CreateFlashDealRequest, type UpdateFlashDealRequest, type CouponDto, type CreateCouponRequest, type UpdateCouponRequest } from '@/lib/api/admin'
 import { productsApi } from '@/lib/api/products'
 import { useAuthStore } from '@/store/auth'
 import { toast } from '@/store/toast'
@@ -191,6 +191,13 @@ export function useCategories() {
   })
 }
 
+export function useBrands() {
+  return useQuery({
+    queryKey: ['brands'],
+    queryFn: () => productsApi.getBrands(),
+  })
+}
+
 export function useCreateProduct() {
   const { accessToken } = useAuthStore()
   const queryClient = useQueryClient()
@@ -217,6 +224,7 @@ export function useCreateProduct() {
         isFeatured: payload.isFeatured,
         metaTitle: payload.metaTitle,
         metaDescription: payload.metaDescription,
+        imageUrls: payload.imageUrls,
       }
       return adminApi.createProduct(accessToken!, apiPayload)
     },
@@ -269,6 +277,157 @@ export function useDeleteProduct() {
 
     onError: (error: { message?: string }) => {
       toast.error('Failed to delete product', error.message ?? 'Please try again')
+    },
+  })
+}
+
+// ─── Flash Deal Management ─────────────────────────────────────────────────────
+
+export function useFlashDeals() {
+  return useQuery({
+    queryKey: ['flash-deals'],
+    queryFn: () => adminApi.getFlashDeals(),
+  })
+}
+
+export function useCreateFlashDeal() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (payload: CreateFlashDealRequest) =>
+      adminApi.createFlashDeal(accessToken!, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['flash-deals'] })
+      toast.success('Flash deal created successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to create flash deal', error.message ?? 'Please try again')
+    },
+  })
+}
+
+export function useUpdateFlashDeal() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateFlashDealRequest }) =>
+      adminApi.updateFlashDeal(accessToken!, id, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['flash-deals'] })
+      toast.success('Flash deal updated successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to update flash deal', error.message ?? 'Please try again')
+    },
+  })
+}
+
+export function useToggleFlashDeal() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
+      adminApi.toggleFlashDeal(accessToken!, id, isActive),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['flash-deals'] })
+      toast.success('Flash deal status updated successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to update flash deal status', error.message ?? 'Please try again')
+    },
+  })
+}
+
+export function useDeleteFlashDeal() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) =>
+      adminApi.deleteFlashDeal(accessToken!, id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['flash-deals'] })
+      toast.success('Flash deal deleted successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to delete flash deal', error.message ?? 'Please try again')
+    },
+  })
+}
+
+// ─── Coupon Management ────────────────────────────────────────────────────────
+
+export function useCoupons() {
+  return useQuery({
+    queryKey: ['coupons'],
+    queryFn: () => adminApi.getCoupons(),
+  })
+}
+
+export function useCreateCoupon() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (payload: CreateCouponRequest) =>
+      adminApi.createCoupon(accessToken!, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['coupons'] })
+      toast.success('Coupon created successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to create coupon', error.message ?? 'Please try again')
+    },
+  })
+}
+
+export function useUpdateCoupon() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: UpdateCouponRequest }) =>
+      adminApi.updateCoupon(accessToken!, id, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['coupons'] })
+      toast.success('Coupon updated successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to update coupon', error.message ?? 'Please try again')
+    },
+  })
+}
+
+export function useDeleteCoupon() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: number) =>
+      adminApi.deleteCoupon(accessToken!, id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['coupons'] })
+      toast.success('Coupon deleted successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to delete coupon', error.message ?? 'Please try again')
     },
   })
 }

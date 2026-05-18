@@ -1,157 +1,291 @@
-import { api } from './client'
-import type { Order, OrderStatus, User } from '../types/user'
-import type { Product } from '../types/product'
+import { api } from "./client";
+import type { Order, OrderStatus, User } from "../types/user";
+import type { Product } from "../types/product";
 
 export interface PagedResult<T> {
-  items: T[]
-  totalCount: number
-  page: number
-  pageSize: number
-  totalPages: number
-  hasPreviousPage: boolean
-  hasNextPage: boolean
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
 }
 
 export interface DashboardStatsDto extends Record<string, unknown> {
-  totalOrders?: number
-  totalRevenue?: number
-  totalCustomers?: number
-  totalProducts?: number
-  pendingOrders?: number
-  lowStockCount?: number
-  completedOrders?: number
-  cancelledOrders?: number
+  totalOrders?: number;
+  totalRevenue?: number;
+  totalCustomers?: number;
+  totalProducts?: number;
+  pendingOrders?: number;
+  lowStockCount?: number;
+  completedOrders?: number;
+  cancelledOrders?: number;
 }
 
 export interface AdminOrdersFilters {
-  page?: number
-  pageSize?: number
-  status?: string
-  paymentStatus?: string
-  from?: string | Date
-  to?: string | Date
+  page?: number;
+  pageSize?: number;
+  status?: string;
+  paymentStatus?: string;
+  from?: string | Date;
+  to?: string | Date;
 }
 
-export type OrderDto = Order & Record<string, unknown>
+export type OrderDto = Order & Record<string, unknown>;
 
 export interface AdminUsersFilters {
-  page?: number
-  pageSize?: number
-  search?: string
+  page?: number;
+  pageSize?: number;
+  search?: string;
 }
 
-export type AdminUserDto = Partial<User> & Record<string, unknown> & {
-  id: string
-  email: string
-  firstName?: string
-  lastName?: string
-  phone?: string
-  role?: string
-  isActive?: boolean
-  createdAt?: string
-  loyaltyPoints?: number
-}
+export type AdminUserDto = Partial<User> &
+  Record<string, unknown> & {
+    id: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    role?: string;
+    isActive?: boolean;
+    createdAt?: string;
+    loyaltyPoints?: number;
+  };
 
 export interface UpdateOrderStatusRequest {
-  status: OrderStatus | string
-  note?: string
-  trackingNumber?: string
+  status: OrderStatus | string;
+  note?: string;
+  trackingNumber?: string;
 }
 
 export interface AdjustLoyaltyRequest {
-  points: number
-  reason?: string
+  points: number;
+  reason?: string;
 }
 
 export interface LowStockDto extends Record<string, unknown> {
-  productId: string
-  productName: string
-  sku?: string
-  slug?: string
-  availableQty: number
-  stockQty?: number
-  reservedQty?: number
-  threshold?: number
+  productId: string;
+  productName: string;
+  sku?: string;
+  slug?: string;
+  availableQty: number;
+  stockQty?: number;
+  reservedQty?: number;
+  threshold?: number;
 }
 
 export interface BannerDto extends Record<string, unknown> {
-  id: string
-  title?: string
-  subtitle?: string
-  imageUrl: string
-  linkUrl?: string
-  ctaText?: string
-  position?: string
-  sortOrder?: number
-  isActive?: boolean
-  startsAt?: string
-  endsAt?: string
-  createdAt?: string
+  id: string;
+  title?: string;
+  subtitle?: string;
+  imageUrl: string;
+  linkUrl?: string;
+  ctaText?: string;
+  position?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+  startsAt?: string;
+  endsAt?: string;
+  createdAt?: string;
 }
 
 export interface CreateBannerRequest {
-  title?: string
-  subtitle?: string
-  imageUrl: string
-  linkUrl?: string
-  ctaText?: string
-  position?: string
-  sortOrder?: number
-  isActive?: boolean
-  startsAt?: string
-  endsAt?: string
+  title?: string;
+  subtitle?: string;
+  imageUrl: string;
+  linkUrl?: string;
+  ctaText?: string;
+  position?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+  startsAt?: string;
+  endsAt?: string;
 }
 
-export type UpdateBannerRequest = Partial<CreateBannerRequest>
+export type UpdateBannerRequest = Partial<CreateBannerRequest>;
 
 export interface AdminProductsFilters {
-  page?: number
-  pageSize?: number
-  search?: string
-  category?: string
-  status?: string
-  sortBy?: string
-  sortOrder?: 'asc' | 'desc'
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  category?: string;
+  status?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }
 
 export interface CreateProductRequest {
-  sku: string
-  name: string
-  slug: string
-  brandId?: string
-  categoryId?: number
-  description?: string
-  shortDescription?: string
-  price: number
-  compareAtPrice?: number
-  costPrice?: number
-  stockQty: number
-  weightKg?: number
-  attributesJson?: string
-  tagsJson?: string
-  isActive?: boolean
-  isFeatured?: boolean
-  metaTitle?: string
-  metaDescription?: string
+  sku: string;
+  name: string;
+  slug: string;
+  brandId?: string;
+  categoryId?: number;
+  description?: string;
+  shortDescription?: string;
+  price: number;
+  compareAtPrice?: number;
+  costPrice?: number;
+  stockQty: number;
+  weightKg?: number;
+  attributesJson?: string;
+  tagsJson?: string;
+  isActive?: boolean;
+  isFeatured?: boolean;
+  metaTitle?: string;
+  metaDescription?: string;
 }
 
 export interface UpdateProductRequest extends Partial<CreateProductRequest> {
-  id: string
+  id: string;
 }
 
-export type ProductDto = Product & Record<string, unknown>
+export type ProductDto = Product & Record<string, unknown>;
+
+export interface FlashDealDto {
+  id: string;
+  productId: string;
+  productName: string;
+  productSlug: string;
+  productImageUrl: string | null;
+  salePrice: number;
+  originalPrice: number;
+  discountPercent: number;
+  startsAt: string;
+  endsAt: string;
+  maxQuantity: number;
+  soldQuantity: number;
+  remainingQuantity: number;
+  isLive: boolean;
+  timeRemaining?: string;
+}
+
+export interface CreateFlashDealRequest {
+  productId: string;
+  salePrice: number;
+  originalPrice: number;
+  startsAt: string;
+  endsAt: string;
+  maxQuantity: number;
+}
+
+export interface UpdateFlashDealRequest extends Partial<CreateFlashDealRequest> {}
+
+export interface CouponDto {
+  id: number;
+  code: string;
+  type: "Fixed" | "Percentage";
+  value: number;
+  minimumOrderAmount: number;
+  maxUses: number;
+  usedCount: number;
+  perUserLimit: number;
+  expiresAt: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface CreateCouponRequest {
+  code: string;
+  type: "Fixed" | "Percentage";
+  value: number;
+  minimumOrderAmount: number;
+  maxUses: number;
+  perUserLimit: number;
+  expiresAt: string;
+  isActive?: boolean;
+}
+
+export interface AnalyticsData {
+  revenueToday: number;
+  revenueThisWeek: number;
+  revenueThisMonth: number;
+  ordersToday: number;
+  processingOrders: number;
+  shippedOrders: number;
+  newUsersToday: number;
+  totalProducts: number;
+  lowStockCount: number;
+  recentOrders: RecentOrder[];
+  totalRevenue: number;
+  totalOrders: number;
+  totalCustomers: number;
+  pendingOrders: number;
+  lowStockProducts: number;
+  monthlyRevenue: number;
+  todayOrders: number;
+}
+
+export interface RecentOrder {
+  id: string;
+  orderNumber: string;
+  customerEmail: string;
+  total: number;
+  status: string;
+  createdAt: string;
+}
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+
+export interface AdminNotificationDto {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  linkUrl: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+export interface AdminNotificationsResponse {
+  items: AdminNotificationDto[];
+  unreadCount: number;
+}
+
+export interface AdminNotificationsFilters {
+  page?: number;
+  pageSize?: number;
+  unreadOnly?: boolean;
+}
+
+// ─── Reviews ──────────────────────────────────────────────────────────────────
+
+export interface ReviewDto {
+  id: string;
+  userId: string;
+  reviewerName: string;
+  rating: number;
+  title: string;
+  body: string;
+  isVerifiedPurchase: boolean;
+  createdAt: string;
+  // Client-side moderation status — not yet returned by the API.
+  // Will be replaced with a real field once the backend adds it.
+  moderationStatus?: ReviewModerationStatus;
+}
+
+export type ReviewModerationStatus = "Pending" | "Approved" | "Rejected" | "Flagged";
+
+export interface AdminReviewsFilters {
+  page?: number;
+  pageSize?: number;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface UpdateCouponRequest extends Partial<CreateCouponRequest> {}
 
 function toDateParam(value?: string | Date) {
-  if (!value) return undefined
-  return value instanceof Date ? value.toISOString() : value
+  if (!value) return undefined;
+  return value instanceof Date ? value.toISOString() : value;
 }
 
 export const adminApi = {
   getDashboard: (token: string) =>
-    api.get<DashboardStatsDto>('/admin/dashboard', { token }),
+    api.get<DashboardStatsDto>("/admin/dashboard", { token }),
 
   getOrders: (token: string, filters: AdminOrdersFilters = {}) =>
-    api.get<PagedResult<OrderDto>>('/admin/orders', {
+    api.get<PagedResult<OrderDto>>("/admin/orders", {
       token,
       params: {
         page: filters.page ?? 1,
@@ -164,7 +298,7 @@ export const adminApi = {
     }),
 
   getUsers: (token: string, filters: AdminUsersFilters = {}) =>
-    api.get<PagedResult<AdminUserDto>>('/admin/users', {
+    api.get<PagedResult<AdminUserDto>>("/admin/users", {
       token,
       params: {
         page: filters.page ?? 1,
@@ -173,48 +307,88 @@ export const adminApi = {
       },
     }),
 
+  getAnalytics: (token: string) =>
+    api.get<AnalyticsData>("/admin/analytics", { token }),
+
+  getReviews: (token: string, filters: AdminReviewsFilters = {}) =>
+    api.get<PagedResult<ReviewDto>>("/admin/reviews", {
+      token,
+      params: {
+        page: filters.page ?? 1,
+        pageSize: filters.pageSize ?? 20,
+      },
+    }),
+
+  // TODO: add once backend implements moderation endpoints:
+  // approveReview, rejectReview, flagReview, postReviewResponse
+
+  getNotifications: (
+    token: string,
+    filters: AdminNotificationsFilters = {},
+  ) =>
+    api.get<AdminNotificationsResponse>("/admin/notifications", {
+      token,
+      params: {
+        page: filters.page ?? 1,
+        pageSize: filters.pageSize ?? 20,
+        unreadOnly: filters.unreadOnly,
+      },
+    }),
+
+  markNotificationRead: (token: string, id: string) =>
+    api.put<void>(
+      `/admin/notifications/${encodeURIComponent(id)}/read`,
+      null,
+      { token },
+    ),
+
+  markAllNotificationsRead: (token: string) =>
+    api.put<void>("/admin/notifications/read-all", null, { token }),
+
   updateOrderStatus: (
     token: string,
     orderNumber: string,
-    payload: UpdateOrderStatusRequest
+    payload: UpdateOrderStatusRequest,
   ) =>
     api.put<void>(
       `/admin/orders/${encodeURIComponent(orderNumber)}/status`,
       payload,
-      { token }
+      { token },
     ),
 
   adjustUserLoyalty: (
     token: string,
     userId: string,
-    payload: AdjustLoyaltyRequest
+    payload: AdjustLoyaltyRequest,
   ) =>
     api.post<void>(
       `/admin/users/${encodeURIComponent(userId)}/loyalty`,
       payload,
-      { token }
+      { token },
     ),
 
   getLowStock: (token: string, threshold = 5) =>
-    api.get<LowStockDto[]>('/admin/inventory/low-stock', {
+    api.get<LowStockDto[]>("/admin/inventory/low-stock", {
       token,
       params: { threshold },
     }),
 
   getBanners: (token: string) =>
-    api.get<BannerDto[]>('/admin/banners', { token }),
+    api.get<BannerDto[]>("/admin/banners", { token }),
 
   createBanner: (token: string, payload: CreateBannerRequest) =>
-    api.post<unknown>('/admin/banners', payload, { token }),
+    api.post<unknown>("/admin/banners", payload, { token }),
 
   updateBanner: (token: string, id: string, payload: UpdateBannerRequest) =>
-    api.put<void>(`/admin/banners/${encodeURIComponent(id)}`, payload, { token }),
+    api.put<void>(`/admin/banners/${encodeURIComponent(id)}`, payload, {
+      token,
+    }),
 
   deleteBanner: (token: string, id: string) =>
     api.delete<void>(`/admin/banners/${encodeURIComponent(id)}`, { token }),
 
   getProducts: (token: string, filters: AdminProductsFilters = {}) =>
-    api.get<PagedResult<ProductDto>>('/products', {
+    api.get<PagedResult<ProductDto>>("/products", {
       token,
       params: {
         page: filters.page ?? 1,
@@ -228,11 +402,45 @@ export const adminApi = {
     }),
 
   createProduct: (token: string, payload: CreateProductRequest) =>
-    api.post<ProductDto>('/products', payload, { token }),
+    api.post<ProductDto>("/products", payload, { token }),
 
   updateProduct: (token: string, id: string, payload: UpdateProductRequest) =>
-    api.put<ProductDto>(`/products/${encodeURIComponent(id)}`, payload, { token }),
+    api.put<ProductDto>(`/products/${encodeURIComponent(id)}`, payload, {
+      token,
+    }),
 
   deleteProduct: (token: string, id: string) =>
-    api.delete<void>(`/products/${encodeURIComponent(id)}`, { token }),
-}
+    api.delete<void>(`/admin/products/${encodeURIComponent(id)}`, { token }),
+
+  getFlashDeals: () => api.get<FlashDealDto[]>("/flash-deals"),
+
+  createFlashDeal: (token: string, payload: CreateFlashDealRequest) =>
+    api.post<FlashDealDto>("/flash-deals", payload, { token }),
+
+  updateFlashDeal: (
+    token: string,
+    id: string,
+    payload: UpdateFlashDealRequest,
+  ) =>
+    api.put<void>(`/flash-deals/${encodeURIComponent(id)}`, payload, { token }),
+
+  toggleFlashDeal: (token: string, id: string, isActive: boolean) =>
+    api.put<void>(`/flash-deals/${encodeURIComponent(id)}/toggle`, null, {
+      token,
+      params: { isActive },
+    }),
+
+  deleteFlashDeal: (token: string, id: string) =>
+    api.delete<void>(`/flash-deals/${encodeURIComponent(id)}`, { token }),
+
+  getCoupons: () => api.get<CouponDto[]>("/coupons"),
+
+  createCoupon: (token: string, payload: CreateCouponRequest) =>
+    api.post<CouponDto>("/coupons", payload, { token }),
+
+  updateCoupon: (token: string, id: number, payload: UpdateCouponRequest) =>
+    api.put<void>(`/coupons/${id}`, payload, { token }),
+
+  deleteCoupon: (token: string, id: number) =>
+    api.delete<void>(`/coupons/${id}`, { token }),
+};

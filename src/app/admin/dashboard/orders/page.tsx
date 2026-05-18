@@ -4,9 +4,11 @@ import { IoEyeOutline, IoWarningOutline } from "react-icons/io5";
 import { Button } from "@/components/ui/Button";
 import { ColumnDef, DataTable } from "@/components/ui/DataTable";
 import { HiMagnifyingGlass } from "react-icons/hi2";
-import { useOrders } from "@/lib/hooks/useAdmin";
+import { useOrders, useUpdateOrderStatus } from "@/lib/hooks/useAdmin";
 import { useState, useMemo } from "react";
 import type { AdminOrdersFilters } from "@/lib/api/admin";
+import OrderDetailsModal from "@/components/admin/OrderDetailsModal";
+import { Spinner } from "@/components/ui/Spinner";
 
 const paymentAndStatusColors: Record<string, string> = {
   Paid: "bg-green-100 text-green-700",
@@ -17,7 +19,63 @@ const paymentAndStatusColors: Record<string, string> = {
   Cancelled: "bg-red-100 text-red-600",
 };
 
-const orderColumns: ColumnDef<any>[] = [
+
+const AdminOrderPage = () => {
+  const [filters, setFilters] = useState<AdminOrdersFilters>({});
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { data: ordersData, isLoading } = useOrders(filters);
+  const updateOrderStatusMutation = useUpdateOrderStatus();
+
+  const orders = useMemo(() => {
+    if (!ordersData?.items) return [];
+    return ordersData.items.map((order: any) => ({
+      id: order.id,
+      orderId: order.orderNumber || order.id,
+      customer: 'Customer', // API doesn't provide customer name directly
+      date: order.createdAt ? new Date(order.createdAt).toLocaleDateString() : '',
+      items: `${order.items?.length || 0} items`,
+      total: `₦${order.total?.toLocaleString() || '0'}`,
+      payment: order.paymentStatus || 'Unknown',
+      status: order.status || 'Unknown',
+      fullOrder: order, // Store the full order data for the modal
+    }));
+  }, [ordersData]);
+
+
+  const handleViewOrder = (order: any) => {
+    setSelectedOrder(order.fullOrder);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedOrder(null);
+  };
+
+  const handleStatusUpdate = (orderId: string, status: string) => {
+    updateOrderStatusMutation.mutate({ orderNumber: orderId, payload: { status } });
+  };
+
+  const handleTrackingSave = (orderId: string, tracking: string) => {
+    // Find the current order to get its status
+    const currentOrder = ordersData?.items.find(o => (o.orderNumber || o.id) === orderId);
+    const currentStatus = currentOrder?.status || 'Pending';
+
+    updateOrderStatusMutation.mutate({
+      orderNumber: orderId,
+      payload: { status: currentStatus, trackingNumber: tracking }
+    });
+  };
+
+  const handleCancelOrder = (orderId: string) => {
+    updateOrderStatusMutation.mutate({
+      orderNumber: orderId,
+      payload: { status: 'Cancelled' }
+    });
+  };
+
+  const orderColumns: ColumnDef<any>[] = [
   {
     key: "orderId",
     header: "ORDER ID",
@@ -74,29 +132,13 @@ const orderColumns: ColumnDef<any>[] = [
     key: "action",
     header: "ACTION",
     render: (row) => (
-      <button className="cursor-pointer">
+      <button onClick={()=> handleViewOrder(row)} className="cursor-pointer">
         <IoEyeOutline className="text-xl"/>
       </button>
     ),
   },
 ];
 
-const AdminOrderPage = () => {
-  const [filters, setFilters] = useState<AdminOrdersFilters>({});
-  const { data: ordersData, isLoading } = useOrders(filters);
-
-  const orders = useMemo(() => {
-    if (!ordersData?.items) return [];
-    return ordersData.items.map((order: any) => ({
-      orderId: order.orderNumber || order.id,
-      customer: order.customerName || 'Unknown Customer',
-      date: order.createdAt ? new Date(order.createdAt).toLocaleDateString() : '',
-      items: 'N/A items', // API doesn't provide items count
-      total: `₦${order.total?.toLocaleString() || '0'}`,
-      payment: order.paymentStatus || 'Unknown',
-      status: order.status || 'Unknown',
-    }));
-  }, [ordersData]);
 
   return (
     <div className="flex flex-col gap-4 md:gap-2 p-2 md:p-4 lg:p-6">
@@ -159,7 +201,7 @@ const AdminOrderPage = () => {
 
       {/* Table */}
       {isLoading ? (
-        <div className="text-center py-8">Loading orders...</div>
+        <div className="text-center py-8"><Spinner/></div>
       ) : (
         <DataTable
           title=""
@@ -169,8 +211,52 @@ const AdminOrderPage = () => {
           emptyMessage="No orders found"
         />
       )}
+
+      {isModalOpen && selectedOrder && (
+        <OrderDetailsModal
+          order={transformOrderForModal(selectedOrder)}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onStatusUpdate={handleStatusUpdate}
+          onTrackingSave={handleTrackingSave}
+          onCancelOrder={handleCancelOrder}
+        />
+      )}
     </div>
   );
 };
+
+// Transform API order data to match OrderDetailsModal interface
+function transformOrderForModal(order: any): any {
+  return {
+    orderId: order.orderNumber || order.id,
+    status: order.status,
+    lineItems: order.items?.map((item: any) => ({
+      id: item.id,
+      name: item.productSnapshot?.name || 'Unknown Product',
+      variant: item.productSnapshot?.sku || '',
+      qty: item.quantity,
+      unitPrice: item.unitPrice,
+      image: item.productSnapshot?.imageUrl,
+    })) || [],
+    subtotal: order.subtotal,
+    deliveryFee: order.deliveryFee,
+    vatRate: order.vatAmount ? (order.vatAmount / order.subtotal) : 0,
+    customer: {
+      name: 'Customer', // API doesn't provide customer name
+      email: 'customer@example.com', // API doesn't provide customer email
+      phone: '', // API doesn't provide customer phone
+    },
+    shipping: {
+      address: order.deliveryAddress ? `${order.deliveryAddress.line1}, ${order.deliveryAddress.city}, ${order.deliveryAddress.state}` : 'No address provided',
+      method: order.deliveryMethod || 'Standard',
+    },
+    payment: {
+      provider: order.paymentMethod || 'Unknown',
+      status: (order.paymentStatus === 'Paid' ? 'PAID' : order.paymentStatus === 'Unpaid' ? 'UNPAID' : 'REFUNDED') as 'PAID' | 'UNPAID' | 'REFUNDED',
+    },
+    trackingNumber: order.trackingNumber,
+  };
+}
 
 export default AdminOrderPage;

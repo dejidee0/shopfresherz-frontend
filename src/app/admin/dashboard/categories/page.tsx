@@ -4,6 +4,8 @@ import SectionCard from "@/components/ui/SectionCard";
 import { Toggle } from "@/components/ui/Toggle";
 import { useState } from "react";
 import { MdDragIndicator } from "react-icons/md";
+import { useCategories } from "@/lib/hooks/useAdmin";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface CategoryFormData {
   name: string;
@@ -25,36 +27,12 @@ const AdminCategoriesPage = () => {
 
   const [inEditMode, setInEditMode] = useState(false)
 
-  const fetchedCategories = [
-    {
-      id: "1",
-      name: "Computers & Laptop",
-      itemsUnder: "3",
-    },
-    {
-      id: "2",
-      name: "SmartPhone",
-      itemsUnder: "3",
-    },
-    {
-      id: "3",
-      name: "Headphone",
-      itemsUnder: "7",
-    },
-    {
-      id: "4",
-      name: "Mobile Assessories",
-      itemsUnder: "2",
-    },
-    {
-      id: "5",
-      name: "Gaming Console",
-      itemsUnder: "8",
-    },
-  ];
+  const { data: categories, isLoading } = useCategories();
 
   const set = (key: keyof CategoryFormData, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [key]: value }));
+
+  // Note: Save functionality is disabled until backend POST endpoint is implemented
 
   return (
     <div className="p-2 md:p-4 lg:p-6">
@@ -63,8 +41,7 @@ const AdminCategoriesPage = () => {
         <div className="mb-6 flex flex-col gap-3">
           <p className="font-bold">Categories Details</p>
           <p className="text-xs text-text-muted">
-            {" "}
-            organise your product catalogue
+            {isLoading ? 'Loading categories...' : `${categories?.length || 0} categories • organise your product catalogue`}
           </p>
         </div>
 
@@ -74,22 +51,28 @@ const AdminCategoriesPage = () => {
       {/* Content */}
       <div className="flex flex-col-reverse md:flex-row gap-3 ">
         <SectionCard className="flex flex-1 flex-col gap-3 p-1 md:p-6">
-          {fetchedCategories.map((cat) => (
-            <div key={cat.id} className="flex w-full p-3 justify-between">
-              <div className="flex gap-2">
-                <button>
-                  <MdDragIndicator />
-                </button>
-                <p className="flex text-xs md:text-sm gap-2 items-center">
-                  <span className="h-8 flex justify-center items-center w-8 rounded-full p-2 bg-border">
-                    {cat.name.split("").at(0)}
-                  </span>
-                  {cat.name}
-                </p>
+          {isLoading ? (
+            <div className="text-center py-8"><Spinner/></div>
+          ) : categories && categories.length > 0 ? (
+            categories.map((cat) => (
+              <div key={cat.id} className="flex w-full p-3 justify-between">
+                <div className="flex gap-2">
+                  <button>
+                    <MdDragIndicator />
+                  </button>
+                  <p className="flex text-xs md:text-sm gap-2 items-center">
+                    <span className="h-8 flex justify-center items-center w-8 rounded-full p-2 bg-border">
+                      {cat.name.charAt(0).toUpperCase()}
+                    </span>
+                    {cat.name}
+                  </p>
+                </div>
+                <p className="flex items-center text-xs md:text-sm text-text-muted">N/A</p>
               </div>
-              <p className="flex items-center text-xs md:text-sm text-text-muted">{cat.itemsUnder}</p>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div className="text-center py-8 text-text-muted">No categories found</div>
+          )}
         </SectionCard>
         <SectionCard className={`flex flex-1 flex-col gap-3 ${!inEditMode && "hidden"}`}>
           <p className=" font-semibold m-6 mb-0">New Category</p>
@@ -173,7 +156,9 @@ const AdminCategoriesPage = () => {
 
             <div className="flex gap-2">
                  <Button variant="ghost" onClick={()=>(setInEditMode(false))} className="text-xs md:text-sm rounded-md">Cancel</Button>
-                <Button className="text-xs md:text-sm rounded-md">Save Category</Button>
+                <Button disabled className="text-xs md:text-sm rounded-md opacity-50 cursor-not-allowed" title="Backend endpoint not yet implemented">
+                  Save Category (Coming Soon)
+                </Button>
             </div>
           </div>
         </SectionCard>

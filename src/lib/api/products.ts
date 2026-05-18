@@ -1,89 +1,133 @@
-import { api } from './client'
-import type { Product, FlashDeal, CategoryItem } from '../types/product'
-import type { PaginatedResponse } from '../types/user'
+import { api } from "./client";
+import type {
+  Product,
+  FlashDeal,
+  CategoryItem,
+  SearchResult,
+  InstantSearchResult,
+  Brands,
+} from "../types/product";
+import type { PaginatedResponse } from "../types/user";
 
 // Raw API pagination shape (backend uses `items` instead of `data`)
 interface ApiPaginatedResponse<T> {
-  items: T[]
-  totalCount: number
-  page: number
-  pageSize: number
-  totalPages: number
-  hasPreviousPage: boolean
-  hasNextPage: boolean
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
 }
 
 type ProductApiResponse = Product & {
-  stockQty?: number
-  reservedQty?: number
-}
+  stockQty?: number;
+  reservedQty?: number;
+};
 
 // Transform API product to UI-compatible format
 function transformProduct(apiProduct: ProductApiResponse): Product {
   return {
     ...apiProduct,
     // Ensure image format compatibility
-    images: ((apiProduct.images ?? []) as Array<{ thumbUrl?: string; displayUrl?: string; zoomUrl?: string; originalUrl?: string; sortOrder?: number; isVideo?: boolean }>).map((img) => ({
-      id: '',
-      thumb: img.thumbUrl ?? img.displayUrl ?? img.originalUrl ?? '',
-      display: img.displayUrl ?? img.originalUrl ?? '',
-      zoom: img.zoomUrl ?? img.originalUrl ?? '',
-      original: img.originalUrl ?? '',
+    images: (
+      (apiProduct.images ?? []) as Array<{
+        thumbUrl?: string;
+        displayUrl?: string;
+        zoomUrl?: string;
+        originalUrl?: string;
+        sortOrder?: number;
+        isVideo?: boolean;
+      }>
+    ).map((img) => ({
+      id: "",
+      thumb: img.thumbUrl ?? img.displayUrl ?? img.originalUrl ?? "",
+      display: img.displayUrl ?? img.originalUrl ?? "",
+      zoom: img.zoomUrl ?? img.originalUrl ?? "",
+      original: img.originalUrl ?? "",
       sortOrder: img.sortOrder,
       isVideo: img.isVideo,
     })),
     // Flatten brand
-    brandId: apiProduct.brand?.id ?? '',
-    brandName: apiProduct.brand?.name ?? '',
+    brandId: apiProduct.brand?.id ?? "",
+    brandName: apiProduct.brand?.name ?? "",
     // Flatten category
     categoryId: apiProduct.category?.id ?? 0,
-    categoryName: apiProduct.category?.name ?? '',
+    categoryName: apiProduct.category?.name ?? "",
     // Map availableQty to stockQty for backwards compatibility
     stockQty: apiProduct.availableQty ?? apiProduct.stockQty ?? 0,
     reservedQty: 0,
-  }
+  };
 }
 
 export interface ProductFilters {
-  category?: string
-  brand?: string
-  priceMin?: number
-  priceMax?: number
-  rating?: number
-  inStock?: boolean
-  condition?: 'new' | 'refurbished'
-  sort?: 'relevance' | 'price_asc' | 'price_desc' | 'newest' | 'best_rated' | 'best_selling'
-  page?: number
-  limit?: number
-  q?: string
+  categoryId?: number;
+  brandId?: string;
+  priceMin?: number;
+  priceMax?: number;
+  rating?: number;
+  inStock?: boolean;
+  condition?: "new" | "refurbished";
+  sortBy?:
+    | "relevance"
+    | "price_asc"
+    | "price_desc"
+    | "newest"
+    | "best_rated"
+    | "best_selling";
+  page?: number;
+  pageSize?: number;
+  q?: string;
 }
 
 export const productsApi = {
   /** List products with filters — used on category + search pages */
   list: (filters: ProductFilters = {}) =>
-    api.get<ApiPaginatedResponse<Product>>('/products', {
-      params: {
-        category: filters.category,
-        brand: filters.brand,
-        price_min: filters.priceMin,
-        price_max: filters.priceMax,
-        rating: filters.rating,
-        in_stock: filters.inStock,
-        condition: filters.condition,
-        sort: filters.sort,
-        page: filters.page ?? 1,
-        limit: filters.limit ?? 24,
-        q: filters.q,
-      },
-    }).then((res) => ({
-      ...res,
-      data: res.items, // map `items` → `data` to satisfy PaginatedResponse
-    })),
+    api
+      .get<ApiPaginatedResponse<Product>>("/products", {
+        params: {
+          categoryId: filters.categoryId,
+          brand: filters.brandId,
+          price_min: filters.priceMin,
+          price_max: filters.priceMax,
+          rating: filters.rating,
+          in_stock: filters.inStock,
+          condition: filters.condition,
+          sort: filters.sortBy,
+          page: filters.page ?? 1,
+          pageSize: filters.pageSize ?? 24,
+          q: filters.q,
+        },
+      })
+      .then((res) => ({
+        ...res,
+        data: res.items, // map `items` → `data` to satisfy PaginatedResponse
+      })),
 
-/** Single product by slug — used on PDP */
+  /** Search products with advanced filters — used on search pages */
+  search: (filters: ProductFilters = {}) =>
+    api
+      .get<SearchResult>("/search", {
+        params: {
+          q: filters.q,
+          page: filters.page ?? 1,
+          pageSize: filters.pageSize ?? 20,
+          priceMin: filters.priceMin,
+          priceMax: filters.priceMax,
+          ratingMin: filters.rating,
+          inStockOnly: filters.inStock,
+          sortBy: filters.sortBy,
+        },
+      })
+      .then((res) => ({
+        ...res,
+        data: res.items, // map `items` → `data` to satisfy PaginatedResponse
+      })),
+
+  /** Single product by slug — used on PDP */
   getBySlug: async (slug: string) => {
-    const product = await api.get<Product>(`/products/${slug}`)
-    return transformProduct(product)
+    const product = await api.get<Product>(`/products/${slug}`);
+    return transformProduct(product);
   },
 
   /** Related products — shown below PDP */
@@ -92,24 +136,21 @@ export const productsApi = {
 
   /** New arrivals — homepage section */
   newArrivals: (limit = 10) =>
-    api.get<Product[]>('/products/new-arrivals', { params: { limit } }),
+    api.get<Product[]>("/products/new-arrivals", { params: { limit } }),
 
   /** Best sellers — homepage + footer section */
   bestSellers: (limit = 10) =>
-    api.get<Product[]>('/products/best-sellers', { params: { limit } }),
+    api.get<Product[]>("/products/best-sellers", { params: { limit } }),
 
   /** Active flash deals with endTime for countdown */
-  flashDeals: () =>
-    api.get<FlashDeal[]>('/flash-deals'),
+  flashDeals: () => api.get<FlashDeal[]>("/flash-deals"),
 
   /** Instant search — dropdown results (top 5 products + 3 categories) */
   instantSearch: (q: string) =>
-    api.get<{ products: Product[]; categories: { id: number; name: string; slug: string }[] }>(
-      '/products/search/instant',
-      { params: { q } }
-    ),
+    api.get<InstantSearchResult>("/search/instant", { params: { q } }),
 
   /** Get all categories */
-  getCategories: () =>
-    api.get<{ id: number; parentId: number | null; name: string; slug: string; imageUrl: string | null }[]>('/categories'),
-}
+  getCategories: () => api.get<[CategoryItem]>("/categories"),
+
+  getBrands: () => api.get<Brands[]>("/brands"),
+};

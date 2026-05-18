@@ -6,6 +6,7 @@ import { HiMagnifyingGlass } from "react-icons/hi2";
 import { useUsers } from "@/lib/hooks/useAdmin";
 import { useState, useMemo } from "react";
 import type { AdminUsersFilters } from "@/lib/api/admin";
+import { Spinner } from "@/components/ui/Spinner";
 
 const roleColors: Record<string, string> = { 
   Admin: "bg-green-100 text-green-700",
@@ -94,7 +95,7 @@ const AdminCustomersPage = () => {
 
       {/* Table */}
       {isLoading ? (
-        <div className="text-center py-8">Loading customers...</div>
+        <div className="text-center py-8"><Spinner/></div>
       ) : (
         <DataTable
           title=""

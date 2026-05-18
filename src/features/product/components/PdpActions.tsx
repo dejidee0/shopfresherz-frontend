@@ -188,7 +188,7 @@ export function PDPActions({ product }: PDPActionsProps) {
       <div className="h-px bg-[#F5F5F5]" />
 
       {/* ── Qty + CTA row ── */}
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         {/* Qty stepper */}
         <div className="flex items-center border border-[#E5E7EB] rounded-btn overflow-hidden shrink-0">
           <button

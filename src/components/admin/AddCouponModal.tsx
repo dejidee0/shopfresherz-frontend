@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { HiXMark } from "react-icons/hi2";
 import { Button } from "../ui/Button";
 import { Toggle } from "../ui/Toggle";
+import { useCreateCoupon, useUpdateCoupon } from "@/lib/hooks/useAdmin";
 
 interface AddCouponModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit?: (data: CouponFormData) => void;
+  editingCoupon?: any;
 }
 
 export interface CouponFormData {
@@ -20,7 +21,9 @@ export interface CouponFormData {
   active: boolean;
 }
 
-const AddCouponModal = ({ isOpen, onSubmit, onClose }: AddCouponModalProps) => {
+const AddCouponModal = ({ isOpen, onClose, editingCoupon }: AddCouponModalProps) => {
+  const isEditing = !!editingCoupon;
+
   const [form, setForm] = useState<CouponFormData>({
     code: "",
     type: "percentage",
@@ -32,13 +35,78 @@ const AddCouponModal = ({ isOpen, onSubmit, onClose }: AddCouponModalProps) => {
     active: true,
   });
 
+  const createCouponMutation = useCreateCoupon();
+  const updateCouponMutation = useUpdateCoupon();
+
+  // Populate form when editing
+  useEffect(() => {
+    if (editingCoupon) {
+      setForm({
+        code: editingCoupon.code || "",
+        type: editingCoupon.type?.toLowerCase() || "percentage",
+        value: editingCoupon.value?.toString() || "",
+        minimumOrder: editingCoupon.minimumOrderAmount?.toString() || "",
+        perUserLimit: editingCoupon.perUserLimit || 1,
+        maxUses: editingCoupon.maxUses?.toString() || "",
+        expiryDate: editingCoupon.expiresAt ? new Date(editingCoupon.expiresAt).toISOString().split('T')[0] : "",
+        active: editingCoupon.isActive ?? true,
+      });
+    } else {
+      // Reset form for new coupon
+      setForm({
+        code: "",
+        type: "percentage",
+        value: "",
+        minimumOrder: "",
+        perUserLimit: 1,
+        maxUses: "",
+        expiryDate: "",
+        active: true,
+      });
+    }
+  }, [editingCoupon]);
+
   const set = (key: keyof CouponFormData, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
-  const handleSubmit = () => {
-    if (!form.code || !form.expiryDate || form.type) return;
-    onSubmit?.(form);
-    onClose();
+  const generateCode = () => {
+    const prefix = "COUPON";
+    const timestamp = Date.now().toString().slice(-4);
+    const random = Math.random().toString(36).substring(2, 4).toUpperCase();
+    return `${prefix}${random}${timestamp}`;
+  };
+
+  const handleSubmit = async () => {
+    if (!form.code || !form.value || !form.expiryDate) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      const couponData = {
+        code: form.code,
+        type: form.type === 'fixed' ? 'Fixed' as const : 'Percentage' as const,
+        value: parseFloat(form.value),
+        minimumOrderAmount: parseFloat(form.minimumOrder) || 0,
+        maxUses: parseInt(form.maxUses) || 0,
+        perUserLimit: form.perUserLimit,
+        expiresAt: new Date(form.expiryDate).toISOString(),
+        isActive: form.active,
+      };
+
+      if (isEditing && editingCoupon) {
+        await updateCouponMutation.mutateAsync({
+          id: editingCoupon.id,
+          payload: couponData
+        });
+      } else {
+        await createCouponMutation.mutateAsync(couponData);
+      }
+
+      onClose();
+    } catch (error) {
+      console.error('Failed to save coupon:', error);
+    }
   };
 
   if (!isOpen) return null;
@@ -55,7 +123,9 @@ const AddCouponModal = ({ isOpen, onSubmit, onClose }: AddCouponModalProps) => {
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto mx-4">
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100 sticky top-0 bg-white z-10">
-          <h2 className="text-lg font-bold text-gray-900">Create Coupon</h2>
+          <h2 className="text-lg font-bold text-gray-900">
+            {isEditing ? 'Edit Coupon' : 'Create Coupon'}
+          </h2>
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
@@ -82,6 +152,8 @@ const AddCouponModal = ({ isOpen, onSubmit, onClose }: AddCouponModalProps) => {
             <Button
               variant="ghost"
               className=" text-text-muted rounded-md cursor-pointer"
+              onClick={() => set("code", generateCode())}
+              disabled={isEditing} // Can't change code when editing
             >
               Generate
             </Button>
@@ -192,9 +264,13 @@ const AddCouponModal = ({ isOpen, onSubmit, onClose }: AddCouponModalProps) => {
           </button>
           <button
             onClick={handleSubmit}
-            className="px-6 py-2.5 text-sm font-bold bg-[#F97316] text-white rounded-lg hover:bg-orange-500 transition-colors shadow-sm shadow-orange-200"
+            disabled={createCouponMutation.isPending || updateCouponMutation.isPending}
+            className="px-6 py-2.5 text-sm font-bold bg-[#F97316] text-white rounded-lg hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm shadow-orange-200"
           >
-            Save
+            {createCouponMutation.isPending || updateCouponMutation.isPending
+              ? (isEditing ? 'Updating...' : 'Creating...')
+              : (isEditing ? 'Update' : 'Create')
+            }
           </button>
         </div>
       </div>

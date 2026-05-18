@@ -5,6 +5,7 @@ import { useState, useMemo } from "react";
 import { LuImage, LuPencil } from "react-icons/lu";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { useBanners } from "@/lib/hooks/useAdmin";
+import { Spinner } from "@/components/ui/Spinner";
 
 const AdminContentPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -15,6 +16,7 @@ const AdminContentPage = () => {
       return banners.map(banner => ({
         id: banner.id,
         title: banner.title || 'Untitled',
+        subtitle: banner.subtitle,
         cta: banner.ctaText || 'Learn More',
         imgUrl: banner.imageUrl,
         live: banner.isActive || false,
@@ -29,7 +31,7 @@ const AdminContentPage = () => {
         </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
         {isLoading ? (
-          <div className="col-span-full text-center py-8">Loading banners...</div>
+          <div className="col-span-full text-center py-8"><Spinner/></div>
         ) : contentData.length === 0 ? (
           <div className="col-span-full text-center py-8">No banners found</div>
         ) : (
@@ -49,6 +51,9 @@ const AdminContentPage = () => {
 
             <div className="flex flex-col gap-3 p-2">
               <p className="font-semibold">{content.title}</p>
+              {content.subtitle && (
+                <p className="text-text-muted text-sm">{content.subtitle}</p>
+              )}
               <p className="text-text-muted text-sm">CTA: {content.cta}</p>
               <div className="flex gap-3">
                 <button className="cursor-pointer">

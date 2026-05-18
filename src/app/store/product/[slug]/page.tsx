@@ -47,7 +47,7 @@ export default async function ProductDetailPage({ params }: PDPProps) {
   const [flashDeals, bestSellers, topRated, newArrivals] = await Promise.allSettled([
     productsApi.flashDeals().then((deals) => deals.slice(0, 3)),
     productsApi.bestSellers(3),
-    productsApi.list({ sort: 'best_rated', limit: 3 }).then((r) => r.data ?? []),
+    productsApi.list({ sortBy: 'best_rated', pageSize: 3 }).then((r) => r.data ?? []),
     productsApi.newArrivals(3),
   ])
 

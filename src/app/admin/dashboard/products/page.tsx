@@ -6,8 +6,9 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import { LuPencil } from "react-icons/lu";
 import { useState, useMemo } from "react";
 import AddProductModal from "@/components/admin/AddProductModal";
-import { useProducts, useDeleteProduct, useCategories } from "@/lib/hooks/useAdmin";
+import { useProducts, useDeleteProduct, useCategories, useBrands } from "@/lib/hooks/useAdmin";
 import type { AdminProductsFilters } from "@/lib/api/admin";
+import { Spinner } from "@/components/ui/Spinner";
 
 // Status colors will be defined inside the component
 
@@ -64,6 +65,7 @@ const AdminProductsPage = () => {
   const [filters, setFilters] = useState<AdminProductsFilters>({});
   const { data: productsData, isLoading } = useProducts(filters);
   const { data: categoriesData } = useCategories();
+  const { data: brandsData } = useBrands();
   const deleteProductMutation = useDeleteProduct();
 
   const products = useMemo(() => {
@@ -221,7 +223,7 @@ const AdminProductsPage = () => {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-8">Loading products...</div>
+        <div className="text-center py-8"><Spinner/></div>
       ) : (
         <DataTable
           title=""
@@ -238,6 +240,7 @@ const AdminProductsPage = () => {
           onClose={handleCloseModal}
           editingProduct={editingProduct}
           categories={categoriesData}
+          brands={brandsData}
         />
       )}
     </div>

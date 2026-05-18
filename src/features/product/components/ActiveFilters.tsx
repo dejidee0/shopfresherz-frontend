@@ -81,7 +81,7 @@ export function ActiveFilters({
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <span className="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2.5 py-0.5 sm:py-1 bg-[#F5F5F5] border border-[#E5E7EB] rounded-full text-[10px] sm:text-xs font-medium text-[#111111]">
-      <span className="truncate max-w-[80px] sm:max-w-none">{label}</span>
+      <span className="truncate max-w-20 sm:max-w-none">{label}</span>
       <button
         onClick={onRemove}
         className="text-[#6B7280] hover:text-[#EF4444] transition-colors ml-0.5"
