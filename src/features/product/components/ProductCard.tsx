@@ -43,7 +43,7 @@ export function ProductCard({
 
    const displayImage = imgError
      ? '/images/device-placeholder.jpg'
-     : product.images?.[0]?.display ?? '/images/device-placeholder.jpg'
+     : product.imageUrls?.[0] ?? '/images/device-placeholder.jpg'
 
   function handleAddToCart(e: React.MouseEvent) {
     e.preventDefault()
@@ -55,7 +55,7 @@ addItem({
         productId: product.id,
         name: product.name,
         slug: product.slug,
-        image: product.images?.[0]?.thumb ?? '',
+        image: product.imageUrls?.[0] ?? '',
         price: product.price,
         quantity: 1,
         stockQty: product.availableQty ?? product.stockQty ?? 0,

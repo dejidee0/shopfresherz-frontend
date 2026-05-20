@@ -136,11 +136,11 @@ export const productsApi = {
 
   /** New arrivals — homepage section */
   newArrivals: (limit = 10) =>
-    api.get<Product[]>("/products/new-arrivals", { params: { limit } }),
+    api.get<Product[]>("/new-arrivals", { params: { limit } }),
 
   /** Best sellers — homepage + footer section */
   bestSellers: (limit = 10) =>
-    api.get<Product[]>("/products/best-sellers", { params: { limit } }),
+    api.get<Product[]>("/best-deals", { params: { limit } }),
 
   /** Active flash deals with endTime for countdown */
   flashDeals: () => api.get<FlashDeal[]>("/flash-deals"),

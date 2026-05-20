@@ -63,7 +63,7 @@ export interface Product {
   price: number;
   compareAtPrice?: number;
   primaryImageUrl?: string;
-  images: ProductImage[];
+  imageUrls: string[];
   variants?: ProductVariant[];
   attributes?: Record<string, string>;
   tags?: string[];

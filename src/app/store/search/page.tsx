@@ -41,7 +41,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         initialProducts={products}
         categoryName={`Search results for "${query}"`}
         isSearchPage={true}
-        initialQuery={query}  // ✅ pass query down so ShopClient knows what was searched
+        initialQuery={query}  // pass query down so ShopClient knows what was searched
       />
     </Suspense>
   )

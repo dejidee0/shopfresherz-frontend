@@ -39,8 +39,8 @@ export function PDPBottomProducts({
                   : `/store/product/${(product as Product).slug}`
                 const name = isFlash ? (product as FlashDeal).productName : (product as Product).name
                 const image = isFlash 
-                  ? (product as FlashDeal).productImageUrl ?? '/images/Rbag.png' 
-                  : (product as Product).images?.[0]?.thumb ?? '/images/Rbag.png'
+                  ? (product as FlashDeal).productImageUrl ?? '/images/device-placeholder.jpg' 
+                  : (product as Product).imageUrls?.[0] ?? '/images/device-placeholder.jpg'
                 const price = isFlash 
                   ? (product as FlashDeal).salePrice 
                   : (product as Product).price

@@ -29,10 +29,10 @@ const FEATURES = [
 ]
 
 const SHIPPING_INFO = [
-  { label: 'Courier:', value: '2 - 4 days, free shipping' },
-  { label: 'Local Shipping:', value: 'up to one week, $19.00' },
-  { label: 'UPS Ground Shipping:', value: '4 - 6 days, $29.00' },
-  { label: 'Unishop Global Export:', value: '3 - 4 days, $39.00' },
+  { label: 'Courier:', value: '2 - 4 days' },
+  { label: 'Local Shipping:', value: 'up to one week' },
+  // { label: 'UPS Ground Shipping:', value: '4 - 6 days, $29.00' },
+  // { label: 'Unishop Global Export:', value: '3 - 4 days, $39.00' },
 ]
 
 interface ProductTabsProps {

@@ -56,14 +56,14 @@ export default async function HomePage() {
         <ProductGridSection
           title="Best Deals"
           products={bestSellers}
-          tabs={[
-            { label: 'All Products', key: 'all' },
-            { label: 'Smart Phones', key: 'mobile-phones' },
-            { label: 'Laptops', key: 'laptops-computers' },
-            { label: 'Headphones', key: 'accessories/headphones' },
-            { label: 'TVs', key: 'electronics/tv' },
-          ]}
-          seeAllHref="/category/best-sellers"
+          // tabs={[
+          //   { label: 'All Products', key: 'all' },
+          //   { label: 'Smart Phones', key: 'mobile-phones' },
+          //   { label: 'Laptops', key: 'laptops-computers' },
+          //   { label: 'Headphones', key: 'accessories/headphones' },
+          //   { label: 'TVs', key: 'electronics/tv' },
+          // ]}
+          seeAllHref="/store/category/all"
         />
       </div>
 
@@ -71,7 +71,7 @@ export default async function HomePage() {
       <ProductGridSection
         title="New Arrivals"
         products={newArrivals}
-        seeAllHref="/category/new-arrivals"
+        seeAllHref="/store/category/all"
       />
 
       {/* Spacer before footer */}

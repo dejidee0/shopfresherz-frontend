@@ -168,7 +168,7 @@ export function Navbar() {
               >
                 <div className="w-10 h-10 bg-gray-100 rounded shrink-0 overflow-hidden">
                    <Image
-                     src={product.images?.[0]?.thumb ?? '/images/Rbag.png'}
+                     src={product.imageUrls?.[0] ?? '/images/device-placeholder.jpg'}
                      alt={product.name}
                     width={40}
                     height={40}
@@ -343,11 +343,11 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-5 text-sm text-[#111111]">
-            <Link href="/support" className="flex items-center gap-1.5 hover:text-[#F5820A] transition-colors">
+            <Link href="#" className="flex items-center gap-1.5 hover:text-[#F5820A] transition-colors">
               <FiHeadphones size={15} />
               Customer Support
             </Link>
-            <Link href="/help" className="flex items-center gap-1.5 hover:text-[#F5820A] transition-colors">
+            <Link href="#" className="flex items-center gap-1.5 hover:text-[#F5820A] transition-colors">
               <FiHelpCircle size={15} />
               Need Help
             </Link>
