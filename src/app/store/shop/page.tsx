@@ -14,7 +14,7 @@ export default async function ShopPage() {
   let products: Product[] = []
 
   try {
-    const res = await productsApi.list({ limit: 24, sort: 'best_selling' })
+    const res = await productsApi.list({ pageSize: 24, sortBy: 'best_selling' })
     products = res.data ?? []
   } catch {
     // Render empty state gracefully if API is down
