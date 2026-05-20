@@ -102,7 +102,7 @@ export function CartDrawer() {
                     className="w-18 h-18 shrink-0 bg-[#F5F5F5] rounded-card overflow-hidden"
                   >
                     <Image
-                      src={item.image || '/images/Rbag.png'}
+                      src={item.image || '/images/device-placeholder.jpg'}
                       alt={item.name}
                       width={72}
                       height={72}

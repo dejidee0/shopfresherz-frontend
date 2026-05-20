@@ -71,7 +71,7 @@ export function PDPActions({ product }: PDPActionsProps) {
         variantId: selectedColor ?? selectedStorage ?? undefined,
         name: product.name,
         slug: product.slug,
-        image: product.images?.[0]?.thumb ?? '',
+        image: product.imageUrls?.[0] ?? '',
         price: product.price,
         quantity: qty,
         stockQty: availableStock,
