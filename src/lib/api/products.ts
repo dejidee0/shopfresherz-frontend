@@ -20,44 +20,63 @@ interface ApiPaginatedResponse<T> {
   hasNextPage: boolean;
 }
 
-type ProductApiResponse = Product & {
-  stockQty?: number;
-  reservedQty?: number;
-};
+// type ProductApiResponse = Product & {
+//   stockQty?: number;
+//   reservedQty?: number;
+// };
+
+type ProductApiResponse = Product
 
 // Transform API product to UI-compatible format
+// function transformProduct(apiProduct: ProductApiResponse): Product {
+//   return {
+//     ...apiProduct,
+//     // Ensure image format compatibility
+//     imageUrls: (
+//       (apiProduct.imageUrls ?? []) as Array<{
+//         thumbUrl?: string;
+//         displayUrl?: string;
+//         zoomUrl?: string;
+//         originalUrl?: string;
+//         sortOrder?: number;
+//         isVideo?: boolean;
+//       }>
+//     ).map((img) => ({
+//       id: "",
+//       thumb: img.thumbUrl ?? img.displayUrl ?? img.originalUrl ?? "",
+//       display: img.displayUrl ?? img.originalUrl ?? "",
+//       zoom: img.zoomUrl ?? img.originalUrl ?? "",
+//       original: img.originalUrl ?? "",
+//       sortOrder: img.sortOrder,
+//       isVideo: img.isVideo,
+//     })),
+//     // Flatten brand
+//     brandId: apiProduct.brand?.id ?? "",
+//     brandName: apiProduct.brand?.name ?? "",
+//     // Flatten category
+//     categoryId: apiProduct.category?.id ?? 0,
+//     categoryName: apiProduct.category?.name ?? "",
+//     // Map availableQty to stockQty for backwards compatibility
+//     stockQty: apiProduct.availableQty ?? apiProduct.stockQty ?? 0,
+//     reservedQty: 0,
+//   };
+// }
+
 function transformProduct(apiProduct: ProductApiResponse): Product {
   return {
     ...apiProduct,
-    // Ensure image format compatibility
-    images: (
-      (apiProduct.images ?? []) as Array<{
-        thumbUrl?: string;
-        displayUrl?: string;
-        zoomUrl?: string;
-        originalUrl?: string;
-        sortOrder?: number;
-        isVideo?: boolean;
-      }>
-    ).map((img) => ({
-      id: "",
-      thumb: img.thumbUrl ?? img.displayUrl ?? img.originalUrl ?? "",
-      display: img.displayUrl ?? img.originalUrl ?? "",
-      zoom: img.zoomUrl ?? img.originalUrl ?? "",
-      original: img.originalUrl ?? "",
-      sortOrder: img.sortOrder,
-      isVideo: img.isVideo,
-    })),
+    // imageUrls is already string[] — no transformation needed
+    imageUrls: apiProduct.imageUrls ?? [],
     // Flatten brand
-    brandId: apiProduct.brand?.id ?? "",
-    brandName: apiProduct.brand?.name ?? "",
+    brandId: apiProduct.brand?.id ?? '',
+    brandName: apiProduct.brand?.name ?? '',
     // Flatten category
     categoryId: apiProduct.category?.id ?? 0,
-    categoryName: apiProduct.category?.name ?? "",
+    categoryName: apiProduct.category?.name ?? '',
     // Map availableQty to stockQty for backwards compatibility
     stockQty: apiProduct.availableQty ?? apiProduct.stockQty ?? 0,
     reservedQty: 0,
-  };
+  }
 }
 
 export interface ProductFilters {
