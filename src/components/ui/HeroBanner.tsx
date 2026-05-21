@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils/format'
 import { productsApi } from '@/lib/api/products'
 import type { Banner } from '@/lib/types/product'
 
-// HeroSlide now mirrors the Banner API shape directly
 interface HeroSlide {
   id: string
   title: string
@@ -17,14 +16,12 @@ interface HeroSlide {
   linkUrl: string
   ctaText: string
   sortOrder: number
-  // UI-only fields with sensible defaults
   tag?: string
   tagColor?: string
   theme?: 'light' | 'dark'
   bgColor?: string
 }
 
-// Map a Banner from the API to a HeroSlide (adds UI defaults)
 function bannerToSlide(banner: Banner): HeroSlide {
   return {
     ...banner,
@@ -35,7 +32,6 @@ function bannerToSlide(banner: Banner): HeroSlide {
   }
 }
 
-// Static fallback slides shown while the API loads (or if it fails)
 const FALLBACK_SLIDES: HeroSlide[] = [
   {
     id: 'fallback-1',
@@ -90,7 +86,6 @@ export function HeroBanner() {
   const prev = useCallback(() => setCurrent((c) => (c - 1 + total) % total), [total])
   const goTo = useCallback((i: number) => setCurrent(i), [])
 
-  // Fetch banners from API; fall back to static slides on error
   useEffect(() => {
     async function fetchBanners() {
       try {
@@ -100,13 +95,12 @@ export function HeroBanner() {
           setCurrent(0)
         }
       } catch {
-        // Static fallback already set as initial state — nothing to do
+        // static fallback already in state
       }
     }
     fetchBanners()
   }, [])
 
-  // Auto-rotate every 5s, pause on hover
   useEffect(() => {
     if (isPaused) return
     intervalRef.current = setInterval(next, 5000)
@@ -115,7 +109,6 @@ export function HeroBanner() {
     }
   }, [isPaused, next])
 
-  // Touch/swipe support
   function handleTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0].clientX
   }
@@ -141,89 +134,115 @@ export function HeroBanner() {
       aria-label="Featured products carousel"
       aria-roledescription="carousel"
     >
-      {/* Slides */}
+      {/* ── Slides track ── */}
       <div
         className="flex transition-transform duration-500 ease-in-out"
         style={{ transform: `translateX(-${current * 100}%)` }}
       >
-        {slides.map((s, i) => (
-          <div
-            key={s.id}
-            className={cn('min-w-full', s.bgColor ?? 'bg-[#F5F5F5]')}
-            aria-roledescription="slide"
-            aria-label={s.title}
-          >
-            <div className="max-w-content mx-auto px-10">
-              <div className="flex items-center min-h-85 md:min-h-105 py-10 gap-8">
+        {slides.map((s, i) => {
+          const dark = s.theme === 'dark'
+          return (
+            <div
+              key={s.id}
+              className={cn('min-w-full', s.bgColor ?? 'bg-[#F5F5F5]')}
+              aria-roledescription="slide"
+              aria-label={s.title}
+            >
+              <div className="max-w-content mx-auto px-4 sm:px-6 lg:px-10">
+                {/*
+                  Mobile  : column layout — text on top, image below
+                  Desktop : row layout   — text left, image right
+                */}
+                <div className="flex flex-col-reverse md:flex-row items-center gap-4 md:gap-8 py-8 md:py-0 md:min-h-105 lg:min-h-110">
 
-                {/* Text column */}
-                <div className="flex-1 max-w-120">
-                  {s.tag && (
-                    <p className={cn('text-xs font-bold uppercase tracking-widest mb-3', s.tagColor)}>
-                      {s.tag}
+                  {/* ── Text column ── */}
+                  <div className="flex-1 flex flex-col items-center text-center md:items-start md:text-left md:max-w-120">
+                    {s.tag && (
+                      <p className={cn(
+                        'text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-2 md:mb-3',
+                        s.tagColor
+                      )}>
+                        {s.tag}
+                      </p>
+                    )}
+
+                    <h2 className={cn(
+                      'font-extrabold leading-tight mb-2 md:mb-4',
+                      // Fluid type: smaller on mobile, full size on desktop
+                      'text-2xl sm:text-3xl md:text-4xl lg:text-5xl',
+                      dark ? 'text-white' : 'text-[#111111]'
+                    )}>
+                      {s.title}
+                    </h2>
+
+                    <p className={cn(
+                      'text-xs sm:text-sm leading-relaxed mb-5 md:mb-8 max-w-70 sm:max-w-sm',
+                      dark ? 'text-white/70' : 'text-[#6B7280]'
+                    )}>
+                      {s.subTitle}
                     </p>
-                  )}
-                  <h2
-                    className={cn(
-                      'text-4xl md:text-5xl font-extrabold leading-tight mb-4',
-                      isDark ? 'text-white' : 'text-[#111111]'
-                    )}
-                  >
-                    {s.title}
-                  </h2>
-                  <p
-                    className={cn(
-                      'text-sm leading-relaxed mb-8 max-w-sm',
-                      isDark ? 'text-white/70' : 'text-[#6B7280]'
-                    )}
-                  >
-                    {s.subTitle}
-                  </p>
-                  <Link
-                    href={s.linkUrl}
-                    className="inline-flex items-center gap-2 bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white font-semibold px-7 py-3 rounded-btn hover:shadow-lg hover:shadow-orange-200 transition-all active:scale-[0.98]"
-                  >
-                    {s.ctaText} →
-                  </Link>
-                </div>
 
-                {/* Image column */}
-                <div className="flex-1 flex items-center justify-center">
-                  <div className="relative w-full max-w-105 aspect-4/3">
-                    <Image
-                      src={s.imageUrl || 'https://placehold.net/default.png'}
-                      alt={s.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-contain"
-                      priority={i === 0}
-                    />
+                    <Link
+                      href={s.linkUrl}
+                      className={cn(
+                        'rounded inline-flex items-center gap-2 font-semibold rounded-btn transition-all active:scale-[0.98]',
+                        // Smaller tap target on mobile, full size on desktop
+                        'text-xs sm:text-sm px-5 py-2.5 sm:px-7 sm:py-3',
+                        'bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white',
+                        'hover:shadow-lg hover:shadow-orange-200'
+                      )}
+                    >
+                      {s.ctaText} →
+                    </Link>
                   </div>
+
+                  {/* ── Image column ── */}
+                  {/*
+                    Mobile  : fixed height so it doesn't dominate the screen
+                    Desktop : aspect-ratio box that fills available space
+                  */}
+                  <div className="flex-1 flex items-center justify-center w-full">
+                    <div className={cn(
+                      'relative w-full',
+                      // Mobile: constrained height; Desktop: aspect-ratio driven
+                      'h-45 sm:h-60 md:h-auto md:aspect-4/3 md:max-w-105 lg:max-w-120'
+                    )}>
+                      <Image
+                        src={s.imageUrl || 'https://placehold.net/default.png'}
+                        alt={s.title}
+                        fill
+                        sizes="(max-width: 768px) 80vw, 45vw"
+                        className="object-contain"
+                        priority={i === 0}
+                      />
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
-      {/* Arrow controls */}
+      {/* ── Arrow controls — hidden on mobile (swipe instead) ── */}
       <button
         onClick={prev}
-        className="absolute left-4 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 shadow flex items-center justify-center text-[#111111] hover:bg-white hover:shadow-md transition-all z-10"
+        className="hidden sm:flex absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/90 shadow items-center justify-center text-[#111111] hover:bg-white hover:shadow-md transition-all z-10"
         aria-label="Previous slide"
       >
-        <FiChevronLeft size={18} />
+        <FiChevronLeft size={17} />
       </button>
       <button
         onClick={next}
-        className="absolute right-4 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 shadow flex items-center justify-center text-[#111111] hover:bg-white hover:shadow-md transition-all z-10"
+        className="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/90 shadow items-center justify-center text-[#111111] hover:bg-white hover:shadow-md transition-all z-10"
         aria-label="Next slide"
       >
-        <FiChevronRight size={18} />
+        <FiChevronRight size={17} />
       </button>
 
-      {/* Dot indicators */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
+      {/* ── Dot indicators ── */}
+      <div className="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 md:gap-2 z-10">
         {slides.map((_, i) => (
           <button
             key={i}
@@ -231,8 +250,8 @@ export function HeroBanner() {
             className={cn(
               'rounded-full transition-all duration-300',
               i === current
-                ? 'w-5 h-2 bg-[#F5820A]'
-                : 'w-2 h-2 bg-[#D1D5DB] hover:bg-[#F5820A]/50'
+                ? 'w-4 h-1.5 md:w-5 md:h-2 bg-[#F5820A]'
+                : 'w-1.5 h-1.5 md:w-2 md:h-2 bg-[#D1D5DB] hover:bg-[#F5820A]/50'
             )}
             aria-label={`Go to slide ${i + 1}`}
             aria-current={i === current}

@@ -5,9 +5,9 @@ import { FaTruck } from 'react-icons/fa'
 export function TopBar() {
   return (
     <div className="w-full bg-[#0D0D0D] text-white text-xs h-9 flex items-center">
-      <div className="max-w-content mx-auto w-full px-10 flex items-center justify-between">
+      <div className="max-w-content mx-auto w-full px-4 md:px-10 flex items-center justify-center md:justify-between">
         {/* Left: Free shipping */}
-        <div className="flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-2">
           <FaTruck className="text-[#F5820A]" size={14} />
           <span>Free Shipping on orders over ₦100,000</span>
         </div>

@@ -7,7 +7,7 @@ import { FiX, FiTrash2, FiMinus, FiPlus, FiShoppingBag } from 'react-icons/fi'
 import { useCartStore } from '@/store/cart'
 import { cn, formatPrice } from '@/lib/utils/format'
 
-const DELIVERY_THRESHOLD = 50_000  // ₦50k = free delivery
+const DELIVERY_THRESHOLD = 100_000  // ₦100k = free delivery
 const VAT_RATE = 0.075              // 7.5%
 
 export function CartDrawer() {
@@ -125,7 +125,7 @@ export function CartDrawer() {
 
                     {/* Qty stepper + remove */}
                     <div className="flex items-center justify-between mt-2">
-                      <div className="flex items-center border border-[#E5E7EB] rounded-btn overflow-hidden">
+                      <div className="flex items-center border border-[#E5E7EB] rounded-sm overflow-hidden">
                         <button
                           onClick={() => updateQty(item.id, item.quantity - 1)}
                           disabled={item.quantity <= 1}
@@ -251,7 +251,7 @@ function EmptyCart({ onClose }: { onClose: () => void }) {
       </p>
       <button
         onClick={onClose}
-        className="h-10 px-6 bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white font-semibold rounded-btn text-sm hover:shadow-md hover:shadow-orange-200 transition-all"
+        className="h-10 px-6 bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white font-semibold rounded-sm text-sm hover:shadow-md hover:shadow-orange-200 transition-all"
       >
         Browse Products
       </button>

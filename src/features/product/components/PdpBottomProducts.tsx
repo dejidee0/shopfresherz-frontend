@@ -25,7 +25,7 @@ export function PDPBottomProducts({
 
   return (
     <div className="mt-12 border-t border-[#E5E7EB] pt-10">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {sections.map(({ title, products, isFlashDeal }) => (
           <div key={title}>
             <h3 className="text-sm font-bold text-[#111111] uppercase tracking-wide mb-4 pb-2 border-b border-[#F5F5F5]">

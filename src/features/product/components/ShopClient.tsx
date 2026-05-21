@@ -37,7 +37,7 @@ interface ShopClientProps {
   categorySlug?: string;
   categoryId?: number;
   isSearchPage?: boolean;
-  initialQuery?: string
+  initialQuery?: string;
 }
 
 // This is the interactive client shell.
@@ -47,21 +47,21 @@ export function ShopClient({
   categoryName,
   categoryId,
   isSearchPage = false,
-  initialQuery = '',
+  initialQuery = "",
 }: ShopClientProps) {
   const [filters, setFilters] = useState<ShopFilters>({
     ...DEFAULT_FILTERS,
     categoryId: categoryId ?? null,
-  })
-  const [sort, setSort] = useState(isSearchPage ? 'relevance' : 'best_selling')
-  const [sortOpen, setSortOpen] = useState(false)
-  const [page, setPage] = useState(1)
-  const [localSearch, setLocalSearch] = useState(initialQuery)  // seed with server query
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
-  const [products, setProducts] = useState<Product[]>(initialProducts)  // start with server data
-  const [isLoading, setIsLoading] = useState(false)
-  const [totalCount, setTotalCount] = useState(initialProducts.length)
-  const [hasInteracted, setHasInteracted] = useState(false)
+  });
+  const [sort, setSort] = useState(isSearchPage ? "relevance" : "best_selling");
+  const [sortOpen, setSortOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [localSearch, setLocalSearch] = useState(initialQuery); // seed with server query
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [products, setProducts] = useState<Product[]>(initialProducts); // start with server data
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalCount, setTotalCount] = useState(initialProducts.length);
+  const [hasInteracted, setHasInteracted] = useState(false);
   const [sidebarCategories, setSidebarCategories] = useState<
     {
       label: string;
@@ -69,20 +69,21 @@ export function ShopClient({
       children?: { label: string; slug: string }[];
     }[]
   >([]);
-  const [sidebarBrands, setSidebarBrands] = useState<string[]>([]);
 
-  // Replace the brands useEffect:
-  useEffect(() => {
-    const fetchBrands = async () => {
-      try {
-        const brands = await productsApi.getBrands();
-        setSidebarBrands(brands.map((b) => b.name));
-      } catch (error) {
-        console.error("Failed to fetch brands:", error);
-      }
-    };
-    fetchBrands();
-  }, []);
+  // const [sidebarBrands, setSidebarBrands] = useState<string[]>([]);
+
+  // // Replace the brands useEffect:
+  // useEffect(() => {
+  //   const fetchBrands = async () => {
+  //     try {
+  //       const brands = await productsApi.getBrands();
+  //       setSidebarBrands(brands.map((b) => b.name));
+  //     } catch (error) {
+  //       console.error("Failed to fetch brands:", error);
+  //     }
+  //   };
+  //   fetchBrands();
+  // }, []);
 
   // Fetch categories for sidebar
   useEffect(() => {
@@ -106,57 +107,72 @@ export function ShopClient({
   }, []);
 
   // Fetch products from API when search or filters change
-    useEffect(() => {
+  useEffect(() => {
     // ✅ Skip the very first render — use initialProducts from server instead
     // Only fetch when the user actually changes something
-    if (!hasInteracted) return
+    if (!hasInteracted) return;
 
     const fetchProducts = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
-        let resolvedCategoryId = categoryId ?? undefined
+        let resolvedCategoryId = categoryId ?? undefined;
 
-        if (filters.categorySlug && filters.categorySlug !== 'all') {
-          const allCats = await productsApi.getCategories()
-          const matched = allCats.find(c => c.slug === filters.categorySlug)
-          resolvedCategoryId = matched?.id ? Number(matched.id) : resolvedCategoryId
+        if (filters.categorySlug && filters.categorySlug !== "all") {
+          const allCats = await productsApi.getCategories();
+          const matched = allCats.find((c) => c.slug === filters.categorySlug);
+          resolvedCategoryId = matched?.id
+            ? Number(matched.id)
+            : resolvedCategoryId;
         }
 
-        const apiCall = isSearchPage ? productsApi.search : productsApi.list
+        const isDefaultRange =
+          filters.priceRange[0] === 0 && filters.priceRange[1] === 10_000_000;
+
+        const apiCall = isSearchPage ? productsApi.search : productsApi.list;
         const response = await apiCall({
           categoryId: resolvedCategoryId,
           q: localSearch || undefined,
-          priceMin: filters.priceRange[0] || undefined,
-          priceMax: filters.priceRange[1] === 10_000_000 ? undefined : filters.priceRange[1],
+          priceMin: isDefaultRange
+            ? undefined
+            : filters.priceRange[0] || undefined,
+          priceMax: isDefaultRange ? undefined : filters.priceRange[1],
           rating: filters.rating || undefined,
           inStock: filters.inStock || undefined,
           sortBy: sort as any,
           page,
           pageSize: 24,
-          brandId: filters.brands.length > 0 ? filters.brands.join(',') : undefined,
-        })
+          brandId:
+            filters.brands.length > 0 ? filters.brands.join(",") : undefined,
+        });
 
-        let filteredData = response.data
+        let filteredData = response.data;
         if (filters.tags.length > 0) {
           filteredData = filteredData.filter(
-            p => p.tags && filters.tags.some(tag => p.tags!.includes(tag))
-          )
+            (p) => p.tags && filters.tags.some((tag) => p.tags!.includes(tag)),
+          );
         }
 
-        setProducts(filteredData)
-        setTotalCount(response.totalCount)
+        setProducts(filteredData);
+        setTotalCount(response.totalCount);
       } catch (error) {
-        console.error('Failed to fetch products:', error)
-        setProducts([])
-        setTotalCount(0)
+        console.error("Failed to fetch products:", error);
+        setProducts([]);
+        setTotalCount(0);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchProducts()
-  }, [localSearch, filters, sort, page, categoryId, isSearchPage, hasInteracted])
-
+    fetchProducts();
+  }, [
+    localSearch,
+    filters,
+    sort,
+    page,
+    categoryId,
+    isSearchPage,
+    hasInteracted,
+  ]);
 
   const breadcrumbs = [
     { label: "Shop", href: "/shop" },
@@ -171,29 +187,32 @@ export function ShopClient({
 
   // ── Filter helpers ────────────────────────────────────────────────────────
 
- //handleFilterChange now marks that user has interacted
+  //handleFilterChange now marks that user has interacted
   function handleFilterChange(next: ShopFilters) {
-    setHasInteracted(true)
-    setFilters(next)
-    setPage(1)
+    setHasInteracted(true);
+    setFilters(next);
+    setPage(1);
   }
 
-   function handleRemoveFilter(key: keyof ShopFilters, value?: string) {
-    setHasInteracted(true)
-    if (key === 'categoryId') {
-      setFilters(f => ({ ...f, categorySlug: null }))
-    } else if (key === 'brands' && value) {
-      setFilters(f => ({ ...f, brands: f.brands.filter(b => b !== value) }))
-    } else if (key === 'tags' && value) {
-      setFilters(f => ({ ...f, tags: f.tags.filter(t => t !== value) }))
+  function handleRemoveFilter(key: keyof ShopFilters, value?: string) {
+    setHasInteracted(true);
+    if (key === "categoryId") {
+      setFilters((f) => ({ ...f, categorySlug: null }));
+    } else if (key === "brands" && value) {
+      setFilters((f) => ({
+        ...f,
+        brands: f.brands.filter((b) => b !== value),
+      }));
+    } else if (key === "tags" && value) {
+      setFilters((f) => ({ ...f, tags: f.tags.filter((t) => t !== value) }));
     }
-    setPage(1)
+    setPage(1);
   }
 
   function handleClearAll() {
-    setHasInteracted(true)
-    setFilters({ ...DEFAULT_FILTERS, categoryId: categoryId ?? null })
-    setPage(1)
+    setHasInteracted(true);
+    setFilters({ ...DEFAULT_FILTERS, categoryId: categoryId ?? null });
+    setPage(1);
   }
   // ── Client-side filter/search (placeholder until API filtering is wired) ──
   // In production, these params get sent to productsApi.list() and the server
@@ -226,7 +245,7 @@ export function ShopClient({
             filters={filters}
             onChange={handleFilterChange}
             categories={sidebarCategories}
-            brands={sidebarBrands}
+            // brands={sidebarBrands}
           />
         </div>
 
@@ -252,7 +271,7 @@ export function ShopClient({
                   filters={filters}
                   onChange={handleFilterChange}
                   categories={sidebarCategories}
-                  brands={sidebarBrands}
+                  // brands={sidebarBrands}
                 />
               </div>
             </div>
@@ -268,7 +287,10 @@ export function ShopClient({
               <input
                 type="text"
                 value={localSearch}
-                onChange={(e) => { setHasInteracted(true); setLocalSearch(e.target.value) }}
+                onChange={(e) => {
+                  setHasInteracted(true);
+                  setLocalSearch(e.target.value);
+                }}
                 placeholder="Search for anything..."
                 className="w-full h-9 sm:h-10 pl-3 sm:pl-4 pr-9 sm:pr-10 text-sm border border-[#E5E7EB] rounded-btn outline-none focus:border-[#F5820A] focus:ring-2 focus:ring-[#F5820A]/20 transition-all"
               />

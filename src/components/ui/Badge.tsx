@@ -56,7 +56,7 @@ export function Badge({ variant, label, discountPercent, className }: BadgeProps
   return (
     <span
       className={cn(
-        'inline-flex items-center px-1.5 py-0.5 rounded-badge text-[11px] font-bold leading-none uppercase tracking-wide',
+        'inline-flex items-center px-1.5 py-0.5 rounded-badge text-[9px] md:text-[11px] font-bold leading-none uppercase tracking-wide rounded',
         config.bg,
         config.text,
         className

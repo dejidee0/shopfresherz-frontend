@@ -203,7 +203,7 @@ addItem({
           onClick={handleAddToCart}
           disabled={isOutOfStock}
           className={cn(
-            'mt-1 w-full h-9 rounded-btn text-sm font-semibold flex items-center justify-center gap-1.5 transition-all duration-200',
+            'mt-1 w-full h-9 rounded-sm text-sm font-semibold flex items-center justify-center gap-1.5 transition-all duration-200',
             isOutOfStock
               ? 'bg-[#F5F5F5] text-[#6B7280] cursor-not-allowed'
               : 'bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white hover:shadow-md hover:shadow-orange-200 active:scale-[0.98]'

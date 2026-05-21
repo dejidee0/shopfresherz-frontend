@@ -130,7 +130,7 @@ export default async function HomePage() {
                 <div className="flex flex-col gap-1.5 sm:gap-2 mt-3 sm:mt-4">
                   <Link
                     href={"/store/category/all"}
-                    className="flex items-center justify-center gap-1.5 sm:gap-2 h-8 sm:h-9 bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white text-[10px] sm:text-xs font-semibold rounded-btn hover:shadow-md transition-all"
+                    className="rounded-sm flex items-center justify-center gap-1.5 sm:gap-2 h-8 sm:h-9 bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white text-[10px] sm:text-xs font-semibold rounded-btn hover:shadow-md transition-all"
                   >
                     <FiShoppingCart size={11} />
                     EXPLORE

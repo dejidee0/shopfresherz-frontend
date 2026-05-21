@@ -182,7 +182,7 @@ export function ProductGridSection({
   const gridCols =
     cols === 5
       ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'
-      : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 auto-rows-[300px]'
+      : 'grid-cols-2 gap-2 sm:gap-0 sm:grid-cols-3 md:grid-cols-4 auto-rows-[300px]'
 
   const showPromo = !!promoCard && cols === 4
 
@@ -191,7 +191,7 @@ export function ProductGridSection({
       <div className="max-w-content mx-auto lg:mx-40 px-2 md:px-4 lg:px-10">
 
         {/* Header row */}
-        <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
+        <div className="flex items-cen\ter justify-between mb-5 flex-wrap gap-3">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
               <div className="w-1 h-7 bg-[#F5820A] rounded-full shrink-0" />

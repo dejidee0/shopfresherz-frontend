@@ -190,22 +190,22 @@ export function PDPActions({ product }: PDPActionsProps) {
       {/* ── Qty + CTA row ── */}
       <div className="flex flex-wrap items-center gap-3">
         {/* Qty stepper */}
-        <div className="flex items-center border border-[#E5E7EB] rounded-btn overflow-hidden shrink-0">
+        <div className="flex items-center border border-[#E5E7EB] rounded-sm overflow-hidden shrink-0">
           <button
             onClick={() => setQty((q) => clampQty(q - 1, availableStock))}
             disabled={qty <= 1}
-            className="w-10 h-11 flex items-center justify-center text-[#6B7280] hover:bg-[#F5F5F5] disabled:opacity-40 transition-colors"
+            className="w-6 h-8 md:w-10 md:h-11 flex items-center justify-center text-[#6B7280] hover:bg-[#F5F5F5] disabled:opacity-40 transition-colors"
             aria-label="Decrease quantity"
           >
             <FiMinus size={14} />
           </button>
-          <span className="w-10 text-center text-sm font-bold text-[#111111]">
+          <span className="w-6 md:w-10 text-center text-sm font-bold text-[#111111]">
             {qty}
           </span>
           <button
             onClick={() => setQty((q) => clampQty(q + 1, availableStock))}
             disabled={qty >= Math.min(availableStock, 10)}
-            className="w-10 h-11 flex items-center justify-center text-[#6B7280] hover:bg-[#F5F5F5] disabled:opacity-40 transition-colors"
+            className="w-6 h-8 md:w-10 md:h-11 flex items-center justify-center text-[#6B7280] hover:bg-[#F5F5F5] disabled:opacity-40 transition-colors"
             aria-label="Increase quantity"
           >
             <FiPlus size={14} />
@@ -217,13 +217,13 @@ export function PDPActions({ product }: PDPActionsProps) {
           onClick={handleAddToCart}
           disabled={isOutOfStock}
           className={cn(
-            'flex-1 h-11 flex items-center justify-center gap-2 rounded-btn text-sm font-semibold transition-all',
+            'flex-1 h-11 flex items-center justify-center gap-2 px-2 md:px-0 rounded-sm text-xs md:text-sm font-semibold transition-all',
             isOutOfStock
               ? 'bg-[#F5F5F5] text-[#6B7280] cursor-not-allowed'
               : 'bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white hover:shadow-lg hover:shadow-orange-200 active:scale-[0.98]'
           )}
         >
-          <FiShoppingCart size={15} />
+          <FiShoppingCart size={15} className='hidden md:block' />
           ADD TO CART
         </button>
 
@@ -231,7 +231,7 @@ export function PDPActions({ product }: PDPActionsProps) {
         <button
           onClick={handleBuyNow}
           disabled={isOutOfStock}
-          className="shrink-0 h-11 px-5 border border-[#E5E7EB] text-[#111111] font-semibold rounded-btn text-sm hover:border-[#F5820A] hover:text-[#F5820A] transition-colors disabled:opacity-40"
+          className="shrink-0 h-11 px-5 border border-[#E5E7EB] text-[#111111] font-semibold rounded-sm text-sm hover:border-[#F5820A] hover:text-[#F5820A] transition-colors disabled:opacity-40"
         >
           BUY NOW
         </button>
