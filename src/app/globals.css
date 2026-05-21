@@ -46,6 +46,17 @@
 
   --color-muted: var(--color-text-muted);
   --color-text: var(--color-text-primary);
+
+  --animate-marquee: 15s linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 @media (prefers-color-scheme: dark) {

@@ -4,34 +4,34 @@ import { FiPhone, FiMail, FiMapPin } from 'react-icons/fi'
 import { RiInstagramLine, RiFacebookLine, RiTwitterXLine, RiWhatsappLine } from 'react-icons/ri'
 
 const SHOP_LINKS = [
-  { label: 'New Arrivals', href: '/category/new-arrivals' },
-  { label: 'Best Sellers', href: '/category/best-sellers' },
-  { label: 'Flash Deals', href: '/deals' },
-  { label: 'Mobile Phones', href: '/category/mobile-phones' },
-  { label: 'Laptops & Computers', href: '/category/laptops-computers' },
-  { label: 'Gaming & Consoles', href: '/category/games-consoles' },
-  { label: 'Accessories', href: '/category/accessories' },
-  { label: 'Browse All Products', href: '/category/all', highlight: true },
+  { label: 'New Arrivals', href: '/store/category/all' },
+  { label: 'Best Sellers', href: '/store/category/all' },
+  { label: 'Flash Deals', href: '/store/category/all' },
+  { label: 'Mobile Phones', href: '/store/category/all' },
+  { label: 'Laptops & Computers', href: '/store/category/all' },
+  { label: 'Gaming & Consoles', href: '/store/category/all' },
+  { label: 'Accessories', href: '/store/category/all' },
+  { label: 'Browse All Products', href: '/store/category/all', highlight: true },
 ]
 
 const TOP_CATEGORIES = [
-  { label: 'Computer & Laptop', href: '/category/computer-laptop' },
-  { label: 'SmartPhone', href: '/category/mobile-phones' },
-  { label: 'Electronics', href: '/category/electronics' },
-  { label: 'Accessories', href: '/category/accessories' },
-  { label: 'Camera & Photo', href: '/category/electronics/cameras' },
-  { label: 'Gaming & Consoles', href: '/category/games-consoles' },
-  { label: 'Romoss', href: '/category/romoss' },
-  { label: 'Browse All Products', href: '/category/all', highlight: true },
+  { label: 'Computer & Laptop', href: '/store/category/all' },
+  { label: 'SmartPhone', href: '/store/category/all' },
+  { label: 'Electronics', href: '/store/category/all' },
+  { label: 'Accessories', href: '/store/category/all' },
+  { label: 'Camera & Photo', href: '/store/category/all' },
+  { label: 'Gaming & Consoles', href: '/store/category/all' },
+  { label: 'Romoss', href: '/store/category/all' },
+  { label: 'Browse All Products', href: '/store/category/all', highlight: true },
 ]
 
 const QUICK_LINKS = [
-  { label: 'About Us', href: '/about' },
-  { label: 'Blog Posts', href: '/blog' },
-  { label: 'Shopping Cart', href: '/cart' },
+  // { label: 'About Us', href: '/about' },
+  // { label: 'Blog Posts', href: '/blog' },
+  // { label: 'Shopping Cart', href: '/cart' },
   { label: 'Wishlist', href: '/account/wishlist' },
-  { label: 'Customer Help', href: '/support' },
-  { label: 'Track Order', href: '/account/orders' },
+  { label: 'Customer Help', href: '#' },
+  { label: 'Track Order', href: '/account/track' },
 ]
 
 const SOCIAL_LINKS = [
@@ -48,6 +48,11 @@ const POPULAR_TAGS = [
 ]
 
 export function Footer() {
+  const getCurrentYear = () => {
+    const currentYear = new Date().getFullYear()
+    return currentYear
+  }
+
   return (
     <footer className="bg-[#0D0D0D] text-white">
       {/* Main footer content */}
@@ -194,7 +199,7 @@ export function Footer() {
               {POPULAR_TAGS.map((tag) => (
                 <Link
                   key={tag}
-                  href={`/search?q=${encodeURIComponent(tag)}`}
+                  href={`/store/search?q=${encodeURIComponent(tag)}`}
                   className="px-3 py-1 text-xs text-[#6B7280] border border-[#333] rounded hover:border-[#F5820A] hover:text-[#F5820A] transition-colors"
                 >
                   {tag}
@@ -208,12 +213,12 @@ export function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-[#1A1A1A]">
         <div className="max-w-content mx-auto px-10 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#6B7280]">
-          <p>© 2024 shopfresherz.com. All rights reserved.</p>
+          <p>© {getCurrentYear()} shopfresherz.com. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            <Link href="/privacy" className="hover:text-[#F5820A] transition-colors">
+            <Link href="#" className="hover:text-[#F5820A] transition-colors">
               Privacy Policy
             </Link>
-            <Link href="/terms" className="hover:text-[#F5820A] transition-colors">
+            <Link href="#" className="hover:text-[#F5820A] transition-colors">
               Terms of Service
             </Link>
           </div>

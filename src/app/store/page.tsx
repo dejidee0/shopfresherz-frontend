@@ -9,6 +9,7 @@ import Link from "next/link";
 import { FiShoppingCart } from "react-icons/fi";
 import Image from "next/image";
 import { FaArrowRight } from "react-icons/fa";
+import { MarqueeBanner } from "@/components/layout/MarqueeBanner";
 
 // ISR — revalidate every 60 seconds
 export const revalidate = 60;
@@ -71,15 +72,18 @@ export default async function HomePage() {
         <TrustSignals />
       </div>
 
-      {/* 3. Flash deals */}
+      {/* 3. Marquee banner */}
+      <MarqueeBanner/>
+
+      {/* 4. Flash deals */}
       {flashDeals.length > 0 && (
         <FlashDealsStrip deals={flashDeals} sessionEndTime={sessionEndTime} />
       )}
 
-      {/* 4. Shop by category */}
+      {/* 5. Shop by category */}
       <CategoryGrid />
 
-      {/* 5. Best deals / featured products */}
+      {/* 6. Best deals / featured products */}
       <div className="bg-[#F5F5F5] py-2">
         <ProductGridSection
           title="Best Deals"
@@ -142,7 +146,7 @@ export default async function HomePage() {
         />
       </div>
 
-      {/* 6. New arrivals */}
+      {/* 7. New arrivals */}
       <ProductGridSection
         title="New Arrivals"
         products={newArrivals}

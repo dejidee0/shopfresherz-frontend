@@ -5,33 +5,20 @@ import {
   useRef,
   useEffect,
   useCallback,
+  type ChangeEvent,
   type KeyboardEvent,
 } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
 import { FiSend, FiMinus, FiX, FiMessageCircle } from 'react-icons/fi'
 import { RiRobot2Line } from 'react-icons/ri'
-import { cn, formatPrice } from '@/lib/utils/format'
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface ProductSuggestion {
-  name: string
-  description: string
-  price: number
-  slug: string
-  image: string
-}
+import { chatbotApi } from '@/lib/api/chatbot'
+import { cn } from '@/lib/utils/format'
 
 interface Message {
   id: string
   role: 'assistant' | 'user'
   text: string
-  product?: ProductSuggestion
   timestamp: Date
 }
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatTime(date: Date) {
   return date.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' })
@@ -48,56 +35,12 @@ const GREETING: Message = {
   timestamp: new Date(),
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
 function BotBubble({ message }: { message: Message }) {
   return (
     <div className="flex flex-col gap-1">
-      {/* Text bubble */}
       <div className="max-w-[82%] bg-[#F5F0E8] rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-[#111111] leading-relaxed">
         {message.text}
       </div>
-
-      {/* Inline product card */}
-      {message.product && (
-        <div className="max-w-[82%] bg-white border border-[#E5E7EB] rounded-xl overflow-hidden mt-1">
-          <div className="flex items-center gap-3 p-3">
-            {/* Product image */}
-            <div className="w-14 h-14 bg-[#F5F5F5] rounded-lg shrink-0 overflow-hidden">
-              <Image
-                src={message.product.image}
-                alt={message.product.name}
-                width={56}
-                height={56}
-                className="w-full h-full object-contain p-1"
-              />
-            </div>
-
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-2">
-                <p className="text-sm font-bold text-[#111111] leading-tight">
-                  {message.product.name}
-                </p>
-                <p className="text-sm font-bold text-[#111111] shrink-0">
-                  {formatPrice(message.product.price)}
-                </p>
-              </div>
-              <p className="text-xs text-[#6B7280] mt-0.5 line-clamp-1">
-                {message.product.description}
-              </p>
-              <Link
-                href={`/store/product/${message.product.slug}`}
-                className="text-xs text-[#F5820A] font-semibold hover:underline mt-1 inline-block"
-              >
-                View Product →
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Timestamp */}
       <span className="text-[10px] text-[#9CA3AF] ml-1">
         {formatTime(message.timestamp)}
       </span>
@@ -134,8 +77,6 @@ function TypingIndicator() {
   )
 }
 
-// ─── Main widget ──────────────────────────────────────────────────────────────
-
 export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
@@ -143,23 +84,22 @@ export function ChatWidget() {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [hasUnread, setHasUnread] = useState(false)
+  const [conversationId, setConversationId] = useState<string>()
+  const [quickReplies, setQuickReplies] = useState<string[]>([])
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  // Auto-scroll on new message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, isLoading])
 
-  // Focus input when opened
   useEffect(() => {
     if (isOpen && !isMinimized) {
       setTimeout(() => inputRef.current?.focus(), 150)
     }
   }, [isOpen, isMinimized])
 
-  // Show unread dot when closed and bot responds
   useEffect(() => {
     if (!isOpen && messages.length > 1) {
       setHasUnread(true)
@@ -172,66 +112,55 @@ export function ChatWidget() {
     setHasUnread(false)
   }
 
-  const sendMessage = useCallback(async () => {
-    const text = input.trim()
-    if (!text || isLoading) return
+  const sendMessage = useCallback(
+    async (messageText?: string) => {
+      const text = (messageText ?? input).trim()
+      if (!text || isLoading) return
 
-    const userMsg: Message = {
-      id: uid(),
-      role: 'user',
-      text,
-      timestamp: new Date(),
-    }
-
-    setMessages((prev) => [...prev, userMsg])
-    setInput('')
-    setIsLoading(true)
-
-    // Build conversation history for the API (exclude greeting system message)
-    const history = [...messages, userMsg]
-      .filter((m) => m.id !== 'greeting' || m.role !== 'assistant')
-      .map((m) => ({ role: m.role, content: m.text }))
-
-    // Include greeting as first assistant turn
-    const apiMessages = [
-      { role: 'assistant', content: GREETING.text },
-      ...history.filter((m) => m.content !== GREETING.text),
-    ]
-
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: apiMessages }),
-      })
-
-      const data = await res.json()
-
-      if (data.error) throw new Error(data.error)
-
-      const botMsg: Message = {
+      const userMsg: Message = {
         id: uid(),
-        role: 'assistant',
-        text: data.text,
-        product: data.product ?? undefined,
+        role: 'user',
+        text,
         timestamp: new Date(),
       }
 
-      setMessages((prev) => [...prev, botMsg])
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
+      setMessages((prev) => [...prev, userMsg])
+      setInput('')
+      setQuickReplies([])
+      setIsLoading(true)
+
+      try {
+        const data = await chatbotApi.sendMessage({
+          message: text,
+          conversationId,
+        })
+
+        const botMsg: Message = {
           id: uid(),
           role: 'assistant',
-          text: "Sorry, I'm having trouble connecting right now. Please try again or call us at +234 907 530 8722.",
+          text: data.reply,
           timestamp: new Date(),
-        },
-      ])
-    } finally {
-      setIsLoading(false)
-    }
-  }, [input, isLoading, messages])
+        }
+
+        setConversationId(data.conversationId)
+        setQuickReplies(data.quickReplies ?? [])
+        setMessages((prev) => [...prev, botMsg])
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: uid(),
+            role: 'assistant',
+            text: "Sorry, I'm having trouble connecting right now. Please try again or call us at +234 907 530 8722.",
+            timestamp: new Date(),
+          },
+        ])
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [conversationId, input, isLoading]
+  )
 
   function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -240,8 +169,7 @@ export function ChatWidget() {
     }
   }
 
-  // Auto-resize textarea
-  function handleInput(e: React.ChangeEvent<HTMLTextAreaElement>) {
+  function handleInput(e: ChangeEvent<HTMLTextAreaElement>) {
     setInput(e.target.value)
     e.target.style.height = 'auto'
     e.target.style.height = `${Math.min(e.target.scrollHeight, 100)}px`
@@ -249,7 +177,6 @@ export function ChatWidget() {
 
   return (
     <>
-      {/* ── Floating trigger button ── */}
       {!isOpen && (
         <button
           onClick={open}
@@ -257,14 +184,12 @@ export function ChatWidget() {
           aria-label="Open chat with Fresherz"
         >
           <FiMessageCircle size={24} />
-          {/* Unread indicator */}
           {hasUnread && (
             <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#EF4444] rounded-full border-2 border-white" />
           )}
         </button>
       )}
 
-      {/* ── Chat panel ── */}
       {isOpen && (
         <div
           className={cn(
@@ -275,18 +200,14 @@ export function ChatWidget() {
           aria-label="Chat with Fresherz"
           aria-modal="false"
         >
-          {/* ── Header ── */}
           <div className="flex items-center gap-3 px-4 py-3 bg-white border-b border-[#F5F5F5] shrink-0">
-            {/* Avatar */}
             <div className="relative shrink-0">
               <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
                 <RiRobot2Line size={20} className="text-[#F5820A]" />
               </div>
-              {/* Online dot */}
               <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#22C55E] rounded-full border-2 border-white" />
             </div>
 
-            {/* Name + status */}
             <div className="flex-1 min-w-0">
               <p className="font-bold text-sm text-[#111111] leading-none">ShopFresherz</p>
               <p className="text-[11px] text-[#6B7280] mt-0.5 uppercase tracking-wider">
@@ -294,7 +215,6 @@ export function ChatWidget() {
               </p>
             </div>
 
-            {/* Minimize + Close */}
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setIsMinimized((v) => !v)}
@@ -313,7 +233,6 @@ export function ChatWidget() {
             </div>
           </div>
 
-          {/* ── Messages area ── */}
           {!isMinimized && (
             <>
               <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 scroll-smooth">
@@ -325,14 +244,25 @@ export function ChatWidget() {
                   )
                 )}
 
-                {/* Typing indicator */}
                 {isLoading && <TypingIndicator />}
-
-                {/* Scroll anchor */}
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* ── Input bar ── */}
+              {quickReplies.length > 0 && !isLoading && (
+                <div className="flex gap-2 overflow-x-auto px-4 py-3 border-t border-[#F5F5F5] bg-white shrink-0">
+                  {quickReplies.map((reply) => (
+                    <button
+                      key={reply}
+                      type="button"
+                      onClick={() => sendMessage(reply)}
+                      className="shrink-0 rounded-full border border-[#F5820A]/30 bg-[#FFF7ED] px-3 py-2 text-xs font-semibold text-[#B45309] hover:border-[#F5820A] hover:bg-[#FFEDD5] transition-colors"
+                    >
+                      {reply}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <div className="flex items-end gap-3 px-4 py-3 border-t border-[#F5F5F5] bg-white shrink-0">
                 <textarea
                   ref={inputRef}
@@ -346,7 +276,7 @@ export function ChatWidget() {
                   aria-label="Chat input"
                 />
                 <button
-                  onClick={sendMessage}
+                  onClick={() => sendMessage()}
                   disabled={!input.trim() || isLoading}
                   className="w-10 h-10 rounded-full bg-linear-to-br from-[#F5820A] to-[#E06B00] text-white shrink-0 flex items-center justify-center shadow-sm hover:shadow-md hover:scale-105 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100"
                   aria-label="Send message"
