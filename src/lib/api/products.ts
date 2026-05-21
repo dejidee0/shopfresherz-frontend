@@ -6,6 +6,7 @@ import type {
   SearchResult,
   InstantSearchResult,
   Brands,
+  Banner,
 } from "../types/product";
 import type { PaginatedResponse } from "../types/user";
 
@@ -172,4 +173,6 @@ export const productsApi = {
   getCategories: () => api.get<[CategoryItem]>("/categories"),
 
   getBrands: () => api.get<Brands[]>("/brands"),
+
+  getBanners: () => api.get<Banner[]>("/banners"),
 };

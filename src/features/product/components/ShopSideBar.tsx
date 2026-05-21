@@ -130,7 +130,7 @@ export function ShopSidebar({ filters, onChange, categories, }: ShopSidebarProps
 
         {/* ── Category ── */}
         <Section title="Category">
-          <ul className="space-y-0.5 max-h-64 overflow-y-auto scrollbar-hide flex flex-col md:hidden">
+          <ul className="space-y-0.5 max-h-64 overflow-y-auto scrollbar-hide flex flex-col">
             {categories?.map((cat, index) => (
               <li key={`${cat.slug}-${index}`}>
                 {/* Parent */}

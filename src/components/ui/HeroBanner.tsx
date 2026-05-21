@@ -5,60 +5,73 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { cn } from '@/lib/utils/format'
+import { productsApi } from '@/lib/api/products'
+import type { Banner } from '@/lib/types/product'
 
+// HeroSlide now mirrors the Banner API shape directly
 interface HeroSlide {
   id: string
+  title: string
+  subTitle: string
+  imageUrl: string
+  linkUrl: string
+  ctaText: string
+  sortOrder: number
+  // UI-only fields with sensible defaults
   tag?: string
   tagColor?: string
-  headline: string
-  subtext: string
-  ctaLabel: string
-  ctaHref: string
-  image: string
-  imageAlt: string
-  /** 'light' = dark text on light bg | 'dark' = white text on dark bg */
-  theme: 'light' | 'dark'
-  bgColor: string
+  theme?: 'light' | 'dark'
+  bgColor?: string
 }
 
-// Static slides — swap with CMS/admin banner data when the banners API is ready
-const SLIDES: HeroSlide[] = [
+// Map a Banner from the API to a HeroSlide (adds UI defaults)
+function bannerToSlide(banner: Banner): HeroSlide {
+  return {
+    ...banner,
+    tag: undefined,
+    tagColor: 'text-[#F5820A]',
+    theme: 'light',
+    bgColor: 'bg-[#F5F5F5]',
+  }
+}
+
+// Static fallback slides shown while the API loads (or if it fails)
+const FALLBACK_SLIDES: HeroSlide[] = [
   {
-    id: '1',
+    id: 'fallback-1',
     tag: 'THE BEST PLACE TO PLAY',
     tagColor: 'text-[#F5820A]',
-    headline: 'Video Game Consoles',
-    subtext: 'Save up to 50% on select Xbox and playstation games',
-    ctaLabel: 'SHOP NOW',
-    ctaHref: '/category/games-consoles',
-    image: '/images/categories/xbox.png',
-    imageAlt: 'Xbox Series X console',
+    title: 'Video Game Consoles',
+    subTitle: 'Save up to 50% on select Xbox and PlayStation games',
+    ctaText: 'SHOP NOW',
+    linkUrl: '/category/games-consoles',
+    imageUrl: '/images/categories/xbox.png',
+    sortOrder: 0,
     theme: 'light',
     bgColor: 'bg-[#F5F5F5]',
   },
   {
-    id: '2',
-    // tag: 'SUMMER SALES',
+    id: 'fallback-2',
     tagColor: 'text-[#F5820A]',
-    headline: 'New Mobile Phones',
-    subtext: 'Experience the ultimate Android/Apple flagship. Available now.',
-    ctaLabel: 'SHOP NOW',
-    ctaHref: '/store/',
-    image: '/images/categories/phone.png',
-    imageAlt: 'Mobile Phone',
+    title: 'New Mobile Phones',
+    subTitle: 'Experience the ultimate Android/Apple flagship. Available now.',
+    ctaText: 'SHOP NOW',
+    linkUrl: '/store/',
+    imageUrl: '/images/categories/phone.png',
+    sortOrder: 1,
     theme: 'light',
     bgColor: 'bg-white',
   },
   {
-    id: '3',
+    id: 'fallback-3',
     tag: 'NEW ARRIVAL',
     tagColor: 'text-[#7B2FBE]',
-    headline: 'Headphones & Earpods',
-    subtext: 'Premium sound, all-day comfort.',
-    ctaLabel: 'SHOP NOW',
-    ctaHref: '/store/',
-    image: '/images/categories/earpod.png',
-    imageAlt: 'Xiaomi FlipBuds Pro',
+    title: 'Headphones & Earpods',
+    subTitle: 'Premium sound, all-day comfort.',
+    ctaText: 'SHOP NOW',
+    linkUrl: '/store/',
+    imageUrl: '/images/categories/earpod.png',
+    sortOrder: 2,
     theme: 'dark',
     bgColor: 'bg-[#0D0D0D]',
   },
@@ -67,14 +80,31 @@ const SLIDES: HeroSlide[] = [
 export function HeroBanner() {
   const [current, setCurrent] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
+  const [slides, setSlides] = useState<HeroSlide[]>(FALLBACK_SLIDES)
   const touchStartX = useRef<number | null>(null)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  const total = SLIDES.length
+  const total = slides.length
 
   const next = useCallback(() => setCurrent((c) => (c + 1) % total), [total])
   const prev = useCallback(() => setCurrent((c) => (c - 1 + total) % total), [total])
   const goTo = useCallback((i: number) => setCurrent(i), [])
+
+  // Fetch banners from API; fall back to static slides on error
+  useEffect(() => {
+    async function fetchBanners() {
+      try {
+        const banners = await productsApi.getBanners()
+        if (banners.length > 0) {
+          setSlides(banners.map(bannerToSlide))
+          setCurrent(0)
+        }
+      } catch {
+        // Static fallback already set as initial state — nothing to do
+      }
+    }
+    fetchBanners()
+  }, [])
 
   // Auto-rotate every 5s, pause on hover
   useEffect(() => {
@@ -93,13 +123,11 @@ export function HeroBanner() {
   function handleTouchEnd(e: React.TouchEvent) {
     if (touchStartX.current === null) return
     const diff = touchStartX.current - e.changedTouches[0].clientX
-    if (Math.abs(diff) > 40) {
-      diff > 0 ? next() : prev()
-    }
+    if (Math.abs(diff) > 40) diff > 0 ? next() : prev()
     touchStartX.current = null
   }
 
-  const slide = SLIDES[current]
+  const slide = slides[current]
   const isDark = slide.theme === 'dark'
 
   return (
@@ -118,12 +146,12 @@ export function HeroBanner() {
         className="flex transition-transform duration-500 ease-in-out"
         style={{ transform: `translateX(-${current * 100}%)` }}
       >
-        {SLIDES.map((s) => (
+        {slides.map((s, i) => (
           <div
             key={s.id}
-            className={cn('min-w-full', s.bgColor)}
+            className={cn('min-w-full', s.bgColor ?? 'bg-[#F5F5F5]')}
             aria-roledescription="slide"
-            aria-label={s.headline}
+            aria-label={s.title}
           >
             <div className="max-w-content mx-auto px-10">
               <div className="flex items-center min-h-85 md:min-h-105 py-10 gap-8">
@@ -141,7 +169,7 @@ export function HeroBanner() {
                       isDark ? 'text-white' : 'text-[#111111]'
                     )}
                   >
-                    {s.headline}
+                    {s.title}
                   </h2>
                   <p
                     className={cn(
@@ -149,13 +177,13 @@ export function HeroBanner() {
                       isDark ? 'text-white/70' : 'text-[#6B7280]'
                     )}
                   >
-                    {s.subtext}
+                    {s.subTitle}
                   </p>
                   <Link
-                    href={s.ctaHref}
+                    href={s.linkUrl}
                     className="inline-flex items-center gap-2 bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white font-semibold px-7 py-3 rounded-btn hover:shadow-lg hover:shadow-orange-200 transition-all active:scale-[0.98]"
                   >
-                    {s.ctaLabel} →
+                    {s.ctaText} →
                   </Link>
                 </div>
 
@@ -163,12 +191,12 @@ export function HeroBanner() {
                 <div className="flex-1 flex items-center justify-center">
                   <div className="relative w-full max-w-105 aspect-4/3">
                     <Image
-                      src={s.image? s.image : "https://placehold.net/default.png"}
-                      alt={s.imageAlt}
+                      src={s.imageUrl || 'https://placehold.net/default.png'}
+                      alt={s.title}
                       fill
                       sizes="(max-width: 768px) 100vw, 50vw"
                       className="object-contain"
-                      priority={s.id === '1'}
+                      priority={i === 0}
                     />
                   </div>
                 </div>
@@ -196,7 +224,7 @@ export function HeroBanner() {
 
       {/* Dot indicators */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
-        {SLIDES.map((_, i) => (
+        {slides.map((_, i) => (
           <button
             key={i}
             onClick={() => goTo(i)}

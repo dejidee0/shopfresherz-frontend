@@ -112,6 +112,16 @@ export interface Brands {
   logoUrl: string;
 }
 
+export interface Banner {
+  id: string;
+  title: string;
+  subTitle: string;
+  imageUrl: string;
+  linkUrl: string;
+  ctaText: string;
+  sortOrder: number;
+}
+
 // export interface Brands {
 //   id: string;
 //   title: string;

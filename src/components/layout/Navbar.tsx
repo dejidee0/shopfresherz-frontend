@@ -5,17 +5,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import {
-  FiSearch,
-  FiShoppingCart,
-  FiHeart,
-  FiUser,
-  FiChevronDown,
-  FiHeadphones,
-  FiHelpCircle,
-  FiMapPin,
-  FiMenu,
-  FiX,
-  FiHome,
+  FiSearch, FiShoppingCart, FiHeart, FiUser, FiChevronDown,
+  FiChevronRight, FiHeadphones, FiHelpCircle, FiMapPin,
+  FiMenu, FiX, FiHome, FiGrid,
 } from 'react-icons/fi'
 import { useCartStore } from '@/store/cart'
 import { useAuthStore } from '@/store/auth'
@@ -37,6 +29,7 @@ export function Navbar() {
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
+  const [isMobileCatsOpen, setIsMobileCatsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -48,14 +41,10 @@ export function Navbar() {
   const openCart = useCartStore((s) => s.openCart)
   const { isAuthenticated, user } = useAuthStore()
 
-  // Handle hydration - only show cart badge after client-side mount
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  useEffect(() => { setMounted(true) }, [])
 
-  // Fetch all categories on mount
   useEffect(() => {
-    const fetchCategories = async () => {
+    async function fetchCategories() {
       try {
         const categories = await productsApi.getCategories()
         setAllCategories(categories.map(c => ({ id: c.id, name: c.name, slug: c.slug })))
@@ -65,8 +54,6 @@ export function Navbar() {
     }
     fetchCategories()
   }, [])
-
-
 
   // Debounced instant search
   useEffect(() => {
@@ -79,21 +66,16 @@ export function Navbar() {
     debounceRef.current = setTimeout(async () => {
       try {
         const instantData = await productsApi.instantSearch(query)
-        const filteredCategories = allCategories.filter(cat =>
-          cat.name.toLowerCase().includes(query.toLowerCase())
-        ).slice(0, 3) // limit to 3
-        setSuggestions({
-          products: instantData.products,
-          categories: filteredCategories
-        })
+        const filteredCategories = allCategories
+          .filter(cat => cat.name.toLowerCase().includes(query.toLowerCase()))
+          .slice(0, 3)
+        setSuggestions({ products: instantData.products, categories: filteredCategories })
         setIsSuggestionsOpen(true)
       } catch {
         // silent
       }
     }, 300)
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current)
-    }
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [query, allCategories])
 
   // Close suggestions on outside click
@@ -111,28 +93,29 @@ export function Navbar() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  // Lock body scroll when mobile menu is open
+  // Lock body scroll when mobile menu open
   useEffect(() => {
     document.body.style.overflow = isMobileMenuOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [isMobileMenuOpen])
 
-  const handleSearch = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault()
-     setIsLoading(true);
-      if (query.trim()) {
-        setIsSuggestionsOpen(false)
-        setIsMobileSearchOpen(false)
-        setIsMobileMenuOpen(false)
-        router.push(`/store/search?q=${encodeURIComponent(query.trim())}`)
-      }
-      setIsLoading(false)
-    },
-    [query, router]
-  )
+  const handleSearch = useCallback((e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    if (query.trim()) {
+      setIsSuggestionsOpen(false)
+      setIsMobileSearchOpen(false)
+      setIsMobileMenuOpen(false)
+      router.push(`/store/search?q=${encodeURIComponent(query.trim())}`)
+    }
+    setIsLoading(false)
+  }, [query, router])
 
-  // Shared suggestions dropdown markup
+  function closeMenu() {
+    setIsMobileMenuOpen(false)
+    setIsMobileCatsOpen(false)
+  }
+
   const SuggestionsDropdown = () =>
     isSuggestionsOpen && suggestions ? (
       <div className="absolute top-full left-0 right-0 bg-white shadow-xl rounded-b-lg border border-t-0 border-[#E5E7EB] z-50 overflow-hidden">
@@ -141,17 +124,17 @@ export function Navbar() {
             <p className="text-[10px] font-bold uppercase text-[#6B7280] mb-1 tracking-wide">
               Categories
             </p>
-             {suggestions.categories.map((cat) => (
-               <Link
-                 key={cat.id}
-                 href={`/store/category/${cat.id}`}
-                //  onClick={() => { setQuery(cat.name); setIsSuggestionsOpen(false) }}
-                 className="flex items-center gap-2 px-1 py-1.5 text-sm text-[#111111] hover:text-[#F5820A] transition-colors"
-               >
-                 <FiSearch size={12} className="text-[#6B7280]" />
-                 {cat.name}
-               </Link>
-             ))}
+            {suggestions.categories.map((cat) => (
+              <Link
+                key={cat.id}
+                href={`/store/category/${cat.slug}`} 
+                onClick={() => setIsSuggestionsOpen(false)}
+                className="flex items-center gap-2 px-1 py-1.5 text-sm text-[#111111] hover:text-[#F5820A] transition-colors"
+              >
+                <FiSearch size={12} className="text-[#6B7280]" />
+                {cat.name}
+              </Link>
+            ))}
           </div>
         )}
         {suggestions.products.length > 0 && (
@@ -167,9 +150,9 @@ export function Navbar() {
                 className="flex items-center gap-3 p-1.5 rounded hover:bg-gray-50 transition-colors"
               >
                 <div className="w-10 h-10 bg-gray-100 rounded shrink-0 overflow-hidden">
-                   <Image
-                     src={product.imageUrls?.[0] ?? '/images/device-placeholder.jpg'}
-                     alt={product.name}
+                  <Image
+                    src={product.imageUrls?.[0] ?? '/images/device-placeholder.jpg'}
+                    alt={product.name}
                     width={40}
                     height={40}
                     className="w-full h-full object-contain"
@@ -194,13 +177,10 @@ export function Navbar() {
   return (
     <div className="sticky top-0 z-30 w-full shadow-sm">
 
-      {/* ══════════════════════════════════════════
-          DESKTOP header  (md and up)
-      ══════════════════════════════════════════ */}
+      {/* ── Desktop header ── */}
       <header className="bg-[#F5820A] w-full">
         <div className="max-w-content mx-auto px-4 sm:px-6 lg:px-10 h-16 lg:h-18 flex items-center gap-3 lg:gap-6">
 
-          {/* Logo */}
           <Link href="/store" className="shrink-0">
             <Image
               src="/icons/ShopFreshersV2LogoWhite.png"
@@ -212,7 +192,7 @@ export function Navbar() {
             />
           </Link>
 
-          {/* Search bar — hidden on mobile, shown md+ */}
+          {/* Search — md+ only */}
           <div ref={searchRef} className="hidden md:flex flex-1 relative">
             <form onSubmit={handleSearch} className="w-full">
               <div className="flex">
@@ -238,9 +218,7 @@ export function Navbar() {
             <SuggestionsDropdown />
           </div>
 
-          {/* Right icons */}
           <div className="flex items-center gap-3 lg:gap-4 shrink-0 ml-auto md:ml-0">
-            {/* Mobile search toggle */}
             <button
               onClick={() => setIsMobileSearchOpen((v) => !v)}
               className="md:hidden text-white hover:text-white/80 transition-colors"
@@ -249,7 +227,6 @@ export function Navbar() {
               <FiSearch size={21} />
             </button>
 
-            {/* Cart */}
             <button
               onClick={openCart}
               className="relative text-white hover:text-white/80 transition-colors"
@@ -263,16 +240,10 @@ export function Navbar() {
               )}
             </button>
 
-            {/* Wishlist — hidden on smallest screens */}
-            <Link
-              href="/store/wishlist"
-              className="hidden sm:block text-white hover:text-white/80 transition-colors"
-              aria-label="Wishlist"
-            >
+            <Link href="/store/wishlist" className="hidden sm:block text-white hover:text-white/80 transition-colors" aria-label="Wishlist">
               <FiHeart size={21} />
             </Link>
 
-            {/* Auth */}
             <Link
               href={isAuthenticated ? '/account' : '/auth/login'}
               className="hidden sm:block text-white hover:text-white/80 transition-colors"
@@ -281,7 +252,6 @@ export function Navbar() {
               <FiUser size={21} />
             </Link>
 
-            {/* Mobile hamburger */}
             <button
               onClick={() => setIsMobileMenuOpen(true)}
               className="md:hidden text-white hover:text-white/80 transition-colors"
@@ -292,7 +262,7 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* ── Mobile search bar (expands below header) ── */}
+        {/* Mobile search bar */}
         {isMobileSearchOpen && (
           <div ref={mobileSearchRef} className="md:hidden bg-[#E06B00] px-4 pb-3 relative">
             <form onSubmit={handleSearch}>
@@ -320,12 +290,9 @@ export function Navbar() {
         )}
       </header>
 
-      {/* ══════════════════════════════════════════
-          Sub-nav  (hidden on mobile)
-      ══════════════════════════════════════════ */}
+      {/* ── Sub-nav (desktop) ── */}
       <nav className="hidden md:block bg-white border-b border-[#E5E7EB] relative">
         <div className="max-w-content mx-auto px-4 sm:px-6 lg:px-10 h-11 flex items-center gap-6">
-          {/* All Category */}
           <div className="relative">
             <button
               onClick={() => setIsMegaOpen((v) => !v)}
@@ -334,47 +301,37 @@ export function Navbar() {
               aria-haspopup="true"
             >
               <span>All Category</span>
-              <FiChevronDown
-                size={14}
-                className={cn('transition-transform duration-200', isMegaOpen && 'rotate-180')}
-              />
+              <FiChevronDown size={14} className={cn('transition-transform duration-200', isMegaOpen && 'rotate-180')} />
             </button>
             <MegaMenu isOpen={isMegaOpen} onClose={() => setIsMegaOpen(false)} />
           </div>
 
           <div className="flex items-center gap-5 text-sm text-[#111111]">
             <Link href="#" className="flex items-center gap-1.5 hover:text-[#F5820A] transition-colors">
-              <FiHeadphones size={15} />
-              Customer Support
+              <FiHeadphones size={15} /> Customer Support
             </Link>
             <Link href="#" className="flex items-center gap-1.5 hover:text-[#F5820A] transition-colors">
-              <FiHelpCircle size={15} />
-              Need Help
+              <FiHelpCircle size={15} /> Need Help
             </Link>
           </div>
 
           <div className="ml-auto">
             <Link href="/account/orders" className="flex items-center gap-1.5 text-sm text-[#111111] hover:text-[#F5820A] transition-colors">
-              <FiMapPin size={15} />
-              Track Order
+              <FiMapPin size={15} /> Track Order
             </Link>
           </div>
         </div>
       </nav>
 
-      {/* ══════════════════════════════════════════
-          Mobile full-screen menu drawer
-      ══════════════════════════════════════════ */}
+      {/* ── Mobile drawer ── */}
       {isMobileMenuOpen && (
         <>
-          {/* Backdrop */}
           <div
             className="fixed inset-0 z-40 bg-black/50 md:hidden"
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={closeMenu}
             aria-hidden="true"
           />
 
-          {/* Drawer */}
           <div className="fixed inset-y-0 right-0 z-50 w-72 bg-white shadow-2xl md:hidden flex flex-col">
 
             {/* Drawer header */}
@@ -386,11 +343,7 @@ export function Navbar() {
                 height={30}
                 className="h-7 w-auto"
               />
-              <button
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-white hover:text-white/70 transition-colors"
-                aria-label="Close menu"
-              >
+              <button onClick={closeMenu} className="text-white hover:text-white/70 transition-colors" aria-label="Close menu">
                 <FiX size={22} />
               </button>
             </div>
@@ -406,58 +359,40 @@ export function Navbar() {
                 {isAuthenticated ? (
                   <div>
                     <p className="text-sm font-semibold text-[#111111]">{user?.firstName}</p>
-                    <Link
-                      href="/account"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="text-xs text-[#F5820A]"
-                    >
+                    <Link href="/account" onClick={closeMenu} className="text-xs text-[#F5820A]">
                       View Account →
                     </Link>
                   </div>
                 ) : (
                   <div>
-                    <Link
-                      href="/auth/login"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="text-sm font-semibold text-[#111111] hover:text-[#F5820A] transition-colors"
-                    >
+                    <Link href="/auth/login" onClick={closeMenu} className="text-sm font-semibold text-[#111111] hover:text-[#F5820A] transition-colors">
                       Sign In
                     </Link>
                     <p className="text-xs text-[#6B7280]">
                       or{' '}
-                      <Link
-                        href="/auth/register"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="text-[#F5820A]"
-                      >
+                      <Link href="/auth/register" onClick={closeMenu} className="text-[#F5820A]">
                         Create account
                       </Link>
                     </p>
                   </div>
                 )}
-                <Link
-                  href="/account/wishlist"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="ml-auto text-[#6B7280] hover:text-[#F5820A] transition-colors"
-                  aria-label="Wishlist"
-                >
+                <Link href="/account/wishlist" onClick={closeMenu} className="ml-auto text-[#6B7280] hover:text-[#F5820A] transition-colors" aria-label="Wishlist">
                   <FiHeart size={20} />
                 </Link>
               </div>
 
-              {/* Nav links */}
-              <nav className="py-2">
+              {/* Static nav links */}
+              <nav className="py-2 border-b border-gray-100">
                 {[
-                  { id: 1, href: '/store',               icon: FiHome,        label: 'Home'             },
-                  { id: 2, href: '/store/category/all',   icon: FiChevronDown, label: 'All Categories'   },
-                  { id: 3, href: '',        icon: FiHeadphones,  label: 'Customer Support' },
-                  { id: 4, href: '',           icon: FiHelpCircle,  label: 'Need Help'        },
-                  { id: 5, href: '/account/orders', icon: FiMapPin,      label: 'Track Order'      },
-                ].map(({id, href, icon: Icon, label }) => (
+                  { id: 1, href: '/store',          icon: FiHome,       label: 'Home'             },
+                  { id: 2, href: '#',               icon: FiHeadphones, label: 'Customer Support' },
+                  { id: 3, href: '#',               icon: FiHelpCircle, label: 'Need Help'        },
+                  { id: 4, href: '/account/orders', icon: FiMapPin,     label: 'Track Order'      },
+                ].map(({ id, href, icon: Icon, label }) => (
                   <Link
                     key={id}
                     href={href}
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    onClick={closeMenu}
                     className="flex items-center gap-3 px-5 py-3 text-sm text-[#111111] hover:bg-orange-50 hover:text-[#F5820A] transition-colors"
                   >
                     <Icon size={16} className="text-[#6B7280]" />
@@ -465,12 +400,58 @@ export function Navbar() {
                   </Link>
                 ))}
               </nav>
+
+              {/* Categories accordion */}
+              <div className="py-2">
+                <button
+                  onClick={() => setIsMobileCatsOpen((v) => !v)}
+                  className="flex items-center justify-between w-full px-5 py-3 text-sm font-semibold text-[#111111] hover:bg-orange-50 hover:text-[#F5820A] transition-colors"
+                >
+                  <span className="flex items-center gap-3">
+                    <FiGrid size={16} className="text-[#6B7280]" />
+                    All Categories
+                  </span>
+                  <FiChevronRight
+                    size={15}
+                    className={cn('text-[#6B7280] transition-transform duration-200', isMobileCatsOpen && 'rotate-90')}
+                  />
+                </button>
+
+                {isMobileCatsOpen && (
+                  <div className="bg-[#FAFAFA] border-t border-gray-100">
+                    {/* "All products" shortcut */}
+                    <Link
+                      href="/store/category/all"
+                      onClick={closeMenu}
+                      className="flex items-center gap-2 px-8 py-2.5 text-sm text-[#F5820A] font-medium hover:bg-orange-50 transition-colors"
+                    >
+                      All Products
+                    </Link>
+
+                    {allCategories.length === 0 ? (
+                      <p className="px-8 py-3 text-xs text-[#6B7280]">Loading…</p>
+                    ) : (
+                      allCategories.map((cat) => (
+                        <Link
+                          key={cat.id}
+                          href={`/store/category/${cat.slug}`}
+                          onClick={closeMenu}
+                          className="flex items-center gap-2 px-8 py-2.5 text-sm text-[#111111] hover:bg-orange-50 hover:text-[#F5820A] transition-colors"
+                        >
+                          <span className="w-1 h-1 rounded-full bg-[#D1D5DB] shrink-0" />
+                          {cat.name}
+                        </Link>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Drawer footer — cart CTA */}
+            {/* Drawer footer */}
             <div className="border-t border-gray-100 p-4">
               <button
-                onClick={() => { openCart(); setIsMobileMenuOpen(false) }}
+                onClick={() => { openCart(); closeMenu() }}
                 className="w-full flex items-center justify-center gap-2 bg-[#F5820A] text-white text-sm font-semibold py-2.5 rounded hover:bg-[#E06B00] transition-colors"
               >
                 <FiShoppingCart size={16} />
@@ -486,7 +467,7 @@ export function Navbar() {
         </>
       )}
 
-      {isLoading && <PageSpinner label='Searching...'/>}
+      {isLoading && <PageSpinner label="Searching…" />}
     </div>
   )
 }

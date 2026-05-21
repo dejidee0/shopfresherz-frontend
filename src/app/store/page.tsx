@@ -8,6 +8,7 @@ import { productsApi } from "@/lib/api/products";
 import Link from "next/link";
 import { FiShoppingCart } from "react-icons/fi";
 import Image from "next/image";
+import { FaArrowRight } from "react-icons/fa";
 
 // ISR — revalidate every 60 seconds
 export const revalidate = 60;
@@ -166,6 +167,16 @@ export default async function HomePage() {
                   ₦{PROMO2.price}
                 </span>
               </div>
+
+              <div className="flex flex-col gap-1.5 sm:gap-2 mt-3 sm:mt-4">
+                  <Link
+                    href={"/store/category/all"}
+                    className="flex items-center p-4 rounded-sm justify-center gap-1.5 sm:gap-2 h-8 sm:h-9 bg-white text-primary text-[10px] sm:text-xs font-semibold rounded-btn hover:shadow-md transition-all"
+                  >
+                    SHOP NOW
+                    <FaArrowRight/>
+                  </Link>
+                </div>
             </div>
             <div>
               <Image
