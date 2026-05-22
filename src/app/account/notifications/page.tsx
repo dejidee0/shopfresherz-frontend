@@ -1,57 +1,128 @@
 "use client";
+
 import { ColumnDef, DataTable } from "@/components/ui/DataTable";
 import { Toggle } from "@/components/ui/Toggle";
 import { AccountLayout } from "@/features/account/components/AccountLayout";
-import { useState } from "react";
+import {
+  accountApi,
+  type NotificationPreferences,
+} from "@/lib/api/account";
+import { useAuthStore } from "@/store/auth";
+import { toast } from "@/store/toast";
+import { useEffect, useMemo, useState } from "react";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-type NotificationChannel = "enableEmail" | "enableSMS" | "enablePush";
+type NotificationKey = keyof NotificationPreferences;
 
 interface NotificationSetting {
-  id: string;
+  id: NotificationKey;
   eventType: string;
   description: string;
-  isCritical?: boolean;
-  enableEmail: boolean;
-  enableSMS: boolean;
-  enablePush: boolean;
+  enabled: boolean;
 }
 
-// ─── Defaults ─────────────────────────────────────────────────────────────────
-
-const DEFAULT_NOTIFICATIONS: NotificationSetting[] = [
-  { id: "order-updates",      eventType: "Order Updates",      description: "Status changes and delivery updates.",    enableEmail: true,  enableSMS: true,  enablePush: true  },
-  { id: "promotions",         eventType: "Promotions & Offers", description: "Sales, discounts, and special deals.",   enableEmail: true,  enableSMS: false, enablePush: true  },
-  { id: "price-drops",        eventType: "Price Drop Alerts",   description: "When wishlist items go on sale.",        enableEmail: true,  enableSMS: false, enablePush: true  },
-  { id: "back-in-stock",      eventType: "Back in Stock",       description: "When out-of-stock items return.",        enableEmail: true,  enableSMS: false, enablePush: true  },
-  { id: "review-reminders",   eventType: "Review Reminders",    description: "Prompts to review purchased items.",     enableEmail: true,  enableSMS: false, enablePush: false },
-  { id: "loyalty-points",     eventType: "Loyalty Points",      description: "Points earned and redeemed.",            enableEmail: true,  enableSMS: false, enablePush: true  },
-  { id: "account-security",   eventType: "Account & Security",  description: "Login alerts and password changes.",     enableEmail: true,  enableSMS: true,  enablePush: true,  isCritical: true },
+const NOTIFICATION_META: Array<Omit<NotificationSetting, "enabled">> = [
+  {
+    id: "orderUpdates",
+    eventType: "Order Updates",
+    description: "Status changes and delivery updates.",
+  },
+  {
+    id: "promotions",
+    eventType: "Promotions & Offers",
+    description: "Sales, discounts, and special deals.",
+  },
+  {
+    id: "backInStock",
+    eventType: "Back in Stock",
+    description: "When out-of-stock items return.",
+  },
+  {
+    id: "wishlistReminders",
+    eventType: "Wishlist Reminders",
+    description: "Reminders about items saved to your wishlist.",
+  },
+  {
+    id: "reviewReminders",
+    eventType: "Review Reminders",
+    description: "Prompts to review purchased items.",
+  },
 ];
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+const DEFAULT_PREFERENCES: NotificationPreferences = {
+  orderUpdates: false,
+  promotions: false,
+  backInStock: false,
+  wishlistReminders: false,
+  reviewReminders: false,
+};
 
 export default function AccountNotificationsPage() {
-  const [settings, setSettings] = useState<NotificationSetting[]>(DEFAULT_NOTIFICATIONS);
+  const { accessToken } = useAuthStore();
+  const [preferences, setPreferences] =
+    useState<NotificationPreferences>(DEFAULT_PREFERENCES);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
 
-  // Toggle a single channel for a single row — ready for an API call
-  const toggle = (id: string, channel: NotificationChannel, value: boolean) => {
-    setSettings((prev) =>
-      prev.map((row) => (row.id === id ? { ...row, [channel]: value } : row))
-    );
-    // 👇 API call goes here
-    // await updateNotificationSetting({ id, channel, value });
+  useEffect(() => {
+    if (!accessToken) return;
+
+    let isMounted = true;
+    const token = accessToken;
+
+    async function loadNotifications() {
+      await Promise.resolve();
+      if (!isMounted) return;
+
+      setIsLoading(true);
+      setError("");
+
+      try {
+        const data = await accountApi.getNotifications(token);
+        if (isMounted) setPreferences(data);
+      } catch {
+        if (isMounted) setError("Failed to load notification preferences.");
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    }
+
+    loadNotifications();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [accessToken]);
+
+  const settings = useMemo<NotificationSetting[]>(
+    () =>
+      NOTIFICATION_META.map((item) => ({
+        ...item,
+        enabled: preferences[item.id],
+      })),
+    [preferences]
+  );
+
+  const toggle = (id: NotificationKey, enabled: boolean) => {
+    setPreferences((prev) => ({ ...prev, [id]: enabled }));
   };
 
-  // Serialize for submission / API
-  const getPayload = () =>
-    settings.map(({ id, enableEmail, enableSMS, enablePush }) => ({
-      id,
-      enableEmail,
-      enableSMS,
-      enablePush,
-    }));
+  async function handleSave() {
+    if (!accessToken) return;
+
+    setIsSaving(true);
+    setError("");
+
+    try {
+      await accountApi.updateNotifications(accessToken, preferences);
+      toast.success("Notification preferences saved");
+    } catch {
+      setError("Failed to save notification preferences.");
+      toast.error("Failed to save notifications", "Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
 
   const columns: ColumnDef<NotificationSetting>[] = [
     {
@@ -59,45 +130,18 @@ export default function AccountNotificationsPage() {
       header: "EVENT TYPE",
       render: (row) => (
         <div className="flex flex-col gap-0.5">
-          <div className="flex items-center gap-2">
-            <p className="text-base font-bold text-gray-700">{row.eventType}</p>
-            {row.isCritical && (
-              <span className="rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-red-500">
-                Critical
-              </span>
-            )}
-          </div>
+          <p className="text-base font-bold text-gray-700">{row.eventType}</p>
           <p className="text-sm text-text-muted">{row.description}</p>
         </div>
       ),
     },
     {
-      key: "enableEmail",
-      header: "EMAIL",
+      key: "enabled",
+      header: "ENABLED",
       render: (row) => (
         <Toggle
-          checked={row.enableEmail}
-          onChange={(v) => toggle(row.id, "enableEmail", v)}
-        />
-      ),
-    },
-    {
-      key: "enableSMS",
-      header: "SMS",
-      render: (row) => (
-        <Toggle
-          checked={row.enableSMS}
-          onChange={(v) => toggle(row.id, "enableSMS", v)}
-        />
-      ),
-    },
-    {
-      key: "enablePush",
-      header: "PUSH",
-      render: (row) => (
-        <Toggle
-          checked={row.enablePush}
-          onChange={(v) => toggle(row.id, "enablePush", v)}
+          checked={row.enabled}
+          onChange={(value) => toggle(row.id, value)}
         />
       ),
     },
@@ -110,22 +154,33 @@ export default function AccountNotificationsPage() {
       <div className="flex flex-col gap-6 lg:w-[70%]">
         <div>
           <p className="text-2xl font-semibold">Notifications</p>
-          <p className="text-xs text-gray-500">Choose how you'd like to be notified</p>
+          <p className="text-xs text-gray-500">
+            Choose which account notifications you want to receive
+          </p>
         </div>
+
+        {error && (
+          <p className="rounded-md border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-600">
+            {error}
+          </p>
+        )}
 
         <DataTable
           columns={columns}
           data={settings}
           rowKey="id"
-          emptyMessage="No available notifications"
+          emptyMessage={
+            isLoading ? "Loading notification preferences..." : "No available notifications"
+          }
         />
 
-        {/* Optional: Save all at once */}
         <button
-          onClick={() => console.log("Payload →", getPayload())}
-          className="self-start rounded bg-orange-500 px-6 py-2 text-sm font-semibold text-white hover:bg-orange-600"
+          type="button"
+          onClick={handleSave}
+          disabled={isSaving || isLoading}
+          className="self-start rounded bg-orange-500 px-6 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Save Preferences
+          {isSaving ? "Saving..." : "Save Preferences"}
         </button>
       </div>
     </AccountLayout>

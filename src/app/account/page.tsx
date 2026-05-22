@@ -15,12 +15,16 @@ import { OrderStatusBadge } from "@/features/account/components/OrderStatusBadge
 import { DataTable, type ColumnDef } from "@/components/ui/DataTable";
 import { useAuthStore } from "@/store/auth";
 import { formatPrice, formatDate } from "@/lib/utils/format";
-import type { Order } from "@/lib/types/order";
-import { accountApi, DashboardStats, PaymentMethod } from "@/lib/api/account";
+import {
+  accountApi,
+  type AccountOrder,
+  type AccountProfile,
+  type Address,
+  type DashboardStats,
+  type PaymentMethod,
+} from "@/lib/api/account";
 
-// ─── Recent orders columns ────────────────────────────────────────────────────
-
-const ORDER_COLUMNS: ColumnDef<Order>[] = [
+const ORDER_COLUMNS: ColumnDef<AccountOrder>[] = [
   {
     key: "orderNumber",
     header: "Order ID",
@@ -36,7 +40,6 @@ const ORDER_COLUMNS: ColumnDef<Order>[] = [
     render: (row) => <OrderStatusBadge status={row.status} />,
   },
   {
-    // Hidden on mobile — date is secondary info
     key: "createdAt",
     header: "Date",
     render: (row) => (
@@ -57,18 +60,16 @@ const ORDER_COLUMNS: ColumnDef<Order>[] = [
   {
     key: "id",
     header: "Action",
-    render: (row) => (
+    render: () => (
       <Link
-        href={`/account/orders/${row.id}`}
+        href="/account/orders"
         className="text-sm text-[#F5820A] font-medium hover:underline whitespace-nowrap"
       >
-        View →
+        View
       </Link>
     ),
   },
 ];
-
-// ─── Stat card ────────────────────────────────────────────────────────────────
 
 function StatCard({
   icon: Icon,
@@ -94,31 +95,90 @@ function StatCard({
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
 export default function AccountDashboardPage() {
-  const { user, accessToken } = useAuthStore();
+  const { user, accessToken, updateUser } = useAuthStore();
   const [stats, setStats] = useState<DashboardStats>({
     totalOrders: 0,
     completedOrders: 0,
     loyaltyPoints: 0,
   });
-  const [recentOrders, setRecentOrders] = useState<Order[]>([]);
+  const [profile, setProfile] = useState<AccountProfile | null>(null);
+  const [billingAddress, setBillingAddress] = useState<Address | null>(null);
+  const [recentOrders, setRecentOrders] = useState<AccountOrder[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!accessToken) return;
-    accountApi
-      .getDashboard(accessToken)
-      .then((data) => {
-        setStats(data.stats);
-        setRecentOrders(data.recentOrders);
-        setPaymentMethods(data.paymentMethods);
-      })
-      .catch(() => {})
-      .finally(() => setIsLoading(false));
-  }, [accessToken]);
+
+    let isMounted = true;
+    const token = accessToken;
+
+    async function loadDashboard() {
+      await Promise.resolve();
+      if (!isMounted) return;
+
+      setIsLoading(true);
+
+      const [
+        profileResult,
+        ordersResult,
+        loyaltyResult,
+        addressesResult,
+        paymentMethodsResult,
+      ] = await Promise.allSettled([
+        accountApi.getProfile(token),
+        accountApi.getOrders(token, 1, 7),
+        accountApi.getLoyalty(token, 1, 1),
+        accountApi.getAddresses(token),
+        accountApi.getPaymentMethods(token),
+      ]);
+
+      if (!isMounted) return;
+
+      const nextProfile =
+        profileResult.status === "fulfilled" ? profileResult.value : null;
+      const orders =
+        ordersResult.status === "fulfilled" ? ordersResult.value : null;
+      const loyalty =
+        loyaltyResult.status === "fulfilled" ? loyaltyResult.value : null;
+      const addresses =
+        addressesResult.status === "fulfilled" ? addressesResult.value : [];
+
+      if (nextProfile) {
+        setProfile(nextProfile);
+        updateUser(nextProfile);
+      }
+
+      setRecentOrders(orders?.data ?? []);
+      setStats({
+        totalOrders: orders?.totalCount ?? 0,
+        completedOrders:
+          orders?.items.filter((order) => order.status === "Delivered").length ?? 0,
+        loyaltyPoints:
+          loyalty?.balance ?? nextProfile?.loyaltyPoints ?? user?.loyaltyPoints ?? 0,
+      });
+      setBillingAddress(
+        addresses.find((address) => address.isDefault) ?? addresses[0] ?? null
+      );
+
+      if (paymentMethodsResult.status === "fulfilled") {
+        setPaymentMethods(paymentMethodsResult.value);
+      } else {
+        setPaymentMethods([]);
+      }
+
+      setIsLoading(false);
+    }
+
+    loadDashboard().catch(() => {
+      if (isMounted) setIsLoading(false);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [accessToken, updateUser, user?.loyaltyPoints]);
 
   function handleDeleteCard(id: string) {
     if (!accessToken) return;
@@ -128,12 +188,25 @@ export default function AccountDashboardPage() {
       .catch(() => {});
   }
 
+  const account = profile ?? user;
+  const accountName =
+    [account?.firstName, account?.lastName].filter(Boolean).join(" ") || "Customer";
+  const initials =
+    `${account?.firstName?.[0] ?? ""}${account?.lastName?.[0] ?? ""}` || "SF";
+  const addressLines = billingAddress
+    ? [
+        billingAddress.line1 ?? billingAddress.street,
+        billingAddress.line2,
+        [billingAddress.city, billingAddress.state].filter(Boolean).join(", "),
+        billingAddress.postalCode,
+      ].filter(Boolean)
+    : [];
+
   return (
     <AccountLayout>
-      {/* ── Greeting ── */}
       <div className="mb-5 sm:mb-6">
         <h1 className="text-lg sm:text-xl font-bold text-[#111111]">
-          Hello, {user?.firstName} {user?.lastName}
+          Hello, {accountName}
         </h1>
         <p className="text-sm text-[#6B7280] mt-1 leading-relaxed">
           From your account dashboard you can check your{" "}
@@ -156,54 +229,51 @@ export default function AccountDashboardPage() {
         </p>
       </div>
 
-      {/* ── Stats row — 3 cols on all sizes, stacks inside naturally ── */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-6 lg:hidden">
-        <StatCard icon={FiShoppingBag} value={stats.totalOrders}    label="Total Orders"     />
-        <StatCard icon={FiCheckCircle} value={stats.completedOrders} label="Completed"        />
-        <StatCard icon={FiStar}        value={stats.loyaltyPoints}   label="Loyalty Points"   />
+        <StatCard icon={FiShoppingBag} value={stats.totalOrders} label="Total Orders" />
+        <StatCard icon={FiCheckCircle} value={stats.completedOrders} label="Completed" />
+        <StatCard icon={FiStar} value={stats.loyaltyPoints} label="Loyalty Points" />
       </div>
 
-      {/* ── Account Info + Billing + Stats (desktop 3-col grid) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5 sm:mb-6">
-
-        {/* Account Info */}
         <div className="bg-white border border-[#E5E7EB] rounded-card p-4 sm:p-5">
           <p className="text-xs font-bold uppercase tracking-wider text-[#6B7280] mb-3 sm:mb-4">
             Account Info
           </p>
           <div className="flex items-center gap-3 mb-3 sm:mb-4">
             <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#F5F5F5] overflow-hidden shrink-0">
-              {user?.avatarUrl ? (
+              {account?.avatarUrl ? (
                 <Image
-                  src={user.avatarUrl}
-                  alt={user.firstName}
+                  src={account.avatarUrl}
+                  alt={accountName}
                   width={48}
                   height={48}
                   className="w-full h-full object-cover"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-[#6B7280] font-bold text-base sm:text-lg">
-                  {user?.firstName?.[0]}
-                  {user?.lastName?.[0]}
+                  {initials}
                 </div>
               )}
             </div>
             <div className="min-w-0">
               <p className="font-bold text-sm text-[#111111] truncate">
-                {user?.firstName} {user?.lastName}
+                {accountName}
               </p>
-              <p className="text-xs text-[#6B7280]">Uyo, Akwaibom</p>
+              <p className="text-xs text-[#6B7280]">
+                {profile?.isVerified ? "Verified customer" : "Customer account"}
+              </p>
             </div>
           </div>
           <div className="space-y-1 text-xs text-[#6B7280]">
             <p className="truncate">
               <span className="font-medium text-[#111111]">Email: </span>
-              {user?.email}
+              {account?.email ?? "Not available"}
             </p>
-            {user?.phone && (
+            {account?.phone && (
               <p>
                 <span className="font-medium text-[#111111]">Phone: </span>
-                {user.phone}
+                {account.phone}
               </p>
             )}
           </div>
@@ -215,26 +285,28 @@ export default function AccountDashboardPage() {
           </Link>
         </div>
 
-        {/* Billing Address */}
         <div className="bg-white border border-[#E5E7EB] rounded-card p-4 sm:p-5">
           <p className="text-xs font-bold uppercase tracking-wider text-[#6B7280] mb-3 sm:mb-4">
             Billing Address
           </p>
           <div className="text-xs text-[#6B7280] space-y-1 leading-relaxed">
             <p className="font-bold text-sm text-[#111111]">
-              {user?.firstName} {user?.lastName}
+              {billingAddress?.label ?? "No saved address"}
             </p>
-            <p>
-              East Tejturi Bazar, Word No. 04, Road No. 13/x,
-              House no. 1320/C, Flat No. 5D, Dhaka - 1200, Bangladesh
-            </p>
-            <p>
-              <span className="font-medium text-[#111111]">Phone: </span>
-              +1-202-555-0118
-            </p>
+            {addressLines.length > 0 ? (
+              addressLines.map((line) => <p key={line}>{line}</p>)
+            ) : (
+              <p>Add a delivery address to speed up checkout.</p>
+            )}
+            {account?.phone && (
+              <p>
+                <span className="font-medium text-[#111111]">Phone: </span>
+                {account.phone}
+              </p>
+            )}
             <p className="truncate">
               <span className="font-medium text-[#111111]">Email: </span>
-              {user?.email}
+              {account?.email ?? "Not available"}
             </p>
           </div>
           <Link
@@ -245,25 +317,27 @@ export default function AccountDashboardPage() {
           </Link>
         </div>
 
-        {/* Stats column — desktop only (mobile stats are above) */}
         <div className="hidden lg:flex flex-col gap-3">
-          <StatCard icon={FiShoppingBag} value={stats.totalOrders}    label="Total Orders"    />
-          <StatCard icon={FiCheckCircle} value={stats.completedOrders} label="Completed Orders" />
-          <StatCard icon={FiStar}        value={stats.loyaltyPoints}   label="Loyalty Points"  />
+          <StatCard icon={FiShoppingBag} value={stats.totalOrders} label="Total Orders" />
+          <StatCard
+            icon={FiCheckCircle}
+            value={stats.completedOrders}
+            label="Completed Orders"
+          />
+          <StatCard icon={FiStar} value={stats.loyaltyPoints} label="Loyalty Points" />
         </div>
       </div>
 
-      {/* ── Payment Options ── */}
       <div className="bg-white border border-[#E5E7EB] rounded-card p-4 sm:p-5 mb-5 sm:mb-6">
         <div className="flex items-center justify-between mb-3 sm:mb-4">
           <p className="text-xs font-bold uppercase tracking-wider text-[#6B7280]">
             Payment Option
           </p>
           <Link
-            href="/account/payment-methods/add"
+            href="/account/payment-methods"
             className="flex items-center gap-1 text-xs text-[#F5820A] font-medium hover:underline"
           >
-            Add Card <FiPlus size={12} />
+            Manage <FiPlus size={12} />
           </Link>
         </div>
 
@@ -278,45 +352,37 @@ export default function AccountDashboardPage() {
           ))}
           {paymentMethods.length === 0 && !isLoading && (
             <p className="text-sm text-[#6B7280] py-4">
-              No saved payment methods.
+              No saved payment methods from the API.
             </p>
           )}
         </div>
       </div>
 
-      {/* ── Recent Orders ── */}
       <DataTable
         title="Recent Order"
         columns={ORDER_COLUMNS}
-        data={recentOrders.slice(0, 7)}
+        data={recentOrders}
         rowKey="id"
-        emptyMessage="No recent orders."
+        emptyMessage={isLoading ? "Loading recent orders..." : "No recent orders."}
         footer={
           <Link
             href="/account/orders"
             className="text-xs text-[#F5820A] font-medium hover:underline"
           >
-            View All →
+            View All
           </Link>
         }
         className="mb-5 sm:mb-6"
       />
 
-      {/* ── Browsing History ── */}
       <div className="bg-white border border-[#E5E7EB] rounded-card p-4 sm:p-5">
         <div className="flex items-center justify-between mb-3 sm:mb-4">
           <p className="text-xs font-bold uppercase tracking-wider text-[#6B7280]">
             Browsing History
           </p>
-          <Link
-            href="/account/browsing-history"
-            className="text-xs text-[#F5820A] font-medium hover:underline"
-          >
-            View All →
-          </Link>
         </div>
         <p className="text-sm text-[#6B7280]">
-          Browsing history is populated from the API when available.
+          Browsing history endpoint is not available yet.
         </p>
       </div>
     </AccountLayout>

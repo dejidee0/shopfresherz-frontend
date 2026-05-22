@@ -10,6 +10,9 @@ import { FiShoppingCart } from "react-icons/fi";
 import Image from "next/image";
 import { FaArrowRight } from "react-icons/fa";
 import { MarqueeBanner } from "@/components/layout/MarqueeBanner";
+import BottomBanner from "@/components/layout/BottomBanner";
+import { PDPBottomProducts } from "@/features/product/components/PdpBottomProducts";
+import FeatureSection from "@/components/layout/FeatureSection";
 
 // ISR — revalidate every 60 seconds
 export const revalidate = 60;
@@ -27,6 +30,17 @@ async function getHomeData() {
     newArrivals: newArrivals.status === "fulfilled" ? newArrivals.value : [],
   };
 }
+
+// Fetch supporting lists — failures don't break the page
+  const [ topRated, ] =
+    await Promise.allSettled([
+      // productsApi.flashDeals().then((deals) => deals.slice(0, 3)),
+      // productsApi.bestSellers(3),
+      productsApi
+        .list({ sortBy: "best_rated", pageSize: 3 })
+        .then((r) => r.data ?? []),
+      // productsApi.newArrivals(3),
+    ]);
 
 const PROMO = {
   tag: "Smartwatches",
@@ -146,6 +160,8 @@ export default async function HomePage() {
         />
       </div>
 
+      <FeatureSection/>
+
       {/* 7. New arrivals */}
       <ProductGridSection
         title="New Arrivals"
@@ -194,6 +210,24 @@ export default async function HomePage() {
           </div>
         }
       />
+
+      <BottomBanner/>
+
+       {/* ── Bottom product rows ── */}
+           <div className="px-2 md:px-4 lg:px-6">
+             <PDPBottomProducts
+              flashSaleToday={
+                flashDeals
+              }
+              bestSellers={
+                bestSellers
+              }
+              topRated={topRated.status === "fulfilled" ? topRated.value : []}
+              newArrivals={
+                newArrivals
+              }
+            />
+           </div>
 
       {/* Spacer before footer */}
       <div className="h-8" />

@@ -1,19 +1,17 @@
 "use client";
 
 import { AccountLayout } from "@/features/account/components/AccountLayout";
-import { useState, useRef } from "react";
+import { accountApi } from "@/lib/api/account";
+import { useAuthStore } from "@/store/auth";
+import { toast } from "@/store/toast";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { IoCameraOutline, IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface ProfileForm {
   firstName: string;
   lastName: string;
   email: string;
   phoneNumber: string;
-  country: string;
-  state: string;
-  zipCode: string;
   avatarUrl: string;
 }
 
@@ -23,17 +21,17 @@ interface PasswordForm {
   confirmPassword: string;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 function PasswordInput({
   label,
   placeholder,
   value,
+  disabled = false,
   onChange,
 }: {
   label: string;
   placeholder?: string;
   value: string;
+  disabled?: boolean;
   onChange: (v: string) => void;
 }) {
   const [show, setShow] = useState(false);
@@ -46,13 +44,15 @@ function PasswordInput({
           type={show ? "text" : "password"}
           placeholder={placeholder}
           value={value}
+          disabled={disabled}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded border border-gray-300 px-3 py-2.5 pr-10 text-sm outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400"
+          className="w-full rounded border border-gray-300 px-3 py-2.5 pr-10 text-sm outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 disabled:bg-gray-50 disabled:text-gray-500"
         />
         <button
           type="button"
           onClick={() => setShow((p) => !p)}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+          aria-label={show ? "Hide password" : "Show password"}
         >
           {show ? <IoEyeOffOutline size={16} /> : <IoEyeOutline size={16} />}
         </button>
@@ -67,12 +67,14 @@ function FormField({
   onChange,
   type = "text",
   placeholder,
+  disabled = false,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   type?: string;
   placeholder?: string;
+  disabled?: boolean;
 }) {
   return (
     <div className="flex flex-col gap-1.5">
@@ -81,70 +83,75 @@ function FormField({
         type={type}
         placeholder={placeholder}
         value={value}
+        disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400"
+        className="w-full rounded border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 disabled:bg-gray-50 disabled:text-gray-500"
       />
     </div>
   );
 }
 
-function SelectField({
-  label,
-  value,
-  onChange,
-  options,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  options: string[];
-}) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-medium text-gray-700">{label}</label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 bg-white"
-      >
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
 export default function AccountProfileSettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { accessToken, updateUser } = useAuthStore();
 
   const [profileForm, setProfileForm] = useState<ProfileForm>({
-    firstName: "Mfoniso",
-    lastName: "Ibokette",
-    email: "mfonisoibokette21@gmail.com",
-    phoneNumber: "+1-202-555-0118",
-    country: "Nigeria",
-    state: "Uyo",
-    zipCode: "1207",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
     avatarUrl: "",
   });
-
   const [passwordForm, setPasswordForm] = useState<PasswordForm>({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
-
   const [profileErrors, setProfileErrors] = useState<Partial<ProfileForm>>({});
   const [passwordErrors, setPasswordErrors] = useState<Partial<PasswordForm>>({});
   const [profileSuccess, setProfileSuccess] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
+  const [isProfileSaving, setIsProfileSaving] = useState(false);
+  const [isPasswordSaving, setIsPasswordSaving] = useState(false);
 
-  // ── Setters ──
+  useEffect(() => {
+    if (!accessToken) return;
+
+    let isMounted = true;
+    const token = accessToken;
+
+    async function loadProfile() {
+      await Promise.resolve();
+      if (!isMounted) return;
+
+      setIsProfileLoading(true);
+
+      try {
+        const profile = await accountApi.getProfile(token);
+        if (!isMounted) return;
+
+        setProfileForm({
+          firstName: profile.firstName ?? "",
+          lastName: profile.lastName ?? "",
+          email: profile.email ?? "",
+          phoneNumber: profile.phone ?? "",
+          avatarUrl: profile.avatarUrl ?? "",
+        });
+        updateUser(profile);
+      } catch {
+        toast.error("Failed to load profile", "Please refresh and try again.");
+      } finally {
+        if (isMounted) setIsProfileLoading(false);
+      }
+    }
+
+    loadProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [accessToken, updateUser]);
 
   const setProfile = (key: keyof ProfileForm, value: string) => {
     setProfileForm((prev) => ({ ...prev, [key]: value }));
@@ -158,71 +165,88 @@ export default function AccountProfileSettingsPage() {
     setPasswordSuccess(false);
   };
 
-  // ── Avatar upload ──
-
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setProfile("avatarUrl", url);
+    setProfile("avatarUrl", URL.createObjectURL(file));
   };
 
-  // ── Validation ──
-
-  const validateProfile = (): boolean => {
+  const validateProfile = () => {
     const errors: Partial<ProfileForm> = {};
     if (!profileForm.firstName.trim()) errors.firstName = "Required";
     if (!profileForm.lastName.trim()) errors.lastName = "Required";
-    if (!profileForm.email.trim()) errors.email = "Required";
-    else if (!/\S+@\S+\.\S+/.test(profileForm.email)) errors.email = "Invalid email";
     if (!profileForm.phoneNumber.trim()) errors.phoneNumber = "Required";
     setProfileErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  const validatePassword = (): boolean => {
+  const validatePassword = () => {
     const errors: Partial<PasswordForm> = {};
     if (!passwordForm.currentPassword) errors.currentPassword = "Required";
     if (!passwordForm.newPassword) errors.newPassword = "Required";
-    else if (passwordForm.newPassword.length < 8)
+    else if (passwordForm.newPassword.length < 8) {
       errors.newPassword = "At least 8 characters";
+    }
     if (!passwordForm.confirmPassword) errors.confirmPassword = "Required";
-    else if (passwordForm.newPassword !== passwordForm.confirmPassword)
+    else if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       errors.confirmPassword = "Passwords do not match";
+    }
     setPasswordErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  // ── Submit handlers — drop API calls here ──
+  const handleSaveProfile = async () => {
+    if (!accessToken || !validateProfile()) return;
 
-  const handleSaveProfile = () => {
-    if (!validateProfile()) return;
-    const payload = { ...profileForm };
-    console.log("Profile payload →", payload);
-    // await updateProfile(payload);
-    setProfileSuccess(true);
-  };
+    setIsProfileSaving(true);
+    setProfileSuccess(false);
 
-  const handleChangePassword = () => {
-    if (!validatePassword()) return;
     const payload = {
-      currentPassword: passwordForm.currentPassword,
-      newPassword: passwordForm.newPassword,
+      firstName: profileForm.firstName.trim(),
+      lastName: profileForm.lastName.trim(),
+      phone: profileForm.phoneNumber.trim(),
+      avatarUrl: profileForm.avatarUrl.trim(),
     };
-    console.log("Password payload →", payload);
-    // await changePassword(payload);
-    setPasswordSuccess(true);
-    setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+
+    try {
+      await accountApi.updateProfile(accessToken, payload);
+      updateUser(payload);
+      setProfileSuccess(true);
+      toast.success("Profile updated successfully");
+    } catch {
+      toast.error("Failed to update profile", "Please try again.");
+    } finally {
+      setIsProfileSaving(false);
+    }
   };
 
-  const COUNTRIES = ["Nigeria", "Ghana", "Kenya", "South Africa", "United States"];
-  const STATES: Record<string, string[]> = {
-    Nigeria: ["Uyo", "Lagos", "Abuja", "Kano", "Port Harcourt"],
-    Ghana: ["Accra", "Kumasi"],
-    Kenya: ["Nairobi", "Mombasa"],
-    "South Africa": ["Cape Town", "Johannesburg"],
-    "United States": ["New York", "California", "Texas"],
+  const handleChangePassword = async () => {
+    if (!accessToken || !validatePassword()) return;
+
+    setIsPasswordSaving(true);
+    setPasswordSuccess(false);
+
+    try {
+      await accountApi.changePassword(accessToken, {
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+        confirmNewPassword: passwordForm.confirmPassword,
+      });
+      setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      setPasswordSuccess(true);
+      toast.success("Password changed successfully");
+    } catch {
+      toast.error(
+        "Failed to change password",
+        "Please check your current password and try again."
+      );
+    } finally {
+      setIsPasswordSaving(false);
+    }
   };
+
+  const avatarName =
+    [profileForm.firstName, profileForm.lastName].filter(Boolean).join("+") || "Shop+Fresherz";
 
   return (
     <AccountLayout
@@ -231,21 +255,18 @@ export default function AccountProfileSettingsPage() {
       ]}
     >
       <div className="flex flex-col gap-6 lg:w-[80%]">
-
-        {/* ── Account Setting ── */}
         <section className="rounded border border-gray-200 bg-white p-6">
           <p className="mb-5 text-xs font-semibold uppercase tracking-widest text-gray-500">
-            Account Setting
+            {isProfileLoading ? "Loading Account Setting" : "Account Setting"}
           </p>
 
           <div className="flex flex-col gap-6 sm:flex-row">
-            {/* Avatar */}
             <div className="flex shrink-0 flex-col items-center gap-2">
               <div className="relative h-24 w-24">
                 <img
                   src={
                     profileForm.avatarUrl ||
-                    "https://ui-avatars.com/api/?name=Mfoniso+Ibokette&background=f97316&color=fff&size=96"
+                    `https://ui-avatars.com/api/?name=${avatarName}&background=f97316&color=fff&size=96`
                   }
                   alt="Avatar"
                   className="h-24 w-24 rounded-full object-cover"
@@ -254,6 +275,7 @@ export default function AccountProfileSettingsPage() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-orange-500 text-white shadow hover:bg-orange-600"
+                  aria-label="Choose avatar"
                 >
                   <IoCameraOutline size={13} />
                 </button>
@@ -267,7 +289,6 @@ export default function AccountProfileSettingsPage() {
               </div>
             </div>
 
-            {/* Form fields */}
             <div className="flex flex-1 flex-col gap-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
@@ -295,11 +316,9 @@ export default function AccountProfileSettingsPage() {
                     label="Email"
                     type="email"
                     value={profileForm.email}
-                    onChange={(v) => setProfile("email", v)}
+                    onChange={() => {}}
+                    disabled
                   />
-                  {profileErrors.email && (
-                    <p className="mt-1 text-xs text-red-500">{profileErrors.email}</p>
-                  )}
                 </div>
                 <div>
                   <FormField
@@ -314,32 +333,9 @@ export default function AccountProfileSettingsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <SelectField
-                  label="Country/Region"
-                  value={profileForm.country}
-                  onChange={(v) => {
-                    setProfile("country", v);
-                    setProfile("state", STATES[v]?.[0] ?? "");
-                  }}
-                  options={COUNTRIES}
-                />
-                <SelectField
-                  label="States"
-                  value={profileForm.state}
-                  onChange={(v) => setProfile("state", v)}
-                  options={STATES[profileForm.country] ?? []}
-                />
-                <FormField
-                  label="Zip Code"
-                  value={profileForm.zipCode}
-                  onChange={(v) => setProfile("zipCode", v)}
-                />
-              </div>
-
               {profileSuccess && (
                 <p className="text-sm text-green-600 font-medium">
-                  ✓ Profile updated successfully
+                  Profile updated successfully
                 </p>
               )}
 
@@ -347,16 +343,16 @@ export default function AccountProfileSettingsPage() {
                 <button
                   type="button"
                   onClick={handleSaveProfile}
-                  className="rounded bg-orange-500 px-6 py-2.5 text-sm font-semibold uppercase tracking-wide text-white hover:bg-orange-600 active:scale-95 transition-transform"
+                  disabled={isProfileSaving || isProfileLoading}
+                  className="rounded bg-orange-500 px-6 py-2.5 text-sm font-semibold uppercase tracking-wide text-white hover:bg-orange-600 active:scale-95 transition-transform disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Save Changes
+                  {isProfileSaving ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ── Change Password ── */}
         <section className="rounded border border-gray-200 bg-white p-6">
           <p className="mb-5 text-xs font-semibold uppercase tracking-widest text-gray-500">
             Change Password
@@ -367,6 +363,7 @@ export default function AccountProfileSettingsPage() {
               <PasswordInput
                 label="Current Password"
                 value={passwordForm.currentPassword}
+                disabled={isPasswordSaving}
                 onChange={(v) => setPassword("currentPassword", v)}
               />
               {passwordErrors.currentPassword && (
@@ -378,6 +375,7 @@ export default function AccountProfileSettingsPage() {
                 label="New Password"
                 placeholder="8+ characters"
                 value={passwordForm.newPassword}
+                disabled={isPasswordSaving}
                 onChange={(v) => setPassword("newPassword", v)}
               />
               {passwordErrors.newPassword && (
@@ -388,6 +386,7 @@ export default function AccountProfileSettingsPage() {
               <PasswordInput
                 label="Confirm Password"
                 value={passwordForm.confirmPassword}
+                disabled={isPasswordSaving}
                 onChange={(v) => setPassword("confirmPassword", v)}
               />
               {passwordErrors.confirmPassword && (
@@ -397,7 +396,7 @@ export default function AccountProfileSettingsPage() {
 
             {passwordSuccess && (
               <p className="text-sm text-green-600 font-medium">
-                ✓ Password changed successfully
+                Password changed successfully
               </p>
             )}
 
@@ -405,14 +404,14 @@ export default function AccountProfileSettingsPage() {
               <button
                 type="button"
                 onClick={handleChangePassword}
-                className="rounded bg-orange-500 px-6 py-2.5 text-sm font-semibold uppercase tracking-wide text-white hover:bg-orange-600 active:scale-95 transition-transform"
+                disabled={isPasswordSaving}
+                className="rounded bg-orange-500 px-6 py-2.5 text-sm font-semibold uppercase tracking-wide text-white hover:bg-orange-600 active:scale-95 transition-transform disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Change Password
+                {isPasswordSaving ? "Changing..." : "Change Password"}
               </button>
             </div>
           </div>
         </section>
-
       </div>
     </AccountLayout>
   );
