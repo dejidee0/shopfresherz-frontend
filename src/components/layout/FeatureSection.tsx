@@ -24,7 +24,7 @@ const FeatureSection = () => {
     <div className="flex flex-col md:flex-row gap-6 p-2 md:p-4 lg:p-10 lg:px-60">
       {/* Feature Section */}
       {features.map((feature, index) => (
-        <div key={index} className={`flex flex-col-reverse py-10 md:py-5 lg:py-0 md:flex-row gap-6 md:gap-0 p-2 md:p-4 lg:p-10 justify-between items-center rounded-md ${index === 1 ? "bg-[#0D0D0D]": "bg-[#F5F5F5]"}`}>
+        <div key={index} className={`flex flex-col-reverse py-10 md:py-5 md:flex-row gap-6 md:gap-0 p-2 md:p-4 lg:p-10 justify-between items-center rounded-md ${index === 1 ? "bg-[#0D0D0D]": "bg-[#F5F5F5]"}`}>
           <div className="flex flex-col gap-3">
             <p className="flex items-center justify-center p-1 px-2 bg-primary text-white text-xs w-fit rounded-xs">
               INTRODUCING
