@@ -395,7 +395,7 @@ function StatCard({
   iconColor?: string;
 }) {
   return (
-    <SectionCard className="p-5 flex items-center gap-4">
+    <SectionCard className="p-2 md:p-5 flex flex-col md:flex-row items-center gap-4">
       <div
         className={`w-12 h-12 rounded-xl ${iconBg} flex items-center justify-center shrink-0`}
       >
