@@ -7,6 +7,7 @@ import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { cn } from '@/lib/utils/format'
 import { productsApi } from '@/lib/api/products'
 import type { Banner } from '@/lib/types/product'
+import { FaArrowRight } from 'react-icons/fa'
 
 interface HeroSlide {
   id: string
@@ -153,7 +154,7 @@ export function HeroBanner() {
                   Mobile  : column layout — text on top, image below
                   Desktop : row layout   — text left, image right
                 */}
-                <div className="flex flex-col-reverse md:flex-row items-center gap-4 md:gap-8 py-8 md:py-0 md:min-h-105 lg:min-h-110">
+                <div className="flex items-center gap-4 md:gap-8 py-8 md:py-0 md:min-h-105 lg:min-h-110">
 
                   {/* ── Text column ── */}
                   <div className="flex-1 flex flex-col items-center text-center md:items-start md:text-left md:max-w-120">
@@ -192,7 +193,7 @@ export function HeroBanner() {
                         'hover:shadow-lg hover:shadow-orange-200'
                       )}
                     >
-                      {s.ctaText} →
+                      {s.ctaText} <FaArrowRight className='hidden md:block'/>
                     </Link>
                   </div>
 
