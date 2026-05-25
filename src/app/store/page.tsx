@@ -840,7 +840,7 @@ import { LaptopPromoSection } from "@/features/product/components/LaptopPromoSec
 import { TopHighlightsSection } from "@/features/product/components/TopHighlightsSection";
 import { MarqueeBanner } from "@/components/layout/MarqueeBanner";
 import { productsApi } from "@/lib/api/products";
-import type { CategoryWithImage } from "@/lib/types/product";
+import type { CategoryWithImage, FlashDeal } from "@/lib/types/product";
 import { FaArrowRight, FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import { FiShoppingCart, FiHeart, FiEye } from "react-icons/fi";
 
@@ -1264,6 +1264,8 @@ function SectionHeader({
 const DEALS_END_TIME = new Date(Date.now() + 16 * 86400000 + 21 * 3600000 + 57 * 60000 + 33000).toISOString();
 
 export default function HomePage() {
+  const [flashDeals, setFlashDeals] = useState<FlashDeal[]>([]);
+  const [flashDealsEndTime, setFlashDealsEndTime] = useState<string>(DEALS_END_TIME);
   const [bestSellers, setBestSellers] = useState<HomeProduct[]>(BEST_SELLERS);
   const [newArrivals, setNewArrivals] = useState<HomeProduct[]>(NEW_ARRIVALS);
   const [featuredCategories, setFeaturedCategories] = useState<CategoryWithImage[]>([]);
@@ -1280,11 +1282,25 @@ export default function HomePage() {
 
   useEffect(() => {
     Promise.allSettled([
+      productsApi.flashDeals(),
       productsApi.bestSellers(8),
       productsApi.newArrivals(8),
       productsApi.getCategories(),
     ])
-      .then(([bestSellersResult, newArrivalsResult, categoriesResult]) => {
+      .then(([flashDealsResult, bestSellersResult, newArrivalsResult, categoriesResult]) => {
+        if (flashDealsResult.status === "fulfilled") {
+          const deals = flashDealsResult.value;
+          setFlashDeals(deals);
+
+          if (deals.length > 0) {
+            const sessionEndTime = deals.reduce(
+              (earliest, deal) => (deal.endsAt < earliest ? deal.endsAt : earliest),
+              deals[0].endsAt,
+            );
+            setFlashDealsEndTime(sessionEndTime);
+          }
+        }
+
         if (bestSellersResult.status === "fulfilled") {
           setBestSellers(
             bestSellersResult.value.map((product) => ({
@@ -1354,8 +1370,10 @@ export default function HomePage() {
       {/* 3. Marquee banner */}
       <MarqueeBanner />
 
-      {/* 4. Flash deals — commented out until API is ready */}
-      {/* <FlashDealsStrip deals={flashDeals} sessionEndTime={sessionEndTime} /> */}
+      {/* 4. Flash deals */}
+      {/* {flashDeals.length > 0 && (
+        <FlashDealsStrip deals={flashDeals} sessionEndTime={flashDealsEndTime} />
+      )} */}
       {/* ─── 6. BEST DEALS ──────────────────────────────────────────────── */}
 
       <div className="bg-[#F5F5F5] py-8">
@@ -1363,7 +1381,7 @@ export default function HomePage() {
           <SectionHeader
             title="Best Deals"
             seeAllHref="/store/category/all"
-            endTime={DEALS_END_TIME}
+            endTime={flashDealsEndTime}
           />
 
           {/* Desktop & Tablet Layout — FIX 1: added gridTemplateRows */}
