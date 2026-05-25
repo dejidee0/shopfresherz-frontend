@@ -891,6 +891,7 @@ const NEW_ARRIVALS_PROMO = {
   subtext: "Computer and accessories",
   label: "starting from",
   price: "100,000",
+  slug: "macbook-pro-14-m2-max",
   image: "/images/categories/promo.png",
 };
 
@@ -960,7 +961,7 @@ function ProductCard({ product }: { product: HomeProduct }) {
 
   return (
     <div
-      className="bg-white border-1 border-[#E5E7EB] border-b-0 overflow-hidden flex flex-col group relative"
+      className="bg-white overflow-hidden flex flex-col group relative h-full"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -973,7 +974,7 @@ function ProductCard({ product }: { product: HomeProduct }) {
 
       {/* Wishlist + action icons — top right, appear on hover */}
       <div
-        className={`absolute top-2 right-2 z-10 flex flex-col gap-1.5 transition-all duration-200 ${hovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-2"}`}
+        className={`absolute top-2 right-2 z-20 flex flex-col gap-1.5 transition-all duration-200 ${hovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-2"}`}
       >
         <button className="w-7 h-7 bg-white rounded-full shadow flex items-center justify-center text-[#6B7280] hover:text-[#F5820A] transition-colors">
           <FiHeart size={13} />
@@ -986,45 +987,47 @@ function ProductCard({ product }: { product: HomeProduct }) {
         </button>
       </div>
 
-      {/* Image — fixed height instead of aspect-square */}
-      <div
-        className=" pt- overflow-hidden"
-        style={{ height: '160px' }}
-      >
-        {imageSrc ? (
-          <Image
-            src={imageSrc}
-            alt={product.name}
-            width={200}
-            height={200}
-            style={{ mixBlendMode: 'multiply' }}
-            className=" w-full h-full transition-transform duration-300 group-hover:scale-105"
-            unoptimized
-          />
-        ) : (
-          <div className="w-full h-full bg-[#F9F9F9] flex items-center justify-center text-[#9CA3AF] text-xs">
-            No image available
-          </div>
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="p-3 flex flex-col gap-1 flex-1">
-        <p className="text-[11px] text-[#111111] font-medium leading-snug line-clamp-2">
-          {product.name}
-        </p>
-
-        <div className="flex items-center gap-1.5 mt-0.5">
-          <span className="text-sm  text-[#F5820A]">
-            ₦{product.price.toLocaleString()}
-          </span>
-          {originalPrice != null && (
-            <span className="text-[10px] text-[#9CA3AF] line-through">
-              ₦{originalPrice.toLocaleString()}
-            </span>
+      <Link href={`/store/product/${product.slug}`} className="flex flex-col flex-1 z-10">
+        {/* Image — fixed height instead of aspect-square */}
+        <div
+          className=" pt- overflow-hidden"
+          style={{ height: '160px' }}
+        >
+          {imageSrc ? (
+            <Image
+              src={imageSrc}
+              alt={product.name}
+              width={200}
+              height={200}
+              style={{ mixBlendMode: 'multiply' }}
+              className=" w-full h-full transition-transform duration-300 group-hover:scale-105"
+              unoptimized
+            />
+          ) : (
+            <div className="w-full h-full bg-[#F9F9F9] flex items-center justify-center text-[#9CA3AF] text-xs">
+              No image available
+            </div>
           )}
         </div>
-      </div>
+
+        {/* Info */}
+        <div className="p-3 flex flex-col gap-1 flex-1">
+          <p className="text-[11px] text-[#111111] font-medium leading-snug line-clamp-2 group-hover:text-[#F5820A] transition-colors">
+            {product.name}
+          </p>
+
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span className="text-sm  text-[#F5820A]">
+              ₦{product.price.toLocaleString()}
+            </span>
+            {originalPrice != null && (
+              <span className="text-[10px] text-[#9CA3AF] line-through">
+                ₦{originalPrice.toLocaleString()}
+              </span>
+            )}
+          </div>
+        </div>
+      </Link>
     </div>
   );
 }
@@ -1032,118 +1035,79 @@ function ProductCard({ product }: { product: HomeProduct }) {
 // ─── BEST DEALS PROMO CARD ────────────────────────────────────────────────────
 function BestDealsPromoCard() {
   return (
-    <div className="relative bg-white overflow-hidden flex flex-col h-full">
+    <div className="relative bg-white overflow-hidden flex flex-col h-full group">
       {/* Badges */}
       <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
         <Badge text={BEST_DEALS_PROMO.badge} type="discount" />
         {BEST_DEALS_PROMO.hotBadge && <Badge text="HOT" type="hot" />}
       </div>
 
-      {/* Image — top half */}
-      <div className="flex-1  flex items-center justify-center p-6 min-h-0">
-        <Image
-          src={BEST_DEALS_PROMO.image}
-          alt={BEST_DEALS_PROMO.name}
-          width={220}
-          height={220}
-          className="object-contain w-full h-full"
-          style={{ mixBlendMode: 'multiply' }}
-          unoptimized
-        />
-      </div>
-
-      {/* Info — bottom half */}
-      <div className="p-4 flex flex-col gap-2 border-t border-[#F0F0F0]">
-        {/* Stars + review count */}
-        <div className="flex items-center gap-1.5">
-          <StarRating rating={BEST_DEALS_PROMO.rating} />
-          <span className="text-[10px] text-[#6B7280]">
-            ({BEST_DEALS_PROMO.reviewCount.toLocaleString()})
-          </span>
+      <Link href={`/store/product/${BEST_DEALS_PROMO.slug}`} className="flex-1 flex flex-col">
+        {/* Image — top half */}
+        <div className="flex-1  flex items-center justify-center p-6 min-h-0">
+          <Image
+            src={BEST_DEALS_PROMO.image}
+            alt={BEST_DEALS_PROMO.name}
+            width={220}
+            height={220}
+            className="object-contain w-full h-full transition-transform duration-300 hover:scale-105"
+            style={{ mixBlendMode: 'multiply' }}
+            unoptimized
+          />
         </div>
 
-        {/* Title */}
-        <p className="text-[12px] font-bold text-[#111111] leading-snug line-clamp-2">
-          {BEST_DEALS_PROMO.name}
-        </p>
+        {/* Info — bottom half */}
+        <div className="p-4 flex flex-col gap-2 border-t border-[#F0F0F0] flex-1">
+          {/* Stars + review count */}
+          <div className="flex items-center gap-1.5">
+            <StarRating rating={BEST_DEALS_PROMO.rating} />
+            <span className="text-[10px] text-[#6B7280]">
+              ({BEST_DEALS_PROMO.reviewCount.toLocaleString()})
+            </span>
+          </div>
 
-        {/* Description */}
-        <p className="text-[10px] text-[#6B7280] leading-relaxed line-clamp-3">
-          {BEST_DEALS_PROMO.description}
-        </p>
+          {/* Title */}
+          <p className="text-[12px] font-bold text-[#111111] leading-snug line-clamp-2 group-hover:text-[#F5820A] transition-colors">
+            {BEST_DEALS_PROMO.name}
+          </p>
 
-        {/* Price */}
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] text-[#9CA3AF] line-through">
-            ₦{BEST_DEALS_PROMO.originalPrice}
-          </span>
-          <span className="text-base  text-[#F5820A]">
-            ₦{BEST_DEALS_PROMO.salePrice}
-          </span>
+          {/* Description */}
+          <p className="text-[10px] text-[#6B7280] leading-relaxed line-clamp-3">
+            {BEST_DEALS_PROMO.description}
+          </p>
+
+          {/* Price */}
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-[#9CA3AF] line-through">
+              ₦{BEST_DEALS_PROMO.originalPrice}
+            </span>
+            <span className="text-base  text-[#F5820A]">
+              ₦{BEST_DEALS_PROMO.salePrice}
+            </span>
+          </div>
         </div>
+      </Link>
 
-        {/* Buttons */}
-        <div className="flex items-center gap-2 mt-1">
-          <Link
-            href={`/store/product/${BEST_DEALS_PROMO.slug}`}
-            className="flex-1 flex items-center justify-center gap-1.5 h-9 bg-[#F5820A] hover:bg-[#E06B00] text-white text-[11px] font-bold rounded transition-colors"
-          >
-            <FiShoppingCart size={13} />
-            ADD TO CART
-          </Link>
-          <button className="w-9 h-9 flex items-center justify-center border border-[#E5E7EB] rounded hover:border-[#F5820A] hover:text-[#F5820A] text-[#6B7280] transition-colors">
-            <FiEye size={14} />
-          </button>
-        </div>
+      {/* Buttons — Kept outside the main Link to maintain their own functionality */}
+      <div className="p-4 pt-0 flex items-center gap-2 mt-auto z-10">
+        <Link
+          href={`/store/product/${BEST_DEALS_PROMO.slug}`}
+          className="flex-1 flex items-center justify-center gap-1.5 h-9 bg-[#F5820A] hover:bg-[#E06B00] text-white text-[11px] font-bold rounded transition-colors"
+        >
+          <FiShoppingCart size={13} />
+          ADD TO CART
+        </Link>
+        <button className="w-9 h-9 flex items-center justify-center border border-[#E5E7EB] rounded hover:border-[#F5820A] hover:text-[#F5820A] text-[#6B7280] transition-colors">
+          <FiEye size={14} />
+        </button>
       </div>
     </div>
   );
 }
 
-// ─── NEW ARRIVALS PROMO CARD ──────────────────────────────────────────────────
-// function NewArrivalsPromoCard() {
-//   return (
-//     <div className="flex flex-col h-full overflow-hidden">
-//       {/* Top — orange branded area */}
-//       <div className="flex flex-col items-center justify-center gap-2 p-5 bg-[#F5820A] text-white flex-1">
-//         <p className="text-[9px] font-bold uppercase tracking-widest opacity-80">
-//           {NEW_ARRIVALS_PROMO.tag}
-//         </p>
-//         <p className="text-base font-extrabold text-center leading-tight">
-//           {NEW_ARRIVALS_PROMO.name}
-//         </p>
-//         <p className="text-xs font-semibold">{NEW_ARRIVALS_PROMO.headline}</p>
-//         <p className="text-[11px] opacity-80">{NEW_ARRIVALS_PROMO.subtext}</p>
-//         <div className="flex flex-col items-center gap-0.5 mt-1 text-[11px]">
-//           <span className="opacity-80">{NEW_ARRIVALS_PROMO.label}</span>
-//           <span className="font-extrabold text-sm">₦{NEW_ARRIVALS_PROMO.price}</span>
-//         </div>
-//         <Link
-//           href="/store/category/all"
-//           className="mt-2 flex items-center gap-1.5 px-5 py-2 bg-white text-[#F5820A] text-[11px] font-bold rounded hover:shadow-md transition-all"
-//         >
-//           SHOP NOW <FaArrowRight size={10} />
-//         </Link>
-//       </div>
-
-//       {/* Bottom — product image */}
-//       <div className="w-full">
-//         <Image
-//           src={NEW_ARRIVALS_PROMO.image}
-//           alt={NEW_ARRIVALS_PROMO.subtext}
-//           width={180}
-//           height={160}
-//           className="object-contain w-[100%] h-full"
-//           unoptimized
-//         />
-//       </div>
-//     </div>
-//   );
-// }
-
 function NewArrivalsPromoCard() {
   return (
-    <div className="flex flex-col h-full overflow-hidden ">
+    <Link href={`/store/product/${NEW_ARRIVALS_PROMO.slug}`} className="flex flex-col h-full overflow-hidden group">
       {/* Top — Orange branded area styled to match image exactly */}
       <div className="flex flex-col bg-[#F5820A] items-center text-center px-5 pt-[50px] pb-5 text-white flex-1 select-none">
         {/* Category Header */}
@@ -1172,12 +1136,9 @@ function NewArrivalsPromoCard() {
         </div>
 
         {/* Action Button */}
-        <Link
-          href="/store/category/all"
-          className="w-full max-w-[180px] h-10 flex items-center justify-center gap-2 bg-white text-[#F5820A] text-xs font-bold rounded shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
-        >
+        <div className="w-full max-w-[180px] h-10 flex items-center justify-center gap-2 bg-white text-[#F5820A] text-xs font-bold rounded shadow-sm group-hover:bg-[#F0F0F0] transition-all active:scale-[0.98]">
           SHOP NOW <FaArrowRight size={11} className="text-[#F5820A]" />
-        </Link>
+        </div>
       </div>
 
       {/* Bottom — Product image block remains completely safe */}
@@ -1187,11 +1148,11 @@ function NewArrivalsPromoCard() {
           alt="Featured promo product"
           width={180}
           height={160}
-          className="object-contain w-full h-full"
+          className="object-contain w-full h-full transition-transform duration-300 group-hover:scale-105"
           unoptimized
         />
       </div>
-    </div>
+    </Link>
   );
 }
 
