@@ -1,342 +1,3 @@
-// 'use client'
-
-// import { useState, useEffect, useCallback, useRef } from 'react'
-// import Link from 'next/link'
-// import Image from 'next/image'
-// import { cn } from '@/lib/utils/format'
-// import { productsApi } from '@/lib/api/products'
-// import type { Banner } from '@/lib/types/product'
-// import { FiArrowRight } from 'react-icons/fi'
-
-// /* ─── Slide types ─────────────────────────────────────────────────── */
-
-// interface HeroSlide {
-//   id: string
-//   title: string
-//   subTitle: string
-//   imageUrl: string
-//   linkUrl: string
-//   ctaText: string
-//   sortOrder: number
-//   tag?: string
-//   tagColor?: string
-//   theme?: 'light' | 'dark'
-//   bgColor?: string
-// }
-
-// function bannerToSlide(banner: Banner): HeroSlide {
-//   return {
-//     ...banner,
-//     tag: undefined,
-//     tagColor: 'text-[#F5820A]',
-//     theme: 'light',
-//     bgColor: 'bg-[#FF9A2E0D]',
-//   }
-// }
-
-// const FALLBACK_SLIDES: HeroSlide[] = [
-//   {
-//     id: 'fallback-1',
-//     tag: 'THE BEST PLACE TO PLAY',
-//     tagColor: 'text-[#F5820A]',
-//     title: 'Xbox 360 Console',
-//     subTitle: 'Save up to 50% on select Xbox games. Get 3 months of PC Game Pass for $2 USD.',
-//     ctaText: 'SHOP NOW',
-//     linkUrl: '/store/category/games-consoles',
-//     imageUrl: '/images/categories/Image1.png',
-//     sortOrder: 0,
-//     theme: 'light',
-//     bgColor: 'bg-[#FF9A2E0D]',
-//   },
-//   {
-//     id: 'fallback-2',
-//     tag: 'PREMIUM GAMING GEAR',
-//     tagColor: 'text-[#F5820A]',
-//     title: 'Xbox Elite Controllers',
-//     subTitle: 'Designed for the ultimate gaming experience. Precision engineered for pros.',
-//     ctaText: 'SHOP NOW',
-//     linkUrl: '/store/category/games-consoles',
-//     imageUrl: '/images/categories/Image2.png',
-//     sortOrder: 1,
-//     theme: 'light',
-//     bgColor: 'bg-[#FF9A2E0D]',
-//   },
-//   {
-//     id: 'fallback-3',
-//     tag: 'NEW ARRIVAL',
-//     tagColor: 'text-[#7B2FBE]',
-//     title: 'PlayStation 5',
-//     subTitle: 'Experience lightning-fast loading, deeper immersion and an all-new generation of gaming.',
-//     ctaText: 'SHOP NOW',
-//     linkUrl: '/store/category/games-consoles',
-//     imageUrl: '/images/categories/Image3.png',
-//     sortOrder: 2,
-//     theme: 'light',
-//     bgColor: 'bg-[#FF9A2E0D]',
-//   },
-// ]
-
-// /* ─── Promo card data ─────────────────────────────────────────────── */
-
-// const PROMO_CARD_1 = {
-//   tag: 'SUMMER SALES',
-//   title: 'New Google\nPixel 6 Pro',
-//   badge: '29% OFF',
-//   ctaText: 'SHOP NOW',
-//   linkUrl: '/store/',
-//   imageUrl: '/images/categories/pixel.png',
-// }
-
-// const PROMO_CARD_2 = {
-//   title: 'Xiaomi\nFlipBuds Pro',
-//   price: '₦10,000',
-//   ctaText: 'SHOP NOW',
-//   linkUrl: '/store/',
-//   imageUrl: '/images/categories/earpod.png',
-// }
-
-// /* ─── Component ───────────────────────────────────────────────────── */
-
-// export function HeroBanner() {
-//   const [current, setCurrent] = useState(0)
-//   const [isPaused, setIsPaused] = useState(false)
-//   const [slides, setSlides] = useState<HeroSlide[]>(FALLBACK_SLIDES)
-//   const touchStartX = useRef<number | null>(null)
-//   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-//   const total = slides.length
-
-//   const next = useCallback(() => setCurrent((c) => (c + 1) % total), [total])
-//   const prev = useCallback(() => setCurrent((c) => (c - 1 + total) % total), [total])
-//   const goTo = useCallback((i: number) => setCurrent(i), [])
-
-//   /* Fetch real banners */
-//   useEffect(() => {
-//     async function fetchBanners() {
-//       try {
-//         const banners = await productsApi.getBanners()
-//         if (banners.length > 0) {
-//           setSlides(banners.map(bannerToSlide))
-//           setCurrent(0)
-//         }
-//       } catch {
-//         // static fallback already in state
-//       }
-//     }
-//     fetchBanners()
-//   }, [])
-
-//   /* Auto-play */
-//   useEffect(() => {
-//     if (isPaused) return
-//     intervalRef.current = setInterval(next, 5000)
-//     return () => {
-//       if (intervalRef.current) clearInterval(intervalRef.current)
-//     }
-//   }, [isPaused, next])
-
-//   /* Touch swipe */
-//   function handleTouchStart(e: React.TouchEvent) {
-//     touchStartX.current = e.touches[0].clientX
-//   }
-
-//   function handleTouchEnd(e: React.TouchEvent) {
-//     if (touchStartX.current === null) return
-//     const diff = touchStartX.current - e.changedTouches[0].clientX
-//     if (Math.abs(diff) > 40) diff > 0 ? next() : prev()
-//     touchStartX.current = null
-//   }
-
-//   return (
-//     <section className="max-w-content mx-auto px-4 sm:px-6 lg:px-10 py-4 sm:py-6">
-//       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
-
-//         {/* ━━━━━━ LEFT: Auto-playing Slider ━━━━━━ */}
-//         <div
-//           className="lg:col-span-2 relative overflow-hidden rounded-2xl h-[280px] sm:h-[340px] lg:h-[420px]"
-//           onMouseEnter={() => setIsPaused(true)}
-//           onMouseLeave={() => setIsPaused(false)}
-//           onTouchStart={handleTouchStart}
-//           onTouchEnd={handleTouchEnd}
-//           role="region"
-//           aria-label="Featured products carousel"
-//           aria-roledescription="carousel"
-//         >
-//           {/* Slide track */}
-//           <div
-//             className="flex h-full transition-transform duration-600 ease-in-out"
-//             style={{ transform: `translateX(-${current * 100}%)` }}
-//           >
-//             {slides.map((s, i) => {
-//               const dark = s.theme === 'dark'
-//               return (
-//                 <div
-//                   key={s.id}
-//                   className={cn('min-w-full h-full', s.bgColor ?? 'bg-[#F5F5F5]')}
-//                   aria-roledescription="slide"
-//                   aria-label={s.title}
-//                 >
-//                   <div className="h-full px-6 sm:px-8 lg:px-10 flex flex-col-reverse md:flex-row items-center">
-
-//                     {/* Text */}
-//                     <div className="flex-1 flex flex-col items-center text-center md:items-start md:text-left py-4 md:py-8">
-//                       {s.tag && (
-//                         <p className={cn(
-//                           'text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1.5 sm:mb-2 flex items-center gap-2',
-//                           s.tagColor
-//                         )}>
-//                           <span className="w-5 h-[2px] bg-current hidden md:inline-block" />
-//                           {s.tag}
-//                         </p>
-//                       )}
-
-//                       <h2 className={cn(
-//                         'font-extrabold leading-tight mb-2 md:mb-3',
-//                         'text-xl sm:text-2xl md:text-3xl lg:text-4xl',
-//                         dark ? 'text-white' : 'text-[#111111]'
-//                       )}>
-//                         {s.title}
-//                       </h2>
-
-//                       <p className={cn(
-//                         'text-[11px] sm:text-sm leading-relaxed mb-4 md:mb-6 max-w-[260px] sm:max-w-xs',
-//                         dark ? 'text-white/70' : 'text-[#6B7280]'
-//                       )}>
-//                         {s.subTitle}
-//                       </p>
-
-//                       <Link
-//                         href={s.linkUrl}
-//                         className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg bg-gradient-to-r from-[#F5820A] to-[#E06B00] text-white hover:shadow-lg hover:shadow-orange-200/50 transition-all active:scale-[0.97]"
-//                       >
-//                         {s.ctaText}
-//                         <FiArrowRight size={14} />
-//                       </Link>
-//                     </div>
-
-//                     {/* Image */}
-//                     <div className="flex-1 flex items-center justify-center w-full">
-//                       <div className={cn(
-//                         'relative w-full',
-//                         'h-[170px] sm:h-[220px] md:h-[400px] md:aspect-square md:max-w-[380px] lg:max-w-[440px]'
-//                       )}>
-//                         <Image
-//                           src={s.imageUrl || '/images/device-placeholder.jpg'}
-//                           alt={s.title}
-//                           fill
-//                           sizes="(max-width: 768px) 80vw, 40vw"
-//                           className="object-contain"
-//                           style={{ mixBlendMode: 'multiply' }}
-//                           priority={i === 0}
-//                         />
-//                       </div>
-//                     </div>
-
-//                   </div>
-//                 </div>
-//               )
-//             })}
-//           </div>
-
-//           {/* Dot indicators — bottom-left */}
-//           <div className="absolute bottom-4 left-6 sm:left-8 lg:left-10 flex items-center gap-1.5 z-10">
-//             {slides.map((_, i) => (
-//               <button
-//                 key={i}
-//                 onClick={() => goTo(i)}
-//                 className={cn(
-//                   'rounded-full transition-all duration-300',
-//                   i === current
-//                     ? 'w-5 h-2 bg-[#F5820A]'
-//                     : 'w-2 h-2 bg-[#D1D5DB] hover:bg-[#F5820A]/50'
-//                 )}
-//                 aria-label={`Go to slide ${i + 1}`}
-//                 aria-current={i === current}
-//               />
-//             ))}
-//           </div>
-//         </div>
-
-//         {/* ━━━━━━ RIGHT: Two Promotional Cards ━━━━━━ */}
-//         <div className="flex flex-col gap-4 sm:gap-5 lg:h-[420px]">
-
-//           {/* ── Card 1: Google Pixel 6 Pro (Dark) ── */}
-//           <Link
-//             href={PROMO_CARD_1.linkUrl}
-//             className="group relative flex-1 bg-[#0B0C0E] rounded-2xl overflow-hidden flex flex-row items-center min-h-[200px] lg:min-h-0 transition-all duration-300 hover:shadow-2xl hover:shadow-black/40 hover:-translate-y-0.5 border border-white/5"
-//           >
-//             {/* Badge */}
-//             <span className="absolute top-4 right-10 sm:right-12 bg-[#7B2FBE] text-white text-[11px] font-extrabold px-3 py-1.5 rounded shadow-lg z-20">
-//               {PROMO_CARD_1.badge}
-//             </span>
-
-//             {/* Text */}
-//             <div className="flex-1 p-5 sm:p-6 lg:p-7 pr-[45%] sm:pr-[50%] flex flex-col justify-center z-10">
-//               <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#F5820A] mb-1.5">
-//                 {PROMO_CARD_1.tag}
-//               </p>
-//               <h3 className="text-white text-lg sm:text-xl lg:text-2xl font-extrabold leading-tight whitespace-pre-line mb-4 tracking-tight">
-//                 {PROMO_CARD_1.title}
-//               </h3>
-//               <span className="inline-flex items-center gap-2 self-start bg-white text-[#0B1528] text-xs font-bold px-5 py-2.5 rounded-lg shadow-md group-hover:bg-[#F3F4F6] transition-all duration-300">
-//                 {PROMO_CARD_1.ctaText}
-//                 <FiArrowRight size={13} className="stroke-[2.5]" />
-//               </span>
-//             </div>
-
-//             {/* Image */}
-//             <div className="absolute right-0 bottom-0 w-[45%] sm:w-[50%] h-[115%] pointer-events-none select-none z-10">
-//               <Image
-//                 src={PROMO_CARD_1.imageUrl}
-//                 alt={PROMO_CARD_1.title}
-//                 fill
-//                 sizes="(max-width: 768px) 45vw, 25vw"
-//                 className="object-contain object-right-bottom"
-//                 priority
-//               />
-//             </div>
-//           </Link>
-
-//           {/* ── Card 2: Xiaomi FlipBuds Pro (Light) ── */}
-//           <Link
-//             href={PROMO_CARD_2.linkUrl}
-//             className="group flex-1 bg-[#F5F5F5] border border-neutral-200/80 rounded-2xl overflow-hidden flex flex-row items-center min-h-[200px] lg:min-h-0 transition-all duration-300 hover:shadow-2xl hover:shadow-black/5 hover:-translate-y-0.5"
-//           >
-//             {/* Image */}
-//             <div className="relative w-[130px] sm:w-[150px] h-[80%] shrink-0 pointer-events-none select-none ml-4 sm:ml-6">
-//               <Image
-//                 src={PROMO_CARD_2.imageUrl}
-//                 alt={PROMO_CARD_2.title}
-//                 fill
-//                 sizes="150px"
-//                 className="object-contain object-center"
-//                 priority
-//               />
-//             </div>
-
-//             {/* Text */}
-//             <div className="flex-1 p-5 sm:p-6 flex flex-col justify-center pl-4 sm:pl-6">
-//               <h3 className="text-neutral-950 text-base sm:text-lg lg:text-xl font-extrabold leading-tight whitespace-pre-line mb-1">
-//                 {PROMO_CARD_2.title}
-//               </h3>
-//               <p className="text-[#F5820A] text-base sm:text-lg font-extrabold mb-4">
-//                 {PROMO_CARD_2.price}
-//               </p>
-//               <span className="inline-flex items-center gap-2 self-start bg-[#F5820A] text-white text-xs font-bold px-5 py-2.5 rounded-lg shadow-md group-hover:bg-[#E06B00] transition-all duration-300">
-//                 {PROMO_CARD_2.ctaText}
-//                 <FiArrowRight size={13} className="stroke-[2.5]" />
-//               </span>
-//             </div>
-//           </Link>
-
-//         </div>
-//       </div>
-//     </section>
-//   )
-// }
-
-
-
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
@@ -367,9 +28,9 @@ function bannerToSlide(banner: Banner): HeroSlide {
   return {
     ...banner,
     tag: undefined,
-    tagColor: 'text-[#F5820A]',
-    theme: 'light',
-    bgColor: 'bg-[#FF9A2E0D]',
+    tagColor: 'text-[#A5F3FC]',
+    theme: 'dark',
+    bgColor: 'bg-gradient-to-br from-[#0B1120] via-[#0D2758] to-[#0B4A8D]',
   }
 }
 
@@ -377,41 +38,41 @@ const FALLBACK_SLIDES: HeroSlide[] = [
   {
     id: 'fallback-1',
     tag: 'THE BEST PLACE TO PLAY',
-    tagColor: 'text-[#F5820A]',
+    tagColor: 'text-[#A5F3FC]',
     title: 'Xbox 360 Console',
     subTitle: 'Save up to 50% on select Xbox games. Get 3 months of PC Game Pass for $2 USD.',
     ctaText: 'SHOP NOW',
     linkUrl: '/store/category/games-consoles',
     imageUrl: '/images/categories/Image1.png',
     sortOrder: 0,
-    theme: 'light',
-    bgColor: 'bg-[#FF9A2E0D]',
+    theme: 'dark',
+    bgColor: 'bg-gradient-to-br from-[#0B1120] via-[#0D2758] to-[#0B4A8D]',
   },
   {
     id: 'fallback-2',
     tag: 'PREMIUM GAMING GEAR',
-    tagColor: 'text-[#F5820A]',
+    tagColor: 'text-[#A5F3FC]',
     title: 'Xbox Elite Controllers',
     subTitle: 'Designed for the ultimate gaming experience. Precision engineered for pros.',
     ctaText: 'SHOP NOW',
     linkUrl: '/store/category/games-consoles',
     imageUrl: '/images/categories/Image2.png',
     sortOrder: 1,
-    theme: 'light',
-    bgColor: 'bg-[#FF9A2E0D]',
+    theme: 'dark',
+    bgColor: 'bg-gradient-to-br from-[#0B1120] via-[#0D2758] to-[#0B4A8D]',
   },
   {
     id: 'fallback-3',
     tag: 'NEW ARRIVAL',
-    tagColor: 'text-[#7B2FBE]',
+    tagColor: 'text-[#A5F3FC]',
     title: 'PlayStation 5',
     subTitle: 'Experience lightning-fast loading, deeper immersion and an all-new generation of gaming.',
     ctaText: 'SHOP NOW',
     linkUrl: '/store/category/games-consoles',
     imageUrl: '/images/categories/Image3.png',
     sortOrder: 2,
-    theme: 'light',
-    bgColor: 'bg-[#FF9A2E0D]',
+    theme: 'dark',
+    bgColor: 'bg-gradient-to-br from-[#0B1120] via-[#0D2758] to-[#0B4A8D]',
   },
 ]
 
@@ -468,7 +129,7 @@ export function HeroBanner() {
   /* Auto-play */
   useEffect(() => {
     if (isPaused) return
-    intervalRef.current = setInterval(next, 5000)
+    intervalRef.current = setInterval(next, 7000)
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
@@ -503,15 +164,16 @@ export function HeroBanner() {
         >
           {/* Slide track */}
           <div
-            className="flex h-full transition-transform duration-600 ease-in-out"
+            className="flex h-full transition-transform duration-1200 ease-in-out"
             style={{ transform: `translateX(-${current * 100}%)` }}
           >
             {slides.map((s, i) => {
               const dark = s.theme === 'dark'
+              const isActive = i === current
               return (
                 <div
                   key={s.id}
-                  className={cn('min-w-full h-full', s.bgColor ?? 'bg-[#F5F5F5]')}
+                  className={cn('min-w-full h-full', s.bgColor ?? 'bg-gradient-to-br from-[#0B1120] via-[#0D2758] to-[#0B4A8D]')}
                   aria-roledescription="slide"
                   aria-label={s.title}
                 >
@@ -523,7 +185,11 @@ export function HeroBanner() {
                   <div className="relative h-full md:flex md:flex-row md:items-center md:px-8 lg:px-10">
 
                     {/* ── Mobile/Tablet image (absolute, right side, decorative bg) ── */}
-                    <div className="absolute inset-y-0 right-0 w-[55%] md:hidden pointer-events-none select-none">
+                    <div className={cn(
+                      "absolute inset-y-0 right-0 w-[55%] md:hidden pointer-events-none select-none",
+                      "transition-all duration-1200 ease-out delay-300 will-change-transform",
+                      isActive ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
+                    )}>
                       <Image
                         src={s.imageUrl || '/images/device-placeholder.jpg'}
                         alt={s.title}
@@ -536,21 +202,18 @@ export function HeroBanner() {
                     </div>
 
                     {/* ── Text block ── */}
-                    <div className="
-                      relative z-10
-                      /* mobile: left-aligned, takes 55% width so it doesn't clash with image */
-                      flex flex-col items-start text-left
-                      h-full justify-center
-                      pl-4 pr-[48%] py-5
-                      /* tablet+ override */
-                      sm:pl-6 sm:pr-[50%] sm:py-7
-                      /* desktop */
-                      md:flex-1 md:pr-0 md:pl-0 md:py-8 md:items-start
-                    ">
+                    <div className={cn(
+                      "relative z-10 flex flex-col items-start text-left h-full justify-center",
+                      "pl-4 pr-[48%] py-5 sm:pl-6 sm:pr-[50%] sm:py-7 md:flex-1 md:pr-0 md:pl-0 md:py-8 md:items-start",
+                      "transition-all duration-1200 ease-out will-change-transform",
+                      isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                    )}>
                       {s.tag && (
                         <p className={cn(
                           'text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-widest mb-1 sm:mb-1.5 md:mb-2 flex items-center gap-1.5',
-                          s.tagColor
+                          s.tagColor,
+                          isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3',
+                          'transition-all duration-1200 ease-out delay-300'
                         )}>
                           <span className="w-4 h-[2px] bg-current hidden md:inline-block" />
                           {s.tag}
@@ -560,7 +223,9 @@ export function HeroBanner() {
                       <h2 className={cn(
                         'font-extrabold leading-tight mb-1.5 sm:mb-2 md:mb-3',
                         'text-base sm:text-xl md:text-3xl lg:text-4xl',
-                        dark ? 'text-white' : 'text-[#111111]'
+                        dark ? 'text-white' : 'text-[#111111]',
+                        isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
+                        'transition-all duration-1200 ease-out delay-400'
                       )}>
                         {s.title}
                       </h2>
@@ -569,26 +234,25 @@ export function HeroBanner() {
                         'leading-relaxed mb-3 sm:mb-4 md:mb-6',
                         'text-[10px] sm:text-xs md:text-sm',
                         'max-w-[160px] sm:max-w-[200px] md:max-w-xs',
-                        /* hide on very small phones to save space */
                         'hidden xs:block sm:block',
-                        dark ? 'text-white/70' : 'text-[#6B7280]'
+                        dark ? 'text-white/70' : 'text-[#6B7280]',
+                        isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
+                        'transition-all duration-1200 ease-out delay-500'
                       )}>
                         {s.subTitle}
                       </p>
 
                       <Link
                         href={s.linkUrl}
-                        className="
-                          inline-flex items-center gap-1.5
-                          text-[10px] sm:text-xs md:text-sm
-                          font-semibold
-                          px-3 py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3
-                          rounded-lg
-                          bg-gradient-to-r from-[#F5820A] to-[#E06B00]
-                          text-white
-                          hover:shadow-lg hover:shadow-orange-200/50
-                          transition-all active:scale-[0.97]
-                        "
+                        className={cn(
+                          "inline-flex items-center gap-1.5",
+                          "text-[10px] sm:text-xs md:text-sm font-semibold",
+                          "px-3 py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3 rounded-lg",
+                          "bg-gradient-to-r from-[#F5820A] to-[#E06B00] text-white",
+                          "hover:shadow-lg hover:shadow-orange-200/50 transition-all active:scale-[0.97]",
+                          isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
+                          'duration-1200 ease-out delay-600'
+                        )}
                       >
                         {s.ctaText}
                         <FiArrowRight size={12} />
@@ -596,7 +260,11 @@ export function HeroBanner() {
                     </div>
 
                     {/* ── Desktop image (flex col, unchanged from original) ── */}
-                    <div className="hidden md:flex flex-1 items-center justify-center w-full">
+                    <div className={cn(
+                      "hidden md:flex flex-1 items-center justify-center w-full",
+                      "transition-all duration-1200 ease-out delay-300 will-change-transform",
+                      isActive ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-4 scale-[0.98]"
+                    )}>
                       <div className="relative w-full h-[300px] sm:h-[340px] md:h-[360px] lg:h-[400px] md:aspect-square md:max-w-[380px] lg:max-w-[440px]">
                         <Image
                           src={s.imageUrl || '/images/device-placeholder.jpg'}

@@ -195,16 +195,14 @@ function Field({ label, icon, type = "text", placeholder, value, onChange, autoC
         style={{
           display: "flex", alignItems: "center", gap: 10,
           borderRadius: 14, border: "1px solid rgba(255,255,255,0.08)",
-          background: "rgba(255,255,255,0.04)", padding: "0 14px",
+          background: "", padding: "0 14px",
           transition: "border-color 0.15s, background 0.15s",
         }}
         onFocus={(e) => {
           (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(249,115,22,0.55)";
-          (e.currentTarget as HTMLDivElement).style.background = "rgba(249,115,22,0.04)";
         }}
         onBlur={(e) => {
           (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,0.08)";
-          (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,0.04)";
         }}
       >
         <span style={{ color: "rgba(255,255,255,0.3)", flexShrink: 0 }}>{icon}</span>
@@ -223,14 +221,12 @@ function Field({ label, icon, type = "text", placeholder, value, onChange, autoC
             const parent = e.currentTarget.closest("div") as HTMLDivElement;
             if (parent) {
               parent.style.borderColor = "rgba(249,115,22,0.55)";
-              parent.style.background = "rgba(249,115,22,0.04)";
             }
           }}
           onBlur={(e) => {
             const parent = e.currentTarget.closest("div") as HTMLDivElement;
             if (parent) {
               parent.style.borderColor = "rgba(255,255,255,0.08)";
-              parent.style.background = "rgba(255,255,255,0.04)";
             }
           }}
         />
@@ -260,16 +256,14 @@ function PasswordField({ label, placeholder, value, onChange, autoComplete }: Pa
         style={{
           display: "flex", alignItems: "center", gap: 10,
           borderRadius: 14, border: "1px solid rgba(255,255,255,0.08)",
-          background: "rgba(255,255,255,0.04)", padding: "0 14px",
-          transition: "border-color 0.15s, background 0.15s",
+          background: "", padding: "0 14px",
+          transition: "border-color 0.15s",
         }}
         onFocus={(e) => {
           (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(249,115,22,0.55)";
-          (e.currentTarget as HTMLDivElement).style.background = "rgba(249,115,22,0.04)";
         }}
         onBlur={(e) => {
           (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,0.08)";
-          (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,0.04)";
         }}
       >
         <span style={{ color: "rgba(255,255,255,0.3)", flexShrink: 0 }}><IconLock /></span>
@@ -288,14 +282,12 @@ function PasswordField({ label, placeholder, value, onChange, autoComplete }: Pa
             const parent = e.currentTarget.closest("div") as HTMLDivElement;
             if (parent) {
               parent.style.borderColor = "rgba(249,115,22,0.55)";
-              parent.style.background = "rgba(249,115,22,0.04)";
             }
           }}
           onBlur={(e) => {
             const parent = e.currentTarget.closest("div") as HTMLDivElement;
             if (parent) {
               parent.style.borderColor = "rgba(255,255,255,0.08)";
-              parent.style.background = "rgba(255,255,255,0.04)";
             }
           }}
         />
@@ -441,6 +433,15 @@ function ShopFresherzAuth() {
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
         * { box-sizing: border-box; }
         input::placeholder { color: rgba(255,255,255,0.22) !important; }
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+          -webkit-text-fill-color: #fff !important;
+          transition: background-color 5000s ease-in-out 0s !important;
+          box-shadow: 0 0 0px 1000px rgba(255,255,255,0.04) inset !important;
+          -webkit-box-shadow: 0 0 0px 1000px rgba(255,255,255,0.04) inset !important;
+        }
         @media (min-width: 900px) {
           .sf-card { grid-template-columns: 1.15fr 0.85fr !important; }
           .sf-left { display: flex !important; }
@@ -544,8 +545,6 @@ function ShopFresherzAuth() {
             }}>
               {(["signin", "signup"] as AuthMode[]).map((m) => {
                 const active = mode === m;
-                const isOrange = active && m === "signup";
-                const isDark = active && m === "signin";
                 return (
                   <button
                     key={m}
@@ -553,11 +552,11 @@ function ShopFresherzAuth() {
                     onClick={() => switchMode(m)}
                     className="sf-tab"
                     style={{
-                      padding: "11px 0", borderRadius: 12, border: "none", cursor: "pointer",
+                      padding: "11px 0", borderRadius: 12, border: active ? "1px solid rgba(255,255,255,0.16)" : "1px solid transparent", cursor: "pointer",
                       fontSize: 13, fontWeight: 700,
-                      background: isDark ? "#fff" : isOrange ? "#f97316" : "transparent",
-                      color: isDark ? "#111" : isOrange ? "#fff" : "rgba(255,255,255,0.35)",
-                      boxShadow: active ? (isDark ? "0 2px 12px rgba(0,0,0,0.4)" : "0 2px 12px rgba(249,115,22,0.3)") : "none",
+                      background: active ? "rgba(255,255,255,0.08)" : "transparent",
+                      color: active ? "#fff" : "rgba(255,255,255,0.35)",
+                      boxShadow: active ? "0 10px 30px rgba(0,0,0,0.18)" : "none",
                       transition: "all 0.18s",
                       fontFamily: "inherit",
                     }}
