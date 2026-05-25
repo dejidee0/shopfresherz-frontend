@@ -155,7 +155,7 @@ function CategoryItem({ category }: { category: CategoryWithImage }) {
       )}
     >
       {/* Icon circle */}
-      <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-[#F5F5F5] border-2 border-transparent group-hover:border-[#F5820A] transition-all duration-200 overflow-hidden flex items-center justify-center">
+      <div className="w-20 h-20 md:w-24 md:h-24  bg-[#F5F5F5] border-2 border-transparent group-hover:border-[#F5820A] transition-all duration-200 overflow-hidden flex items-center justify-center">
         {category.imageUrl ? (
           <Image
             src={category.imageUrl}

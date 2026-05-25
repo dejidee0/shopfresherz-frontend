@@ -57,7 +57,7 @@ export function Footer() {
     <footer className="bg-[#0D0D0D] text-white">
       {/* Main footer content */}
       <div className="max-w-content mx-auto px-10 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
+        <div className="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-5 gap-10">
 
           {/* Col 1 — Brand + contact */}
           <div className="lg:col-span-1">

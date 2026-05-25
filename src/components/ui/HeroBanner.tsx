@@ -1,12 +1,353 @@
+// 'use client'
+
+// import { useState, useEffect, useCallback, useRef } from 'react'
+// import Link from 'next/link'
+// import Image from 'next/image'
+// import { cn } from '@/lib/utils/format'
+// import { productsApi } from '@/lib/api/products'
+// import type { Banner } from '@/lib/types/product'
+// import { FiArrowRight } from 'react-icons/fi'
+
+// /* ─── Slide types ─────────────────────────────────────────────────── */
+
+// interface HeroSlide {
+//   id: string
+//   title: string
+//   subTitle: string
+//   imageUrl: string
+//   linkUrl: string
+//   ctaText: string
+//   sortOrder: number
+//   tag?: string
+//   tagColor?: string
+//   theme?: 'light' | 'dark'
+//   bgColor?: string
+// }
+
+// function bannerToSlide(banner: Banner): HeroSlide {
+//   return {
+//     ...banner,
+//     tag: undefined,
+//     tagColor: 'text-[#F5820A]',
+//     theme: 'light',
+//     bgColor: 'bg-[#FF9A2E0D]',
+//   }
+// }
+
+// const FALLBACK_SLIDES: HeroSlide[] = [
+//   {
+//     id: 'fallback-1',
+//     tag: 'THE BEST PLACE TO PLAY',
+//     tagColor: 'text-[#F5820A]',
+//     title: 'Xbox 360 Console',
+//     subTitle: 'Save up to 50% on select Xbox games. Get 3 months of PC Game Pass for $2 USD.',
+//     ctaText: 'SHOP NOW',
+//     linkUrl: '/store/category/games-consoles',
+//     imageUrl: '/images/categories/Image1.png',
+//     sortOrder: 0,
+//     theme: 'light',
+//     bgColor: 'bg-[#FF9A2E0D]',
+//   },
+//   {
+//     id: 'fallback-2',
+//     tag: 'PREMIUM GAMING GEAR',
+//     tagColor: 'text-[#F5820A]',
+//     title: 'Xbox Elite Controllers',
+//     subTitle: 'Designed for the ultimate gaming experience. Precision engineered for pros.',
+//     ctaText: 'SHOP NOW',
+//     linkUrl: '/store/category/games-consoles',
+//     imageUrl: '/images/categories/Image2.png',
+//     sortOrder: 1,
+//     theme: 'light',
+//     bgColor: 'bg-[#FF9A2E0D]',
+//   },
+//   {
+//     id: 'fallback-3',
+//     tag: 'NEW ARRIVAL',
+//     tagColor: 'text-[#7B2FBE]',
+//     title: 'PlayStation 5',
+//     subTitle: 'Experience lightning-fast loading, deeper immersion and an all-new generation of gaming.',
+//     ctaText: 'SHOP NOW',
+//     linkUrl: '/store/category/games-consoles',
+//     imageUrl: '/images/categories/Image3.png',
+//     sortOrder: 2,
+//     theme: 'light',
+//     bgColor: 'bg-[#FF9A2E0D]',
+//   },
+// ]
+
+// /* ─── Promo card data ─────────────────────────────────────────────── */
+
+// const PROMO_CARD_1 = {
+//   tag: 'SUMMER SALES',
+//   title: 'New Google\nPixel 6 Pro',
+//   badge: '29% OFF',
+//   ctaText: 'SHOP NOW',
+//   linkUrl: '/store/',
+//   imageUrl: '/images/categories/pixel.png',
+// }
+
+// const PROMO_CARD_2 = {
+//   title: 'Xiaomi\nFlipBuds Pro',
+//   price: '₦10,000',
+//   ctaText: 'SHOP NOW',
+//   linkUrl: '/store/',
+//   imageUrl: '/images/categories/earpod.png',
+// }
+
+// /* ─── Component ───────────────────────────────────────────────────── */
+
+// export function HeroBanner() {
+//   const [current, setCurrent] = useState(0)
+//   const [isPaused, setIsPaused] = useState(false)
+//   const [slides, setSlides] = useState<HeroSlide[]>(FALLBACK_SLIDES)
+//   const touchStartX = useRef<number | null>(null)
+//   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+//   const total = slides.length
+
+//   const next = useCallback(() => setCurrent((c) => (c + 1) % total), [total])
+//   const prev = useCallback(() => setCurrent((c) => (c - 1 + total) % total), [total])
+//   const goTo = useCallback((i: number) => setCurrent(i), [])
+
+//   /* Fetch real banners */
+//   useEffect(() => {
+//     async function fetchBanners() {
+//       try {
+//         const banners = await productsApi.getBanners()
+//         if (banners.length > 0) {
+//           setSlides(banners.map(bannerToSlide))
+//           setCurrent(0)
+//         }
+//       } catch {
+//         // static fallback already in state
+//       }
+//     }
+//     fetchBanners()
+//   }, [])
+
+//   /* Auto-play */
+//   useEffect(() => {
+//     if (isPaused) return
+//     intervalRef.current = setInterval(next, 5000)
+//     return () => {
+//       if (intervalRef.current) clearInterval(intervalRef.current)
+//     }
+//   }, [isPaused, next])
+
+//   /* Touch swipe */
+//   function handleTouchStart(e: React.TouchEvent) {
+//     touchStartX.current = e.touches[0].clientX
+//   }
+
+//   function handleTouchEnd(e: React.TouchEvent) {
+//     if (touchStartX.current === null) return
+//     const diff = touchStartX.current - e.changedTouches[0].clientX
+//     if (Math.abs(diff) > 40) diff > 0 ? next() : prev()
+//     touchStartX.current = null
+//   }
+
+//   return (
+//     <section className="max-w-content mx-auto px-4 sm:px-6 lg:px-10 py-4 sm:py-6">
+//       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
+
+//         {/* ━━━━━━ LEFT: Auto-playing Slider ━━━━━━ */}
+//         <div
+//           className="lg:col-span-2 relative overflow-hidden rounded-2xl h-[280px] sm:h-[340px] lg:h-[420px]"
+//           onMouseEnter={() => setIsPaused(true)}
+//           onMouseLeave={() => setIsPaused(false)}
+//           onTouchStart={handleTouchStart}
+//           onTouchEnd={handleTouchEnd}
+//           role="region"
+//           aria-label="Featured products carousel"
+//           aria-roledescription="carousel"
+//         >
+//           {/* Slide track */}
+//           <div
+//             className="flex h-full transition-transform duration-600 ease-in-out"
+//             style={{ transform: `translateX(-${current * 100}%)` }}
+//           >
+//             {slides.map((s, i) => {
+//               const dark = s.theme === 'dark'
+//               return (
+//                 <div
+//                   key={s.id}
+//                   className={cn('min-w-full h-full', s.bgColor ?? 'bg-[#F5F5F5]')}
+//                   aria-roledescription="slide"
+//                   aria-label={s.title}
+//                 >
+//                   <div className="h-full px-6 sm:px-8 lg:px-10 flex flex-col-reverse md:flex-row items-center">
+
+//                     {/* Text */}
+//                     <div className="flex-1 flex flex-col items-center text-center md:items-start md:text-left py-4 md:py-8">
+//                       {s.tag && (
+//                         <p className={cn(
+//                           'text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1.5 sm:mb-2 flex items-center gap-2',
+//                           s.tagColor
+//                         )}>
+//                           <span className="w-5 h-[2px] bg-current hidden md:inline-block" />
+//                           {s.tag}
+//                         </p>
+//                       )}
+
+//                       <h2 className={cn(
+//                         'font-extrabold leading-tight mb-2 md:mb-3',
+//                         'text-xl sm:text-2xl md:text-3xl lg:text-4xl',
+//                         dark ? 'text-white' : 'text-[#111111]'
+//                       )}>
+//                         {s.title}
+//                       </h2>
+
+//                       <p className={cn(
+//                         'text-[11px] sm:text-sm leading-relaxed mb-4 md:mb-6 max-w-[260px] sm:max-w-xs',
+//                         dark ? 'text-white/70' : 'text-[#6B7280]'
+//                       )}>
+//                         {s.subTitle}
+//                       </p>
+
+//                       <Link
+//                         href={s.linkUrl}
+//                         className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg bg-gradient-to-r from-[#F5820A] to-[#E06B00] text-white hover:shadow-lg hover:shadow-orange-200/50 transition-all active:scale-[0.97]"
+//                       >
+//                         {s.ctaText}
+//                         <FiArrowRight size={14} />
+//                       </Link>
+//                     </div>
+
+//                     {/* Image */}
+//                     <div className="flex-1 flex items-center justify-center w-full">
+//                       <div className={cn(
+//                         'relative w-full',
+//                         'h-[170px] sm:h-[220px] md:h-[400px] md:aspect-square md:max-w-[380px] lg:max-w-[440px]'
+//                       )}>
+//                         <Image
+//                           src={s.imageUrl || '/images/device-placeholder.jpg'}
+//                           alt={s.title}
+//                           fill
+//                           sizes="(max-width: 768px) 80vw, 40vw"
+//                           className="object-contain"
+//                           style={{ mixBlendMode: 'multiply' }}
+//                           priority={i === 0}
+//                         />
+//                       </div>
+//                     </div>
+
+//                   </div>
+//                 </div>
+//               )
+//             })}
+//           </div>
+
+//           {/* Dot indicators — bottom-left */}
+//           <div className="absolute bottom-4 left-6 sm:left-8 lg:left-10 flex items-center gap-1.5 z-10">
+//             {slides.map((_, i) => (
+//               <button
+//                 key={i}
+//                 onClick={() => goTo(i)}
+//                 className={cn(
+//                   'rounded-full transition-all duration-300',
+//                   i === current
+//                     ? 'w-5 h-2 bg-[#F5820A]'
+//                     : 'w-2 h-2 bg-[#D1D5DB] hover:bg-[#F5820A]/50'
+//                 )}
+//                 aria-label={`Go to slide ${i + 1}`}
+//                 aria-current={i === current}
+//               />
+//             ))}
+//           </div>
+//         </div>
+
+//         {/* ━━━━━━ RIGHT: Two Promotional Cards ━━━━━━ */}
+//         <div className="flex flex-col gap-4 sm:gap-5 lg:h-[420px]">
+
+//           {/* ── Card 1: Google Pixel 6 Pro (Dark) ── */}
+//           <Link
+//             href={PROMO_CARD_1.linkUrl}
+//             className="group relative flex-1 bg-[#0B0C0E] rounded-2xl overflow-hidden flex flex-row items-center min-h-[200px] lg:min-h-0 transition-all duration-300 hover:shadow-2xl hover:shadow-black/40 hover:-translate-y-0.5 border border-white/5"
+//           >
+//             {/* Badge */}
+//             <span className="absolute top-4 right-10 sm:right-12 bg-[#7B2FBE] text-white text-[11px] font-extrabold px-3 py-1.5 rounded shadow-lg z-20">
+//               {PROMO_CARD_1.badge}
+//             </span>
+
+//             {/* Text */}
+//             <div className="flex-1 p-5 sm:p-6 lg:p-7 pr-[45%] sm:pr-[50%] flex flex-col justify-center z-10">
+//               <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#F5820A] mb-1.5">
+//                 {PROMO_CARD_1.tag}
+//               </p>
+//               <h3 className="text-white text-lg sm:text-xl lg:text-2xl font-extrabold leading-tight whitespace-pre-line mb-4 tracking-tight">
+//                 {PROMO_CARD_1.title}
+//               </h3>
+//               <span className="inline-flex items-center gap-2 self-start bg-white text-[#0B1528] text-xs font-bold px-5 py-2.5 rounded-lg shadow-md group-hover:bg-[#F3F4F6] transition-all duration-300">
+//                 {PROMO_CARD_1.ctaText}
+//                 <FiArrowRight size={13} className="stroke-[2.5]" />
+//               </span>
+//             </div>
+
+//             {/* Image */}
+//             <div className="absolute right-0 bottom-0 w-[45%] sm:w-[50%] h-[115%] pointer-events-none select-none z-10">
+//               <Image
+//                 src={PROMO_CARD_1.imageUrl}
+//                 alt={PROMO_CARD_1.title}
+//                 fill
+//                 sizes="(max-width: 768px) 45vw, 25vw"
+//                 className="object-contain object-right-bottom"
+//                 priority
+//               />
+//             </div>
+//           </Link>
+
+//           {/* ── Card 2: Xiaomi FlipBuds Pro (Light) ── */}
+//           <Link
+//             href={PROMO_CARD_2.linkUrl}
+//             className="group flex-1 bg-[#F5F5F5] border border-neutral-200/80 rounded-2xl overflow-hidden flex flex-row items-center min-h-[200px] lg:min-h-0 transition-all duration-300 hover:shadow-2xl hover:shadow-black/5 hover:-translate-y-0.5"
+//           >
+//             {/* Image */}
+//             <div className="relative w-[130px] sm:w-[150px] h-[80%] shrink-0 pointer-events-none select-none ml-4 sm:ml-6">
+//               <Image
+//                 src={PROMO_CARD_2.imageUrl}
+//                 alt={PROMO_CARD_2.title}
+//                 fill
+//                 sizes="150px"
+//                 className="object-contain object-center"
+//                 priority
+//               />
+//             </div>
+
+//             {/* Text */}
+//             <div className="flex-1 p-5 sm:p-6 flex flex-col justify-center pl-4 sm:pl-6">
+//               <h3 className="text-neutral-950 text-base sm:text-lg lg:text-xl font-extrabold leading-tight whitespace-pre-line mb-1">
+//                 {PROMO_CARD_2.title}
+//               </h3>
+//               <p className="text-[#F5820A] text-base sm:text-lg font-extrabold mb-4">
+//                 {PROMO_CARD_2.price}
+//               </p>
+//               <span className="inline-flex items-center gap-2 self-start bg-[#F5820A] text-white text-xs font-bold px-5 py-2.5 rounded-lg shadow-md group-hover:bg-[#E06B00] transition-all duration-300">
+//                 {PROMO_CARD_2.ctaText}
+//                 <FiArrowRight size={13} className="stroke-[2.5]" />
+//               </span>
+//             </div>
+//           </Link>
+
+//         </div>
+//       </div>
+//     </section>
+//   )
+// }
+
+
+
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { cn } from '@/lib/utils/format'
 import { productsApi } from '@/lib/api/products'
 import type { Banner } from '@/lib/types/product'
+import { FiArrowRight } from 'react-icons/fi'
+
+/* ─── Slide types ─────────────────────────────────────────────────── */
 
 interface HeroSlide {
   id: string
@@ -28,7 +369,7 @@ function bannerToSlide(banner: Banner): HeroSlide {
     tag: undefined,
     tagColor: 'text-[#F5820A]',
     theme: 'light',
-    bgColor: 'bg-[#F5F5F5]',
+    bgColor: 'bg-[#FF9A2E0D]',
   }
 }
 
@@ -37,41 +378,63 @@ const FALLBACK_SLIDES: HeroSlide[] = [
     id: 'fallback-1',
     tag: 'THE BEST PLACE TO PLAY',
     tagColor: 'text-[#F5820A]',
-    title: 'Video Game Consoles',
-    subTitle: 'Save up to 50% on select Xbox and PlayStation games',
+    title: 'Xbox 360 Console',
+    subTitle: 'Save up to 50% on select Xbox games. Get 3 months of PC Game Pass for $2 USD.',
     ctaText: 'SHOP NOW',
-    linkUrl: '/category/games-consoles',
-    imageUrl: '/images/categories/xbox.png',
+    linkUrl: '/store/category/games-consoles',
+    imageUrl: '/images/categories/Image1.png',
     sortOrder: 0,
     theme: 'light',
-    bgColor: 'bg-[#F5F5F5]',
+    bgColor: 'bg-[#FF9A2E0D]',
   },
   {
     id: 'fallback-2',
+    tag: 'PREMIUM GAMING GEAR',
     tagColor: 'text-[#F5820A]',
-    title: 'New Mobile Phones',
-    subTitle: 'Experience the ultimate Android/Apple flagship. Available now.',
+    title: 'Xbox Elite Controllers',
+    subTitle: 'Designed for the ultimate gaming experience. Precision engineered for pros.',
     ctaText: 'SHOP NOW',
-    linkUrl: '/store/',
-    imageUrl: '/images/categories/phone.png',
+    linkUrl: '/store/category/games-consoles',
+    imageUrl: '/images/categories/Image2.png',
     sortOrder: 1,
     theme: 'light',
-    bgColor: 'bg-white',
+    bgColor: 'bg-[#FF9A2E0D]',
   },
   {
     id: 'fallback-3',
     tag: 'NEW ARRIVAL',
     tagColor: 'text-[#7B2FBE]',
-    title: 'Headphones & Earpods',
-    subTitle: 'Premium sound, all-day comfort.',
+    title: 'PlayStation 5',
+    subTitle: 'Experience lightning-fast loading, deeper immersion and an all-new generation of gaming.',
     ctaText: 'SHOP NOW',
-    linkUrl: '/store/',
-    imageUrl: '/images/categories/earpod.png',
+    linkUrl: '/store/category/games-consoles',
+    imageUrl: '/images/categories/Image3.png',
     sortOrder: 2,
-    theme: 'dark',
-    bgColor: 'bg-[#0D0D0D]',
+    theme: 'light',
+    bgColor: 'bg-[#FF9A2E0D]',
   },
 ]
+
+/* ─── Promo card data ─────────────────────────────────────────────── */
+
+const PROMO_CARD_1 = {
+  tag: 'SUMMER SALES',
+  title: 'New Google\nPixel 6 Pro',
+  badge: '29% OFF',
+  ctaText: 'SHOP NOW',
+  linkUrl: '/store/',
+  imageUrl: '/images/categories/pixel.png',
+}
+
+const PROMO_CARD_2 = {
+  title: 'Xiaomi\nFlipBuds Pro',
+  price: '₦10,000',
+  ctaText: 'SHOP NOW',
+  linkUrl: '/store/',
+  imageUrl: '/images/categories/earpod.png',
+}
+
+/* ─── Component ───────────────────────────────────────────────────── */
 
 export function HeroBanner() {
   const [current, setCurrent] = useState(0)
@@ -86,6 +449,7 @@ export function HeroBanner() {
   const prev = useCallback(() => setCurrent((c) => (c - 1 + total) % total), [total])
   const goTo = useCallback((i: number) => setCurrent(i), [])
 
+  /* Fetch real banners */
   useEffect(() => {
     async function fetchBanners() {
       try {
@@ -101,6 +465,7 @@ export function HeroBanner() {
     fetchBanners()
   }, [])
 
+  /* Auto-play */
   useEffect(() => {
     if (isPaused) return
     intervalRef.current = setInterval(next, 5000)
@@ -109,6 +474,7 @@ export function HeroBanner() {
     }
   }, [isPaused, next])
 
+  /* Touch swipe */
   function handleTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0].clientX
   }
@@ -120,144 +486,274 @@ export function HeroBanner() {
     touchStartX.current = null
   }
 
-  const slide = slides[current]
-  const isDark = slide.theme === 'dark'
-
   return (
-    <div
-      className="relative w-full overflow-hidden"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      role="region"
-      aria-label="Featured products carousel"
-      aria-roledescription="carousel"
-    >
-      {/* ── Slides track ── */}
-      <div
-        className="flex transition-transform duration-500 ease-in-out"
-        style={{ transform: `translateX(-${current * 100}%)` }}
-      >
-        {slides.map((s, i) => {
-          const dark = s.theme === 'dark'
-          return (
-            <div
-              key={s.id}
-              className={cn('min-w-full', s.bgColor ?? 'bg-[#F5F5F5]')}
-              aria-roledescription="slide"
-              aria-label={s.title}
-            >
-              <div className="max-w-content mx-auto px-4 sm:px-6 lg:px-10">
-                {/*
-                  Mobile  : column layout — text on top, image below
-                  Desktop : row layout   — text left, image right
-                */}
-                <div className="flex flex-col-reverse md:flex-row items-center gap-4 md:gap-8 py-8 md:py-0 md:min-h-105 lg:min-h-110">
+    <section className="max-w-content mx-auto px-3 sm:px-6 lg:px-10 py-3 sm:py-4 lg:py-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
 
-                  {/* ── Text column ── */}
-                  <div className="flex-1 flex flex-col items-center text-center md:items-start md:text-left md:max-w-120">
-                    {s.tag && (
-                      <p className={cn(
-                        'text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-2 md:mb-3',
-                        s.tagColor
-                      )}>
-                        {s.tag}
-                      </p>
-                    )}
-
-                    <h2 className={cn(
-                      'font-extrabold leading-tight mb-2 md:mb-4',
-                      // Fluid type: smaller on mobile, full size on desktop
-                      'text-2xl sm:text-3xl md:text-4xl lg:text-5xl',
-                      dark ? 'text-white' : 'text-[#111111]'
-                    )}>
-                      {s.title}
-                    </h2>
-
-                    <p className={cn(
-                      'text-xs sm:text-sm leading-relaxed mb-5 md:mb-8 max-w-70 sm:max-w-sm',
-                      dark ? 'text-white/70' : 'text-[#6B7280]'
-                    )}>
-                      {s.subTitle}
-                    </p>
-
-                    <Link
-                      href={s.linkUrl}
-                      className={cn(
-                        'rounded inline-flex items-center gap-2 font-semibold rounded-btn transition-all active:scale-[0.98]',
-                        // Smaller tap target on mobile, full size on desktop
-                        'text-xs sm:text-sm px-5 py-2.5 sm:px-7 sm:py-3',
-                        'bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white',
-                        'hover:shadow-lg hover:shadow-orange-200'
-                      )}
-                    >
-                      {s.ctaText} →
-                    </Link>
-                  </div>
-
-                  {/* ── Image column ── */}
-                  {/*
-                    Mobile  : fixed height so it doesn't dominate the screen
-                    Desktop : aspect-ratio box that fills available space
+        {/* ━━━━━━ LEFT: Auto-playing Slider ━━━━━━ */}
+        <div
+          className="lg:col-span-2 relative overflow-hidden rounded-2xl h-[200px] sm:h-[280px] lg:h-[420px]"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          role="region"
+          aria-label="Featured products carousel"
+          aria-roledescription="carousel"
+        >
+          {/* Slide track */}
+          <div
+            className="flex h-full transition-transform duration-600 ease-in-out"
+            style={{ transform: `translateX(-${current * 100}%)` }}
+          >
+            {slides.map((s, i) => {
+              const dark = s.theme === 'dark'
+              return (
+                <div
+                  key={s.id}
+                  className={cn('min-w-full h-full', s.bgColor ?? 'bg-[#F5F5F5]')}
+                  aria-roledescription="slide"
+                  aria-label={s.title}
+                >
+                  {/* 
+                    Mobile/Tablet: image sits as absolute background on the right,
+                    text overlays on the left — clean app-like layout.
+                    Desktop (md+): side-by-side flex row (unchanged).
                   */}
-                  <div className="flex-1 flex items-center justify-center w-full">
-                    <div className={cn(
-                      'relative w-full',
-                      // Mobile: constrained height; Desktop: aspect-ratio driven
-                      'h-45 sm:h-60 md:h-auto md:aspect-4/3 md:max-w-105 lg:max-w-120'
-                    )}>
+                  <div className="relative h-full md:flex md:flex-row md:items-center md:px-8 lg:px-10">
+
+                    {/* ── Mobile/Tablet image (absolute, right side, decorative bg) ── */}
+                    <div className="absolute inset-y-0 right-0 w-[55%] md:hidden pointer-events-none select-none">
                       <Image
-                        src={s.imageUrl || 'https://placehold.net/default.png'}
+                        src={s.imageUrl || '/images/device-placeholder.jpg'}
                         alt={s.title}
                         fill
-                        sizes="(max-width: 768px) 80vw, 45vw"
-                        className="object-contain"
+                        sizes="55vw"
+                        className="object-contain object-right-center"
+                        style={{ mixBlendMode: 'multiply' }}
                         priority={i === 0}
                       />
                     </div>
-                  </div>
 
+                    {/* ── Text block ── */}
+                    <div className="
+                      relative z-10
+                      /* mobile: left-aligned, takes 55% width so it doesn't clash with image */
+                      flex flex-col items-start text-left
+                      h-full justify-center
+                      pl-4 pr-[48%] py-5
+                      /* tablet+ override */
+                      sm:pl-6 sm:pr-[50%] sm:py-7
+                      /* desktop */
+                      md:flex-1 md:pr-0 md:pl-0 md:py-8 md:items-start
+                    ">
+                      {s.tag && (
+                        <p className={cn(
+                          'text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-widest mb-1 sm:mb-1.5 md:mb-2 flex items-center gap-1.5',
+                          s.tagColor
+                        )}>
+                          <span className="w-4 h-[2px] bg-current hidden md:inline-block" />
+                          {s.tag}
+                        </p>
+                      )}
+
+                      <h2 className={cn(
+                        'font-extrabold leading-tight mb-1.5 sm:mb-2 md:mb-3',
+                        'text-base sm:text-xl md:text-3xl lg:text-4xl',
+                        dark ? 'text-white' : 'text-[#111111]'
+                      )}>
+                        {s.title}
+                      </h2>
+
+                      <p className={cn(
+                        'leading-relaxed mb-3 sm:mb-4 md:mb-6',
+                        'text-[10px] sm:text-xs md:text-sm',
+                        'max-w-[160px] sm:max-w-[200px] md:max-w-xs',
+                        /* hide on very small phones to save space */
+                        'hidden xs:block sm:block',
+                        dark ? 'text-white/70' : 'text-[#6B7280]'
+                      )}>
+                        {s.subTitle}
+                      </p>
+
+                      <Link
+                        href={s.linkUrl}
+                        className="
+                          inline-flex items-center gap-1.5
+                          text-[10px] sm:text-xs md:text-sm
+                          font-semibold
+                          px-3 py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3
+                          rounded-lg
+                          bg-gradient-to-r from-[#F5820A] to-[#E06B00]
+                          text-white
+                          hover:shadow-lg hover:shadow-orange-200/50
+                          transition-all active:scale-[0.97]
+                        "
+                      >
+                        {s.ctaText}
+                        <FiArrowRight size={12} />
+                      </Link>
+                    </div>
+
+                    {/* ── Desktop image (flex col, unchanged from original) ── */}
+                    <div className="hidden md:flex flex-1 items-center justify-center w-full">
+                      <div className="relative w-full h-[300px] sm:h-[340px] md:h-[360px] lg:h-[400px] md:aspect-square md:max-w-[380px] lg:max-w-[440px]">
+                        <Image
+                          src={s.imageUrl || '/images/device-placeholder.jpg'}
+                          alt={s.title}
+                          fill
+                          sizes="(max-width: 768px) 80vw, 40vw"
+                          className="object-contain"
+                          style={{ mixBlendMode: 'multiply' }}
+                          priority={i === 0}
+                        />
+                      </div>
+                    </div>
+
+                  </div>
                 </div>
+              )
+            })}
+          </div>
+
+          {/* Dot indicators — bottom-left */}
+          <div className="absolute bottom-3 sm:bottom-4 left-4 sm:left-6 lg:left-10 flex items-center gap-1.5 z-10">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goTo(i)}
+                className={cn(
+                  'rounded-full transition-all duration-300',
+                  i === current
+                    ? 'w-4 sm:w-5 h-1.5 sm:h-2 bg-[#F5820A]'
+                    : 'w-1.5 sm:w-2 h-1.5 sm:h-2 bg-[#D1D5DB] hover:bg-[#F5820A]/50'
+                )}
+                aria-label={`Go to slide ${i + 1}`}
+                aria-current={i === current}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* ━━━━━━ RIGHT: Two Promotional Cards ━━━━━━ */}
+        {/*
+          Mobile: side-by-side row (2 cards next to each other, compact height)
+          Tablet (sm): side-by-side row, slightly taller
+          Desktop (lg): stacked column (original layout, untouched)
+        */}
+        <div className="
+          grid grid-cols-2 gap-3
+          sm:gap-4
+          lg:flex lg:flex-col lg:gap-5 lg:h-[420px]
+        ">
+
+          {/* ── Card 1: Google Pixel 6 Pro (Dark) ── */}
+          <Link
+            href={PROMO_CARD_1.linkUrl}
+            className="
+              group relative
+              bg-[#0B0C0E] rounded-xl lg:rounded-2xl overflow-hidden
+              flex flex-col
+              /* mobile/tablet height */
+              h-[160px] sm:h-[200px]
+              /* desktop: flex-1 to share space equally */
+              lg:flex-1 lg:h-auto
+              transition-all duration-300
+              hover:shadow-2xl hover:shadow-black/40 hover:-translate-y-0.5
+              border border-white/5
+            "
+          >
+            {/* Badge */}
+            <span className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 lg:top-4 lg:right-4 bg-[#7B2FBE] text-white text-[9px] sm:text-[10px] font-extrabold px-2 py-1 rounded shadow-lg z-20">
+              {PROMO_CARD_1.badge}
+            </span>
+
+            {/* Text — bottom-left */}
+            <div className="absolute bottom-0 left-0 z-10 p-3 sm:p-4 lg:p-7 flex flex-col justify-end">
+              <p className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold uppercase tracking-widest text-[#F5820A] mb-0.5 sm:mb-1">
+                {PROMO_CARD_1.tag}
+              </p>
+              <h3 className="text-white text-sm sm:text-base lg:text-2xl font-extrabold leading-tight whitespace-pre-line mb-2 sm:mb-3 tracking-tight">
+                {PROMO_CARD_1.title}
+              </h3>
+              <span className="inline-flex items-center gap-1.5 self-start bg-white text-[#0B1528] text-[9px] sm:text-[10px] lg:text-xs font-bold px-3 py-1.5 sm:px-4 sm:py-2 lg:px-5 lg:py-2.5 rounded-lg shadow-md group-hover:bg-[#F3F4F6] transition-all duration-300">
+                {PROMO_CARD_1.ctaText}
+                <FiArrowRight size={10} className="stroke-[2.5]" />
+              </span>
+            </div>
+
+            {/* Image — right side */}
+            <div className="absolute hidden sm:block md:right-0 md:bottom-0 w-[55%] h-[110%] md:pointer-events-none md:select-none z-10">
+              <Image
+                src={PROMO_CARD_1.imageUrl}
+                alt={PROMO_CARD_1.title}
+                fill
+                sizes="(max-width: 640px) 30vw, 25vw"
+                className="object-contain object-right-bottom"
+                priority
+              />
+            </div>
+          </Link>
+
+          {/* ── Card 2: Xiaomi FlipBuds Pro (Light) ── */}
+          <Link
+            href={PROMO_CARD_2.linkUrl}
+            className="
+              group
+              bg-[#F5F5F5] border border-neutral-200/80 rounded-xl lg:rounded-2xl overflow-hidden
+              flex flex-col justify-end
+              /* mobile/tablet height */
+              h-[160px] sm:h-[200px]
+              /* desktop */
+              lg:flex-1 lg:h-auto lg:flex-row lg:items-center lg:justify-start
+              transition-all duration-300
+              hover:shadow-2xl hover:shadow-black/5 hover:-translate-y-0.5
+            "
+          >
+            {/* Image — top on mobile, left on desktop */}
+            <div className="
+              relative
+              /* mobile/tablet: sits at top, fills most of the card height */
+              absolute inset-x-0 top-0 h-[55%]
+              /* desktop: side-by-side */
+              lg:static lg:h-full lg:w-[130px] xl:w-[150px] lg:shrink-0 lg:ml-4 xl:ml-6
+            ">
+              <div className="relative w-full h-full">
+                <Image
+                  src={PROMO_CARD_2.imageUrl}
+                  alt={PROMO_CARD_2.title}
+                  fill
+                  sizes="(max-width: 640px) 25vw, 150px"
+                  className="object-contain object-center"
+                  priority
+                />
               </div>
             </div>
-          )
-        })}
-      </div>
 
-      {/* ── Arrow controls — hidden on mobile (swipe instead) ── */}
-      <button
-        onClick={prev}
-        className="hidden sm:flex absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/90 shadow items-center justify-center text-[#111111] hover:bg-white hover:shadow-md transition-all z-10"
-        aria-label="Previous slide"
-      >
-        <FiChevronLeft size={17} />
-      </button>
-      <button
-        onClick={next}
-        className="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/90 shadow items-center justify-center text-[#111111] hover:bg-white hover:shadow-md transition-all z-10"
-        aria-label="Next slide"
-      >
-        <FiChevronRight size={17} />
-      </button>
+            {/* Text — bottom on mobile, right on desktop */}
+            <div className="
+              relative z-10
+              /* mobile/tablet: bottom portion */
+              p-3 sm:p-4
+              flex flex-col
+              /* desktop */
+              lg:flex-1 lg:p-5 xl:p-6 lg:pl-4
+            ">
+              <h3 className="text-neutral-950 text-xs sm:text-sm lg:text-xl font-extrabold leading-tight whitespace-pre-line mb-0.5 sm:mb-1">
+                {PROMO_CARD_2.title}
+              </h3>
+              <p className="text-[#F5820A] text-xs sm:text-sm lg:text-lg font-extrabold mb-2 sm:mb-3">
+                {PROMO_CARD_2.price}
+              </p>
+              <span className="inline-flex items-center gap-1.5 self-start bg-[#F5820A] text-white text-[9px] sm:text-[10px] lg:text-xs font-bold px-3 py-1.5 sm:px-4 sm:py-2 lg:px-5 lg:py-2.5 rounded-lg shadow-md group-hover:bg-[#E06B00] transition-all duration-300">
+                {PROMO_CARD_2.ctaText}
+                <FiArrowRight size={10} className="stroke-[2.5]" />
+              </span>
+            </div>
+          </Link>
 
-      {/* ── Dot indicators ── */}
-      <div className="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 md:gap-2 z-10">
-        {slides.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => goTo(i)}
-            className={cn(
-              'rounded-full transition-all duration-300',
-              i === current
-                ? 'w-4 h-1.5 md:w-5 md:h-2 bg-[#F5820A]'
-                : 'w-1.5 h-1.5 md:w-2 md:h-2 bg-[#D1D5DB] hover:bg-[#F5820A]/50'
-            )}
-            aria-label={`Go to slide ${i + 1}`}
-            aria-current={i === current}
-          />
-        ))}
+        </div>
       </div>
-    </div>
+    </section>
   )
 }
