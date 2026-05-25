@@ -960,7 +960,7 @@ function ProductCard({ product }: { product: HomeProduct }) {
 
   return (
     <div
-      className="bg-white border-1 border-[#E5E7EB]  overflow-hidden flex flex-col group relative"
+      className="bg-white border-1 border-[#E5E7EB] border-b-0 overflow-hidden flex flex-col group relative"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -988,7 +988,7 @@ function ProductCard({ product }: { product: HomeProduct }) {
 
       {/* Image — fixed height instead of aspect-square */}
       <div
-        className="flex items-center justify-center pt-2 overflow-hidden"
+        className=" pt- overflow-hidden"
         style={{ height: '160px' }}
       >
         {imageSrc ? (
@@ -998,7 +998,7 @@ function ProductCard({ product }: { product: HomeProduct }) {
             width={200}
             height={200}
             style={{ mixBlendMode: 'multiply' }}
-            className="object-contain w-full h-full transition-transform duration-300 group-hover:scale-105"
+            className=" w-full h-full transition-transform duration-300 group-hover:scale-105"
             unoptimized
           />
         ) : (

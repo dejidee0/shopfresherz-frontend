@@ -1,4 +1,4 @@
-import { api } from "./client";
+import { api, apiFetch } from "./client";
 import type { Order, OrderStatus, User } from "../types/user";
 import type { Product } from "../types/product";
 
@@ -162,14 +162,14 @@ export interface FlashDealDto {
 
 export interface CreateFlashDealRequest {
   productId: string;
+  variantId?: string;
   salePrice: number;
-  originalPrice: number;
   startsAt: string;
   endsAt: string;
   maxQuantity: number;
 }
 
-export interface UpdateFlashDealRequest extends Partial<CreateFlashDealRequest> {}
+export type UpdateFlashDealRequest = Partial<CreateFlashDealRequest>;
 
 export interface CouponDto {
   id: number;
@@ -273,7 +273,81 @@ export interface AdminReviewsFilters {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-export interface UpdateCouponRequest extends Partial<CreateCouponRequest> {}
+export interface AdminStoreSettings {
+  storeName: string;
+  supportEmail: string;
+  supportPhone: string;
+  currency: string;
+  timeZone: string;
+  logoUrl: string;
+  contactAddress: string;
+}
+
+export interface AdminPaymentSettings {
+  paystackEnabled: boolean;
+  flutterwaveEnabled: boolean;
+  bankTransferEnabled: boolean;
+  defaultProvider: string;
+}
+
+export interface AdminShippingSettings {
+  defaultDeliveryFee: number;
+  freeShippingThreshold: number;
+  estimatedDeliveryDaysMin: number;
+  estimatedDeliveryDaysMax: number;
+  supportedStates: string[];
+}
+
+export interface AdminTaxSettings {
+  vatEnabled: boolean;
+  vatRatePercent: number;
+  pricesIncludeTax: boolean;
+}
+
+export interface AdminNotificationSettings {
+  emailEnabled: boolean;
+  smsEnabled: boolean;
+  orderUpdatesEnabled: boolean;
+  stockAlertsEnabled: boolean;
+  marketingEnabled: boolean;
+}
+
+export interface AdminSeoSettings {
+  defaultTitle: string;
+  defaultDescription: string;
+  defaultImageUrl: string;
+}
+
+export interface AdminSecuritySettings {
+  accessTokenExpiryMinutes: number;
+  refreshTokenExpiryDays: number;
+  requireEmailVerification: boolean;
+  adminMfaRequired: boolean;
+}
+
+export interface AdminMaintenanceSettings {
+  enabled: boolean;
+  message: string;
+}
+
+export interface AdminSettings {
+  store: AdminStoreSettings;
+  payment: AdminPaymentSettings;
+  shipping: AdminShippingSettings;
+  tax: AdminTaxSettings;
+  notifications: AdminNotificationSettings;
+  seo: AdminSeoSettings;
+  security: AdminSecuritySettings;
+  maintenance: AdminMaintenanceSettings;
+}
+
+export type AdminSettingsSection = keyof AdminSettings | string;
+
+export interface UpdateAdminSettingsSectionRequest<T = unknown> {
+  value: T;
+}
+
+export type UpdateCouponRequest = Partial<CreateCouponRequest>;
 
 function toDateParam(value?: string | Date) {
   if (!value) return undefined;
@@ -283,6 +357,39 @@ function toDateParam(value?: string | Date) {
 export const adminApi = {
   getDashboard: (token: string) =>
     api.get<DashboardStatsDto>("/admin/dashboard", { token }),
+
+  getSettings: (token: string) =>
+    api.get<AdminSettings>("/admin/settings", { token }),
+
+  updateSettings: (token: string, payload: AdminSettings) =>
+    api.put<AdminSettings>("/admin/settings", payload, { token }),
+
+  getSettingsSection: <T = string>(
+    token: string,
+    section: AdminSettingsSection,
+  ) =>
+    api.get<T>(`/admin/settings/${encodeURIComponent(section)}`, { token }),
+
+  updateSettingsSection: <T = unknown>(
+    token: string,
+    section: AdminSettingsSection,
+    payload: UpdateAdminSettingsSectionRequest<T>,
+  ) =>
+    api.put<AdminSettings>(
+      `/admin/settings/${encodeURIComponent(section)}`,
+      payload,
+      { token },
+    ),
+
+  patchSettingsSection: <T = unknown>(
+    token: string,
+    section: AdminSettingsSection,
+    payload: UpdateAdminSettingsSectionRequest<T>,
+  ) =>
+    apiFetch<AdminSettings>(
+      `/admin/settings/${encodeURIComponent(section)}`,
+      { method: "PATCH", body: JSON.stringify(payload), token },
+    ),
 
   getOrders: (token: string, filters: AdminOrdersFilters = {}) =>
     api.get<PagedResult<OrderDto>>("/admin/orders", {

@@ -82,14 +82,14 @@ function ProductCard({ product }: { product: AccessoriesProduct }) {
       )}
 
       {/* Image area */}
-      <div className="flex h-[148px] items-center justify-center px-3 py-3 sm:h-[160px]">
+      <div className="flex h-[148px]   sm:h-[160px]">
         {product.imageUrl ? (
           <Image
             src={product.imageUrl}
             alt={product.name}
             width={180}
             height={180}
-            className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.04]"
+            className="h-full w-full  transition-transform duration-300 group-hover:scale-[1.04]"
             unoptimized
           />
         ) : (

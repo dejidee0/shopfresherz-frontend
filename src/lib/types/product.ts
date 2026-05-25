@@ -104,6 +104,15 @@ export interface FlashDeal {
   timeRemaining?: string;
 }
 
+export interface CreateFlashDealRequest {
+  productId: string;
+  variantId?: string;
+  salePrice: number;
+  startsAt: string;
+  endsAt: string;
+  maxQuantity: number;
+}
+
 // ─── Brands ─────────────────────────────────────────────────────────────
 export interface Brands {
   id: number;

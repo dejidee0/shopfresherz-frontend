@@ -47,16 +47,16 @@ function mapApiProductToItem(value: ApiProduct): Product {
 // 1. Internal Product Card Component
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
   return (
-    <div className="flex items-center gap-4 p-4 border border-gray-100 rounded-sm bg-white hover:shadow-sm transition-shadow duration-200 h-[105px]">
+    <div className="flex items-center gap-4 p-4 border border-gray-100 rounded-sm bg-white hover:shadow-sm transition-shadow duration-200 h-[75px]">
       {/* Aspect-ratio safe image container */}
-      <div className="relative w-16 h-16 flex-shrink-0 flex items-center justify-center rounded bg-[#F8FAFC]">
+      <div className="relative w-16 h-16   rounded bg-[]">
         {product.imageUrl ? (
           <Image
             src={product.imageUrl}
             alt={product.title}
             width={64}
             height={64}
-            className="object-contain max-h-full max-w-full"
+            className=" h-full w-full"
           />
         ) : (
           <div className="h-10 w-10 rounded bg-[#E5E7EB]" />

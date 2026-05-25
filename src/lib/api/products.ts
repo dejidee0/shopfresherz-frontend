@@ -2,13 +2,13 @@ import { api } from "./client";
 import type {
   Product,
   FlashDeal,
+  CreateFlashDealRequest,
   CategoryItem,
   SearchResult,
   InstantSearchResult,
   Brands,
   Banner,
 } from "../types/product";
-import type { PaginatedResponse } from "../types/user";
 
 // Raw API pagination shape (backend uses `items` instead of `data`)
 interface ApiPaginatedResponse<T> {
@@ -164,6 +164,9 @@ export const productsApi = {
 
   /** Active flash deals with endTime for countdown */
   flashDeals: () => api.get<FlashDeal[]>("/flash-deals"),
+
+  createFlashDeal: (token: string, payload: CreateFlashDealRequest) =>
+    api.post<FlashDeal>("/flash-deals", payload, { token }),
 
   /** Instant search — dropdown results (top 5 products + 3 categories) */
   instantSearch: (q: string) =>
