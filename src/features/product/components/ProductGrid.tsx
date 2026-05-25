@@ -104,7 +104,7 @@
 //         </div>
 
 //         {/* Grid */}
-        
+
 //         <div className={cn('grid', gridCols)}>
 //           {isLoading
 //             ? Array.from({ length: cols === 5 ? 10 : 8 }).map((_, i) => (
@@ -239,11 +239,11 @@ export function ProductGridSection({
 
           {isLoading
             ? Array.from({ length: cols === 5 ? 10 : 8 }).map((_, i) => (
-                <SkeletonCard key={i} />
-              ))
+              <SkeletonCard key={i} />
+            ))
             : products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
+              <ProductCard key={product.id} product={product} />
+            ))}
         </div>
       </div>
     </section>

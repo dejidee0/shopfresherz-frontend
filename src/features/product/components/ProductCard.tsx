@@ -41,9 +41,9 @@ export function ProductCard({
   const isNew =
     product.createdAt ? Date.now() - new Date(product.createdAt).getTime() < 30 * 24 * 60 * 60 * 1000 : false
 
-   const displayImage = imgError
-     ? '/images/device-placeholder.jpg'
-     : product.imageUrls?.[0] ?? '/images/device-placeholder.jpg'
+  const displayImage = imgError
+    ? '/images/device-placeholder.jpg'
+    : product.imageUrls?.[0] ?? '/images/device-placeholder.jpg'
 
   function handleAddToCart(e: React.MouseEvent) {
     e.preventDefault()
@@ -51,15 +51,15 @@ export function ProductCard({
 
     if (isOutOfStock) return
 
-addItem({
-        productId: product.id,
-        name: product.name,
-        slug: product.slug,
-        image: product.imageUrls?.[0] ?? '',
-        price: product.price,
-        quantity: 1,
-        stockQty: product.availableQty ?? product.stockQty ?? 0,
-      })
+    addItem({
+      productId: product.id,
+      name: product.name,
+      slug: product.slug,
+      image: product.imageUrls?.[0] ?? '',
+      price: product.price,
+      quantity: 1,
+      stockQty: product.availableQty ?? product.stockQty ?? 0,
+    })
     openCart()
   }
 
