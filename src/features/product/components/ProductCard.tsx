@@ -94,7 +94,7 @@ export function ProductCard({
     <Link
       href={`/store/product/${product.slug}`}
       className={cn(
-        "bg-white border border-[#E5E7EB]  overflow-hidden flex flex-col group relative transition-all duration-200 hover:border-[#F5820A]",
+        "bg-white border border-[#E5E7EB] rounded overflow-hidden flex flex-col group relative transition-all duration-200 hover:border-[#F5820A]",
         isOutOfStock && "opacity-80",
         className,
       )}
