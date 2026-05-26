@@ -4,9 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { FiHeart, FiShoppingCart, FiEye } from 'react-icons/fi'
-import { FaStar } from 'react-icons/fa'
 import { cn, formatPrice } from '@/lib/utils/format'
-import { Badge, CardBadge } from '@/components/ui/Badge'
+import { Badge } from '@/components/ui/Badge'
 import { useCartStore } from '@/store/cart'
 import { useAddToFavorites } from '@/lib/hooks/useAddToFavorites'
 import { type Product } from '@/lib/types/product'
@@ -14,36 +13,41 @@ import { getDiscountPercent, getStockStatus } from '@/lib/utils/productService'
 
 interface ProductCardProps {
   product: Product
-  /** 'grid' = standard card | 'list' = horizontal layout (future) */
-  layout?: 'grid'
-  showQuickView?: boolean
   onWishlistToggle?: (productId: string) => void
   isWishlisted?: boolean
   className?: string
+  onQuickView?: (product: Product) => void
 }
 
 export function ProductCard({
   product,
-  layout = 'grid',
-  showQuickView = true,
   onWishlistToggle,
   isWishlisted = false,
   className,
+  onQuickView,
 }: ProductCardProps) {
-  const [isHovered, setIsHovered] = useState(false)
+  const [hovered, setHovered] = useState(false)
   const [imgError, setImgError] = useState(false)
+
   const addItem = useCartStore((s) => s.addItem)
   const openCart = useCartStore((s) => s.openCart)
   const { handleAddToFavorites, isLoading: isFavLoading, isFavorited } = useAddToFavorites()
 
   const stockStatus = getStockStatus(product)
-  const discountPercent = getDiscountPercent(product.price, product.compareAtPrice)
-  const isOutOfStock = stockStatus === 'out_of_stock'
-  const isLowStock = stockStatus === 'low_stock'
-  const isNew =
-    product.createdAt ? Date.now() - new Date(product.createdAt).getTime() < 30 * 24 * 60 * 60 * 1000 : false
+  const discountPercent = getDiscountPercent(
+    product.price,
+    product.compareAtPrice
+  )
 
-  const displayImage = imgError
+  const isOutOfStock = stockStatus === 'out_of_stock'
+
+  const isNew =
+    product.createdAt
+      ? Date.now() - new Date(product.createdAt).getTime() <
+        30 * 24 * 60 * 60 * 1000
+      : false
+
+  const imageSrc = imgError
     ? '/images/device-placeholder.jpg'
     : product.imageUrls?.[0] ?? '/images/device-placeholder.jpg'
 
@@ -62,6 +66,7 @@ export function ProductCard({
       quantity: 1,
       stockQty: product.availableQty ?? product.stockQty ?? 0,
     })
+
     openCart()
   }
 
@@ -73,46 +78,124 @@ export function ProductCard({
     onWishlistToggle?.(product.id)
   }
 
+  function handleQuickView(e: React.MouseEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+
+    onQuickView?.(product)
+  }
+
   return (
     <Link
       href={`/store/product/${product.slug}`}
       className={cn(
-        'group relative flex flex-col bg-white border border-[#E5E7EB] rounded-card overflow-hidden',
-        'transition-all duration-200 hover:border-[#F5820A] hover:shadow-md',
-        isOutOfStock && 'opacity-90',
+        'bg-white border border-[#E5E7EB]  overflow-hidden flex flex-col group relative transition-all duration-200 hover:border-[#F5820A]',
+        isOutOfStock && 'opacity-80',
         className
       )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
-      {/* ── Image area ── */}
-      <div className="relative aspect-square bg-[#F5F5F5] overflow-hidden">
-        {/* Out of stock overlay */}
-        {isOutOfStock && (
-          <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] z-10 flex items-center justify-center">
-            <Badge variant="out_of_stock" />
-          </div>
-        )}
+      {/* Badge */}
+      {(discountPercent || isNew) && !isOutOfStock && (
+        <div className="absolute top-2 left-2 z-10">
+          {discountPercent ? (
+            <Badge
+              label={`-${discountPercent}%`}
+              variant="sale"
+            />
+          ) : (
+            <Badge
+              label="NEW"
+              variant="new"
+            />
+          )}
+        </div>
+      )}
 
-        {/* Badges */}
-        {discountPercent && !isOutOfStock && (
-          <CardBadge variant="sale" discountPercent={discountPercent} />
-        )}
-        {isNew && !discountPercent && !isOutOfStock && (
-          <CardBadge variant="new" />
-        )}
+      {/* Out of stock badge */}
+      {isOutOfStock && (
+        <div className="absolute top-2 left-2 z-10">
+          <Badge
+            label="Out of Stock"
+            variant="out_of_stock"
+          />
+        </div>
+      )}
 
-        {/* Product image */}
-        <Image
-          src={displayImage}
-          alt={product.name}
-          fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+      {/* Action icons */}
+      <div
+        className={cn(
+          'absolute top-2 right-2 z-10 flex flex-col gap-1.5 transition-all duration-200',
+          // Always visible on mobile
+          'opacity-100 translate-x-0 lg:opacity-0 lg:translate-x-2',
+          // Hover effect only on desktop
+          hovered && 'lg:opacity-100 lg:translate-x-0'
+        )}
+      >
+        {/* Wishlist */}
+        <button
+          onClick={handleWishlist}
           className={cn(
-            'object-contain p-4 transition-transform duration-300',
-            isHovered && !isOutOfStock && 'scale-105'
+            'w-7 h-7 bg-white rounded-full shadow flex items-center justify-center transition-colors',
+            isWishlisted
+              ? 'text-[#F5820A]'
+              : 'text-[#6B7280] hover:text-[#F5820A]'
+          )}
+          aria-label={
+            isWishlisted
+              ? 'Remove from wishlist'
+              : 'Add to wishlist'
+          }
+        >
+          <FiHeart
+            size={13}
+            className={isWishlisted ? 'fill-current' : ''}
+          />
+        </button>
+
+        {/* Add to cart */}
+        <button
+          onClick={handleAddToCart}
+          disabled={isOutOfStock}
+          className={cn(
+            'w-7 h-7 bg-white rounded-full shadow flex items-center justify-center transition-colors',
+            isOutOfStock
+              ? 'text-[#D1D5DB] cursor-not-allowed'
+              : 'text-[#6B7280] hover:text-[#F5820A]'
+          )}
+          aria-label="Add to cart"
+        >
+          <FiShoppingCart size={13} />
+        </button>
+
+        {/* Quick view */}
+        <button
+          onClick={handleQuickView}
+          className="w-7 h-7 bg-white rounded-full shadow flex items-center justify-center text-[#6B7280] hover:text-[#F5820A] transition-colors"
+          aria-label="Quick view"
+        >
+          <FiEye size={13} />
+        </button>
+      </div>
+
+      {/* Image */}
+      <div
+        className="overflow-hidden bg-white"
+        style={{ height: '160px' }}
+      >
+        <Image
+          src={imageSrc}
+          alt={product.name}
+          width={200}
+          height={200}
+          style={{ mixBlendMode: 'multiply' }}
+          className={cn(
+            'w-full h-full object-contain transition-transform duration-300 p-3',
+            !isOutOfStock && 'group-hover:scale-105'
           )}
           onError={() => setImgError(true)}
+          unoptimized
         />
 
         {/* Hover action buttons */}
@@ -158,70 +241,25 @@ export function ProductCard({
         )}
       </div>
 
-      {/* ── Product info ── */}
-      <div className="flex flex-col flex-1 p-3 gap-1.5">
-        {/* Brand */}
-        <p className="text-[11px] text-[#6B7280] uppercase tracking-wide font-medium">
-          {product.brandName}
+      {/* Info */}
+      <div className="p-3 flex flex-col gap-1 flex-1">
+        {/* Product name */}
+        <p className="text-[11px] text-[#111111] font-medium leading-snug line-clamp-2 min-h-8">
+          {product.name}
         </p>
 
-        {/* Name */}
-        <h3 className="text-sm text-[#111111] leading-snug line-clamp-2 group-hover:text-[#F5820A] transition-colors">
-          {product.name}
-        </h3>
-
-        {/* Rating */}
-        <div className="flex items-center gap-1">
-          <div className="flex items-center gap-0.5">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <FaStar
-                key={i}
-                size={11}
-                className={
-                  i < Math.round(product.averageRating)
-                    ? 'text-[#F59E0B]'
-                    : 'text-[#E5E7EB]'
-                }
-              />
-            ))}
-          </div>
-          <span className="text-[11px] text-[#6B7280]">({product.reviewCount})</span>
-        </div>
-
-        {/* Price row */}
-        <div className="flex items-baseline gap-2 mt-auto pt-1">
-          <span className="text-base font-bold text-[#F5820A]">
+        {/* Price */}
+        <div className="flex items-center gap-1.5 mt-0.5">
+          <span className="text-sm text-[#F5820A] font-semibold">
             {formatPrice(product.price)}
           </span>
+
           {product.compareAtPrice && (
-            <span className="text-xs text-[#6B7280] line-through">
+            <span className="text-[10px] text-[#9CA3AF] line-through">
               {formatPrice(product.compareAtPrice)}
             </span>
           )}
         </div>
-
-        {/* Low stock warning */}
-        {isLowStock && (
-          <p className="text-[11px] text-[#F59E0B] font-medium">
-            Only {(product.availableQty ?? product.stockQty ?? 0) - (product.reservedQty ?? 0)} left!
-          </p>
-        )}
-
-        {/* Add to cart button */}
-        <button
-          onClick={handleAddToCart}
-          disabled={isOutOfStock}
-          className={cn(
-            'mt-1 w-full h-9 rounded-sm text-sm font-semibold flex items-center justify-center gap-1.5 transition-all duration-200',
-            isOutOfStock
-              ? 'bg-[#F5F5F5] text-[#6B7280] cursor-not-allowed'
-              : 'bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white hover:shadow-md hover:shadow-orange-200 active:scale-[0.98]'
-          )}
-          aria-label={isOutOfStock ? 'Out of stock' : `Add ${product.name} to cart`}
-        >
-          <FiShoppingCart size={14} />
-          {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
-        </button>
       </div>
     </Link>
   )

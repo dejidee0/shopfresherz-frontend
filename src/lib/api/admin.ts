@@ -142,6 +142,17 @@ export interface UpdateProductRequest extends Partial<CreateProductRequest> {
 
 export type ProductDto = Product & Record<string, unknown>;
 
+export interface CategoryDto {
+  name: string;
+  slug: string;
+  parentId?: number;
+  imageUrl: string;
+  sortOrder?: number;
+  isActive: boolean;
+  metaTitle?: string;
+  metaDescription?: string;
+}
+
 export interface FlashDealDto {
   id: string;
   productId: string;
@@ -264,7 +275,11 @@ export interface ReviewDto {
   moderationStatus?: ReviewModerationStatus;
 }
 
-export type ReviewModerationStatus = "Pending" | "Approved" | "Rejected" | "Flagged";
+export type ReviewModerationStatus =
+  | "Pending"
+  | "Approved"
+  | "Rejected"
+  | "Flagged";
 
 export interface AdminReviewsFilters {
   page?: number;
@@ -367,8 +382,7 @@ export const adminApi = {
   getSettingsSection: <T = string>(
     token: string,
     section: AdminSettingsSection,
-  ) =>
-    api.get<T>(`/admin/settings/${encodeURIComponent(section)}`, { token }),
+  ) => api.get<T>(`/admin/settings/${encodeURIComponent(section)}`, { token }),
 
   updateSettingsSection: <T = unknown>(
     token: string,
@@ -386,10 +400,11 @@ export const adminApi = {
     section: AdminSettingsSection,
     payload: UpdateAdminSettingsSectionRequest<T>,
   ) =>
-    apiFetch<AdminSettings>(
-      `/admin/settings/${encodeURIComponent(section)}`,
-      { method: "PATCH", body: JSON.stringify(payload), token },
-    ),
+    apiFetch<AdminSettings>(`/admin/settings/${encodeURIComponent(section)}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+      token,
+    }),
 
   getOrders: (token: string, filters: AdminOrdersFilters = {}) =>
     api.get<PagedResult<OrderDto>>("/admin/orders", {
@@ -429,10 +444,7 @@ export const adminApi = {
   // TODO: add once backend implements moderation endpoints:
   // approveReview, rejectReview, flagReview, postReviewResponse
 
-  getNotifications: (
-    token: string,
-    filters: AdminNotificationsFilters = {},
-  ) =>
+  getNotifications: (token: string, filters: AdminNotificationsFilters = {}) =>
     api.get<AdminNotificationsResponse>("/admin/notifications", {
       token,
       params: {
@@ -443,11 +455,9 @@ export const adminApi = {
     }),
 
   markNotificationRead: (token: string, id: string) =>
-    api.put<void>(
-      `/admin/notifications/${encodeURIComponent(id)}/read`,
-      null,
-      { token },
-    ),
+    api.put<void>(`/admin/notifications/${encodeURIComponent(id)}/read`, null, {
+      token,
+    }),
 
   markAllNotificationsRead: (token: string) =>
     api.put<void>("/admin/notifications/read-all", null, { token }),
@@ -550,4 +560,15 @@ export const adminApi = {
 
   deleteCoupon: (token: string, id: number) =>
     api.delete<void>(`/coupons/${id}`, { token }),
+
+  createCategory: (token: string, payload: CategoryDto) =>
+    api.post<CategoryDto>("/categories", payload, { token }),
+
+  updateCategory: (token: string, id: number, payload: CategoryDto) =>
+    api.put<CategoryDto>(`/categories/${encodeURIComponent(id)}`, payload, {
+      token,
+    }),
+
+  deleteCategory: (token: string, id: number) =>
+    api.delete<void>(`/categories/${encodeURIComponent(id)}`, { token }),
 };
