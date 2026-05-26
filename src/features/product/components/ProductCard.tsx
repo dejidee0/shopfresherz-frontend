@@ -1,22 +1,23 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { FiHeart, FiShoppingCart, FiEye } from 'react-icons/fi'
-import { cn, formatPrice } from '@/lib/utils/format'
-import { Badge } from '@/components/ui/Badge'
-import { useCartStore } from '@/store/cart'
-import { useAddToFavorites } from '@/lib/hooks/useAddToFavorites'
-import { type Product } from '@/lib/types/product'
-import { getDiscountPercent, getStockStatus } from '@/lib/utils/productService'
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { FiHeart, FiShoppingCart, FiEye } from "react-icons/fi";
+import { cn, formatPrice } from "@/lib/utils/format";
+import { Badge } from "@/components/ui/Badge";
+import { useCartStore } from "@/store/cart";
+import { useAddToFavorites } from "@/lib/hooks/useAddToFavorites";
+import { type Product } from "@/lib/types/product";
+import { getDiscountPercent, getStockStatus } from "@/lib/utils/productService";
+import { toast } from "@/store/toast";
 
 interface ProductCardProps {
-  product: Product
-  onWishlistToggle?: (productId: string) => void
-  isWishlisted?: boolean
-  className?: string
-  onQuickView?: (product: Product) => void
+  product: Product;
+  onWishlistToggle?: (productId: string) => void;
+  isWishlisted?: boolean;
+  className?: string;
+  onQuickView?: (product: Product) => void;
 }
 
 export function ProductCard({
@@ -26,72 +27,76 @@ export function ProductCard({
   className,
   onQuickView,
 }: ProductCardProps) {
-  const [hovered, setHovered] = useState(false)
-  const [imgError, setImgError] = useState(false)
+  const [hovered, setHovered] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
-  const addItem = useCartStore((s) => s.addItem)
-  const openCart = useCartStore((s) => s.openCart)
-  const { handleAddToFavorites, isLoading: isFavLoading, isFavorited } = useAddToFavorites()
+  const addItem = useCartStore((s) => s.addItem);
+  const openCart = useCartStore((s) => s.openCart);
+  const {
+    handleAddToFavorites,
+    isLoading: isFavLoading,
+    isFavorited,
+  } = useAddToFavorites();
 
-  const stockStatus = getStockStatus(product)
+  const stockStatus = getStockStatus(product);
   const discountPercent = getDiscountPercent(
     product.price,
-    product.compareAtPrice
-  )
+    product.compareAtPrice,
+  );
 
-  const isOutOfStock = stockStatus === 'out_of_stock'
+  const isOutOfStock = stockStatus === "out_of_stock";
 
-  const isNew =
-    product.createdAt
-      ? Date.now() - new Date(product.createdAt).getTime() <
-        30 * 24 * 60 * 60 * 1000
-      : false
+  const isNew = product.createdAt
+    ? Date.now() - new Date(product.createdAt).getTime() <
+      30 * 24 * 60 * 60 * 1000
+    : false;
 
   const imageSrc = imgError
-    ? '/images/device-placeholder.jpg'
-    : product.imageUrls?.[0] ?? '/images/device-placeholder.jpg'
+    ? "/images/device-placeholder.jpg"
+    : (product.imageUrls?.[0] ?? "/images/device-placeholder.jpg");
 
   function handleAddToCart(e: React.MouseEvent) {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
 
-    if (isOutOfStock) return
+    if (isOutOfStock) return;
 
     addItem({
       productId: product.id,
       name: product.name,
       slug: product.slug,
-      image: product.imageUrls?.[0] ?? '',
+      image: product.imageUrls?.[0] ?? "",
       price: product.price,
       quantity: 1,
       stockQty: product.availableQty ?? product.stockQty ?? 0,
-    })
-
-    openCart()
+    });
+    toast.success("Product added to cart");
+    openCart();
   }
 
   function handleWishlist(e: React.MouseEvent) {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
     // Call the real favorites API; also fire the optional parent callback
-    handleAddToFavorites(product.id)
-    onWishlistToggle?.(product.id)
+    handleAddToFavorites(product.id);
+    toast.success("Product added to wishlist");
+    onWishlistToggle?.(product.id);
   }
 
   function handleQuickView(e: React.MouseEvent) {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
 
-    onQuickView?.(product)
+    onQuickView?.(product);
   }
 
   return (
     <Link
       href={`/store/product/${product.slug}`}
       className={cn(
-        'bg-white border border-[#E5E7EB]  overflow-hidden flex flex-col group relative transition-all duration-200 hover:border-[#F5820A]',
-        isOutOfStock && 'opacity-80',
-        className
+        "bg-white border border-[#E5E7EB]  overflow-hidden flex flex-col group relative transition-all duration-200 hover:border-[#F5820A]",
+        isOutOfStock && "opacity-80",
+        className,
       )}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -100,15 +105,9 @@ export function ProductCard({
       {(discountPercent || isNew) && !isOutOfStock && (
         <div className="absolute top-2 left-2 z-10">
           {discountPercent ? (
-            <Badge
-              label={`-${discountPercent}%`}
-              variant="sale"
-            />
+            <Badge label={`-${discountPercent}%`} variant="sale" />
           ) : (
-            <Badge
-              label="NEW"
-              variant="new"
-            />
+            <Badge label="NEW" variant="new" />
           )}
         </div>
       )}
@@ -116,42 +115,32 @@ export function ProductCard({
       {/* Out of stock badge */}
       {isOutOfStock && (
         <div className="absolute top-2 left-2 z-10">
-          <Badge
-            label="Out of Stock"
-            variant="out_of_stock"
-          />
+          <Badge label="Out of Stock" variant="out_of_stock" />
         </div>
       )}
 
       {/* Action icons */}
       <div
         className={cn(
-          'absolute top-2 right-2 z-10 flex flex-col gap-1.5 transition-all duration-200',
+          "absolute top-2 right-2 z-10 flex flex-col gap-1.5 transition-all duration-200",
           // Always visible on mobile
-          'opacity-100 translate-x-0 lg:opacity-0 lg:translate-x-2',
+          "opacity-100 translate-x-0 lg:opacity-0 lg:translate-x-2",
           // Hover effect only on desktop
-          hovered && 'lg:opacity-100 lg:translate-x-0'
+          hovered && "lg:opacity-100 lg:translate-x-0",
         )}
       >
         {/* Wishlist */}
         <button
           onClick={handleWishlist}
           className={cn(
-            'w-7 h-7 bg-white rounded-full shadow flex items-center justify-center transition-colors',
+            "w-7 h-7 bg-white rounded-full shadow flex items-center justify-center transition-colors",
             isWishlisted
-              ? 'text-[#F5820A]'
-              : 'text-[#6B7280] hover:text-[#F5820A]'
+              ? "text-[#F5820A]"
+              : "text-[#6B7280] hover:text-[#F5820A]",
           )}
-          aria-label={
-            isWishlisted
-              ? 'Remove from wishlist'
-              : 'Add to wishlist'
-          }
+          aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
-          <FiHeart
-            size={13}
-            className={isWishlisted ? 'fill-current' : ''}
-          />
+          <FiHeart size={13} className={isWishlisted ? "fill-current" : ""} />
         </button>
 
         {/* Add to cart */}
@@ -159,10 +148,10 @@ export function ProductCard({
           onClick={handleAddToCart}
           disabled={isOutOfStock}
           className={cn(
-            'w-7 h-7 bg-white rounded-full shadow flex items-center justify-center transition-colors',
+            "w-7 h-7 bg-white rounded-full shadow flex items-center justify-center transition-colors",
             isOutOfStock
-              ? 'text-[#D1D5DB] cursor-not-allowed'
-              : 'text-[#6B7280] hover:text-[#F5820A]'
+              ? "text-[#D1D5DB] cursor-not-allowed"
+              : "text-[#6B7280] hover:text-[#F5820A]",
           )}
           aria-label="Add to cart"
         >
@@ -180,65 +169,20 @@ export function ProductCard({
       </div>
 
       {/* Image */}
-      <div
-        className="overflow-hidden bg-white"
-        style={{ height: '160px' }}
-      >
+      <div className="overflow-hidden bg-white" style={{ height: "160px" }}>
         <Image
           src={imageSrc}
           alt={product.name}
           width={200}
           height={200}
-          style={{ mixBlendMode: 'multiply' }}
+          style={{ mixBlendMode: "multiply" }}
           className={cn(
-            'w-full h-full object-contain transition-transform duration-300 p-3',
-            !isOutOfStock && 'group-hover:scale-105'
+            "w-full h-full object-contain transition-transform duration-300 p-3",
+            !isOutOfStock && "group-hover:scale-105",
           )}
           onError={() => setImgError(true)}
           unoptimized
         />
-
-        {/* Hover action buttons */}
-        {showQuickView && (
-          <div
-            className={cn(
-              'absolute top-2 right-2 flex flex-col gap-1.5 transition-all duration-200',
-              isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'
-            )}
-          >
-            {/* Wishlist */}
-            <button
-              onClick={handleWishlist}
-              disabled={isFavLoading(product.id)}
-              className={cn(
-                'w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors',
-                isFavorited(product.id) || isWishlisted
-                  ? 'bg-[#F5820A] text-white'
-                  : 'bg-white text-[#6B7280] hover:bg-[#F5820A] hover:text-white',
-                isFavLoading(product.id) && 'opacity-50 cursor-wait'
-              )}
-              aria-label={isFavorited(product.id) || isWishlisted ? 'Added to favorites' : 'Add to favorites'}
-            >
-              <FiHeart
-                size={14}
-                className={(isFavorited(product.id) || isWishlisted) ? 'fill-current' : ''}
-              />
-            </button>
-
-            {/* Quick view */}
-            <button
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                // TODO: open quick view modal
-              }}
-              className="w-8 h-8 rounded-full bg-white text-[#6B7280] hover:bg-[#F5820A] hover:text-white flex items-center justify-center shadow-sm transition-colors"
-              aria-label="Quick view"
-            >
-              <FiEye size={14} />
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Info */}
@@ -262,5 +206,5 @@ export function ProductCard({
         </div>
       </div>
     </Link>
-  )
+  );
 }

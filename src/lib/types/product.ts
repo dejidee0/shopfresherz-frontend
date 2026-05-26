@@ -42,7 +42,7 @@ export interface CategoryItem {
   name: string;
   slug: string;
   // icon?: string;
-  imageUrl?: string;
+  imageUrl: string;
   parentId?: number;
   // children?: CategoryItem[];
   // hasChildren?: boolean;
