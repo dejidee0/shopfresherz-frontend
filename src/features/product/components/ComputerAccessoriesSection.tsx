@@ -89,8 +89,8 @@ function ProductCard({ product }: { product: AccessoriesProduct }) {
 
       {/* Heart / Add to Favorites — appears on hover */}
       <div
-        className={`absolute top-2 right-2 z-20 transition-all duration-200 ${
-          hovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-2"
+        className={`absolute top-2 right-2 z-20 translate-x-0 opacity-100 transition-all duration-200 ${
+          hovered ? "lg:translate-x-0 lg:opacity-100" : "lg:translate-x-2 lg:opacity-0"
         }`}
       >
         <button

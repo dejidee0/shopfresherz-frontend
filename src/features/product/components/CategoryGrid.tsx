@@ -155,17 +155,17 @@ function CategoryItem({ category }: { category: CategoryWithImage }) {
       )}
     >
       {/* Icon circle */}
-      <div className="w-20 h-20 md:w-24 md:h-24  bg-[#F5F5F5] border-2 border-transparent group-hover:border-[#F5820A] transition-all duration-200 overflow-hidden flex items-center justify-center">
+      <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-[#F5F5F5] border-2 border-transparent group-hover:border-[#F5820A] transition-all duration-200 overflow-hidden flex items-center justify-center">
         {category.imageUrl ? (
           <Image
             src={category.imageUrl}
             alt={category.name}
             width={100}
             height={100}
-            className="w-full h-full "
+            className="w-full h-full rounded-full "
           />
         ) : (
-          <div className="h-full w-full flex items-center justify-center bg-linear-to-r from-[#F5820A] to-[#E06B00] p-2 text-white text-center text-xs font-bold drop-shadow-2xl">
+          <div className="h-full w-full rounded-full flex items-center justify-center bg-linear-to-r from-[#F5820A] to-[#E06B00] p-2 text-white text-center text-xs font-bold drop-shadow-2xl">
             {/* {category.name.slice(0, 1).toUpperCase()} */}
             {category.name}
           </div>
