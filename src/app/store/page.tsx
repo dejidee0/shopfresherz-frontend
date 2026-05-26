@@ -976,7 +976,7 @@ function ProductCard({ product }: { product: HomeProduct }) {
 
       {/* Wishlist + action icons — top right, appear on hover */}
       <div
-        className={`absolute top-2 right-2 z-20 flex flex-col gap-1.5 transition-all duration-200 ${hovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-2"}`}
+        className={`absolute top-2 right-2 z-20 flex translate-x-0 flex-col gap-1.5 opacity-100 transition-all duration-200 ${hovered ? "lg:translate-x-0 lg:opacity-100" : "lg:translate-x-2 lg:opacity-0"}`}
       >
         {/* Heart / Add to Favorites */}
         <button
@@ -999,12 +999,20 @@ function ProductCard({ product }: { product: HomeProduct }) {
             className={isFavorited(product.id) ? "fill-current" : ""}
           />
         </button>
-        <button className="w-7 h-7 bg-white rounded-full shadow flex items-center justify-center text-[#6B7280] hover:text-[#F5820A] transition-colors">
+        {/* <button className="w-7 h-7 bg-white rounded-full shadow flex items-center justify-center text-[#6B7280] hover:text-[#F5820A] transition-colors">
           <FiShoppingCart size={13} />
-        </button>
+        </button> */}
+        <Link href={`/store/product/${product.slug}`} className="w-7 h-7 bg-white rounded-full shadow flex items-center justify-center text-[#6B7280] hover:text-[#F5820A] transition-colors">
+          <FiShoppingCart size={13} />
+        </Link>
+        
+        <Link
+        href={`/store/product/${product.slug}`}>
+       
         <button className="w-7 h-7 bg-white rounded-full shadow flex items-center justify-center text-[#6B7280] hover:text-[#F5820A] transition-colors">
           <FiEye size={13} />
         </button>
+         </Link>
       </div>
 
       <Link href={`/store/product/${product.slug}`} className="flex flex-col flex-1 z-10">
@@ -1406,6 +1414,7 @@ export default function HomePage() {
       {/* {flashDeals.length > 0 && (
         <FlashDealsStrip deals={flashDeals} sessionEndTime={flashDealsEndTime} />
       )} */}
+      
       {/* ─── 6. BEST DEALS ──────────────────────────────────────────────── */}
 
       <div className="bg-white py-8">
