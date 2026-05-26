@@ -227,7 +227,7 @@ export function CartDrawer() {
               </Link>
               <button
                 onClick={closeCart}
-                className="w-full h-11 border border-[#E5E7EB] text-[#111111] font-semibold rounded-btn text-sm hover:bg-[#F5F5F5] transition-colors"
+                className="w-full h-11 border border-[#E5E7EB] text-[#111111] font-semibold rounded text-sm hover:bg-[#F5F5F5] transition-colors"
               >
                 Continue Shopping
               </button>

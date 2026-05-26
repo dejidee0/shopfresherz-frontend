@@ -25,6 +25,7 @@ export function MegaMenu({ isOpen, onClose }: MegaMenuProps) {
           id: -1,
           name: "All Categories",
           slug: "all",
+          imageUrl: "",
         };
 
         setCategories([allCategory, ...topCategories]);

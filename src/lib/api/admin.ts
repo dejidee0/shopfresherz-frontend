@@ -550,7 +550,7 @@ export const adminApi = {
   deleteFlashDeal: (token: string, id: string) =>
     api.delete<void>(`/flash-deals/${encodeURIComponent(id)}`, { token }),
 
-  getCoupons: () => api.get<CouponDto[]>("/coupons"),
+  getCoupons: (token: string) => api.get<CouponDto[]>("/coupons", { token }),
 
   createCoupon: (token: string, payload: CreateCouponRequest) =>
     api.post<CouponDto>("/coupons", payload, { token }),

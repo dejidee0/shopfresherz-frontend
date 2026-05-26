@@ -369,9 +369,11 @@ export function useDeleteFlashDeal() {
 // ─── Coupon Management ────────────────────────────────────────────────────────
 
 export function useCoupons() {
+  const { accessToken } = useAuthStore()
+
   return useQuery({
     queryKey: ['coupons'],
-    queryFn: () => adminApi.getCoupons(),
+    queryFn: () => adminApi.getCoupons(accessToken!),
   })
 }
 

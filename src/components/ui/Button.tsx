@@ -55,7 +55,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={isDisabled}
         className={cn(
           // Base
-          'inline-flex items-center justify-center font-semibold rounded-btn transition-all duration-200 select-none',
+          'inline-flex items-center justify-center font-semibold rounded transition-all duration-200 select-none',
           // Variant
           variantClasses[variant],
           // Size

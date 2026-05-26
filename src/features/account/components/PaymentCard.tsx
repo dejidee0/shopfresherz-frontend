@@ -12,65 +12,76 @@ interface PaymentCardProps {
   onEdit: (id: string) => void
 }
 
-const CARD_THEMES: Record<PaymentMethod['type'], string> = {
+type CardType = 'visa' | 'mastercard' | 'verve'
+
+const CARD_THEMES: Record<CardType, string> = {
   visa:       'bg-gradient-to-br from-[#1A1A2E] to-[#16213E]',
   mastercard: 'bg-gradient-to-br from-[#1B4332] to-[#2D6A4F]',
   verve:      'bg-gradient-to-br from-[#6B2737] to-[#8B2FC9]',
 }
 
-const CARD_LOGO: Record<PaymentMethod['type'], React.ReactNode> = {
+const CARD_LOGO: Record<CardType, React.ReactNode> = {
   visa:       <SiVisa size={36} className="text-white" />,
   mastercard: <SiMastercard size={24} className="text-white" />,
-  verve:      <span className="text-white font-bold text-sm">VERVE</span>,
+  verve:      <span className="text-white font-bold text-sm tracking-widest">VERVE</span>,
+}
+
+function normaliseType(raw: string): CardType {
+  const lower = raw?.toLowerCase()
+  if (lower?.includes('master')) return 'mastercard'
+  if (lower?.includes('verve'))  return 'verve'
+  return 'visa'
 }
 
 export function PaymentCard({ card, onDelete, onEdit }: PaymentCardProps) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied]     = useState(false)
 
-  function copyLast4() {
-    navigator.clipboard.writeText(`**** **** **** ${card.last4}`)
+  // API returns full cardNumber — derive last 4 digits
+  const last4 = card.cardNumber?.slice(-4) ?? '••••'
+  const type  = normaliseType(card.type)
+
+  function copyNumber() {
+    navigator.clipboard.writeText(`**** **** **** ${last4}`)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
   return (
-    <div
-      className={cn(
-        'relative rounded-xl p-5 text-white min-w-60 w-65 shrink-0 select-none',
-        CARD_THEMES[card.type]
-      )}
-    >
+    <div className={cn('relative rounded-xl p-5 text-white min-w-60 w-65 shrink-0 select-none', CARD_THEMES[type])}>
+
       {/* Balance */}
       {card.balance !== undefined && (
         <p className="text-lg font-bold mb-4">
-          ${card.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} {card.currency ?? 'USD'}
+          ₦{card.balance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}{' '}
+          <span className="text-xs font-normal opacity-70">{card.currency ?? 'NGN'}</span>
         </p>
       )}
 
       {/* Card number */}
       <div className="mb-4">
-        <p className="text-[10px] text-white/60 uppercase tracking-wider mb-1">
-          Card Number
-        </p>
+        <p className="text-[10px] text-white/60 uppercase tracking-wider mb-1">Card Number</p>
         <div className="flex items-center gap-2 text-sm font-mono tracking-widest">
           <span>**** **** ****</span>
-          <span>{card.last4}</span>
-          <button
-            onClick={copyLast4}
-            className="text-white/60 hover:text-white transition-colors"
-            aria-label="Copy card number"
-          >
+          <span>{last4}</span>
+          <button onClick={copyNumber} className="text-white/60 hover:text-white transition-colors" aria-label="Copy">
             <FiCopy size={12} className={copied ? 'text-green-400' : ''} />
           </button>
         </div>
       </div>
 
-      {/* Bottom row: logo + cardholder */}
+      {/* Cardholder + logo */}
       <div className="flex items-center justify-between">
-        {CARD_LOGO[card.type]}
+        {CARD_LOGO[type]}
         <span className="text-xs text-white/80 font-medium">{card.cardholderName}</span>
       </div>
+
+      {/* Default badge */}
+      {card.isDefault && (
+        <span className="absolute bottom-3 left-5 text-[9px] font-bold uppercase tracking-widest text-white/50">
+          Default
+        </span>
+      )}
 
       {/* ··· menu */}
       <div className="absolute top-3 right-3">
@@ -85,20 +96,18 @@ export function PaymentCard({ card, onDelete, onEdit }: PaymentCardProps) {
         {menuOpen && (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-            <div className="absolute right-0 top-8 bg-white rounded-card shadow-lg border border-[#E5E7EB] z-20 py-1 min-w-32.5">
+            <div className="absolute right-0 top-8 bg-white rounded-card shadow-lg border border-[#E5E7EB] z-20 py-1 min-w-32">
               <button
                 onClick={() => { onEdit(card.id); setMenuOpen(false) }}
                 className="flex items-center gap-2.5 w-full px-4 py-2 text-sm text-[#111111] hover:bg-orange-50 hover:text-[#F5820A] transition-colors"
               >
-                <FiEdit2 size={13} />
-                Edit Card
+                <FiEdit2 size={13} /> Edit Card
               </button>
               <button
                 onClick={() => { onDelete(card.id); setMenuOpen(false) }}
                 className="flex items-center gap-2.5 w-full px-4 py-2 text-sm text-[#EF4444] hover:bg-red-50 transition-colors"
               >
-                <FiTrash2 size={13} />
-                Delete Card
+                <FiTrash2 size={13} /> Delete Card
               </button>
             </div>
           </>
