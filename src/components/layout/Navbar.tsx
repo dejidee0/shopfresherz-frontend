@@ -307,10 +307,10 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-5 text-sm text-[#111111]">
-            <Link href="#" className="flex items-center gap-1.5 hover:text-[#F5820A] transition-colors">
+            <Link href="/store/support" className="flex items-center gap-1.5 hover:text-[#F5820A] transition-colors">
               <FiHeadphones size={15} /> Customer Support
             </Link>
-            <Link href="#" className="flex items-center gap-1.5 hover:text-[#F5820A] transition-colors">
+            <Link href="/store/need-help" className="flex items-center gap-1.5 hover:text-[#F5820A] transition-colors">
               <FiHelpCircle size={15} /> Need Help
             </Link>
           </div>
@@ -385,8 +385,8 @@ export function Navbar() {
               <nav className="py-2 border-b border-gray-100">
                 {[
                   { id: 1, href: '/store',          icon: FiHome,       label: 'Home'             },
-                  { id: 2, href: '#',               icon: FiHeadphones, label: 'Customer Support' },
-                  { id: 3, href: '#',               icon: FiHelpCircle, label: 'Need Help'        },
+                  { id: 2, href: '/store/support',   icon: FiHeadphones, label: 'Customer Support' },
+                  { id: 3, href: '/store/need-help', icon: FiHelpCircle, label: 'Need Help'        },
                   { id: 4, href: '/account/orders', icon: FiMapPin,     label: 'Track Order'      },
                 ].map(({ id, href, icon: Icon, label }) => (
                   <Link

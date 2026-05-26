@@ -178,4 +178,69 @@ export const productsApi = {
   getBrands: () => api.get<Brands[]>("/brands"),
 
   getBanners: () => api.get<Banner[]>("/banners"),
+
+  /** Best Deal promo card — single featured product for the homepage */
+  getBestDealPromo: () =>
+    api.get<{
+      id: string
+      imageUrl: string
+      name: string
+      slug?: string
+      rating: number
+      originalPrice: string
+      salePrice: string
+      description: string
+      badge: string
+    }>("/promotions/best-deal"),
+
+  /** Laptop promo section — bottom featured product banner */
+  getLaptopPromo: () =>
+    api.get<{
+      id: string
+      slug?: string
+      title: string
+      imageUrl: string
+      price?: string
+      salePrice?: string
+      badge?: string
+      ctaText: string
+    }>("/promotions/laptop-promo"),
+
+  /** Computer Accessories sidebar promo card */
+  getAccessoriesPromo: () =>
+    api.get<{
+      id: string
+      slug?: string
+      title: string
+      imageUrl: string
+      price?: string
+      ctaText: string
+    }>("/promotions/accessories-promo"),
+
+  /** Promotion section banner — two-card promo strip */
+  getPromoBanner: () =>
+    api.get<{
+      id: string
+      title: string
+      subtitle: string
+      ctaText: string
+      imageUrl: string
+      imageAlt: string
+      badge: string
+    }>("/promotions/promo-banner"),
+
+  /** Hero promo cards — list used for the two side cards in HeroBanner */
+  getHeroPromos: () =>
+    api.get<Array<{
+      id: string
+      title: string
+      tag?: string
+      badge?: string
+      ctaText: string
+      linkUrl: string
+      imageUrl: string
+      subTitle?: string
+      price?: string
+      sortOrder: number
+    }>>("/promotions/hero"),
 };

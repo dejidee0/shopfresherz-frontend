@@ -8,6 +8,7 @@ import { FaStar } from 'react-icons/fa'
 import { cn, formatPrice } from '@/lib/utils/format'
 import { Badge, CardBadge } from '@/components/ui/Badge'
 import { useCartStore } from '@/store/cart'
+import { useAddToFavorites } from '@/lib/hooks/useAddToFavorites'
 import { type Product } from '@/lib/types/product'
 import { getDiscountPercent, getStockStatus } from '@/lib/utils/productService'
 
@@ -33,6 +34,7 @@ export function ProductCard({
   const [imgError, setImgError] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
   const openCart = useCartStore((s) => s.openCart)
+  const { handleAddToFavorites, isLoading: isFavLoading, isFavorited } = useAddToFavorites()
 
   const stockStatus = getStockStatus(product)
   const discountPercent = getDiscountPercent(product.price, product.compareAtPrice)
@@ -66,6 +68,8 @@ export function ProductCard({
   function handleWishlist(e: React.MouseEvent) {
     e.preventDefault()
     e.stopPropagation()
+    // Call the real favorites API; also fire the optional parent callback
+    handleAddToFavorites(product.id)
     onWishlistToggle?.(product.id)
   }
 
@@ -122,15 +126,20 @@ export function ProductCard({
             {/* Wishlist */}
             <button
               onClick={handleWishlist}
+              disabled={isFavLoading(product.id)}
               className={cn(
                 'w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors',
-                isWishlisted
+                isFavorited(product.id) || isWishlisted
                   ? 'bg-[#F5820A] text-white'
-                  : 'bg-white text-[#6B7280] hover:bg-[#F5820A] hover:text-white'
+                  : 'bg-white text-[#6B7280] hover:bg-[#F5820A] hover:text-white',
+                isFavLoading(product.id) && 'opacity-50 cursor-wait'
               )}
-              aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+              aria-label={isFavorited(product.id) || isWishlisted ? 'Added to favorites' : 'Add to favorites'}
             >
-              <FiHeart size={14} className={isWishlisted ? 'fill-current' : ''} />
+              <FiHeart
+                size={14}
+                className={(isFavorited(product.id) || isWishlisted) ? 'fill-current' : ''}
+              />
             </button>
 
             {/* Quick view */}

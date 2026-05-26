@@ -90,7 +90,7 @@ export function CategoryGrid({
             id: c.id,
             name: c.name,
             slug: c.slug,
-            imageUrl: c.image,
+            imageUrl: c.imageUrl ?? c.image ?? null,
           })),
         );
       } catch (error) {
@@ -162,7 +162,7 @@ function CategoryItem({ category }: { category: CategoryWithImage }) {
             alt={category.name}
             width={100}
             height={100}
-            className="w-full h-full object-contain"
+            className="w-full h-full "
           />
         ) : (
           <div className="h-full w-full flex items-center justify-center bg-linear-to-r from-[#F5820A] to-[#E06B00] p-2 text-white text-center text-xs font-bold drop-shadow-2xl">

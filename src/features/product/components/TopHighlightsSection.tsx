@@ -5,12 +5,14 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { productsApi } from '@/lib/api/products';
 import type { FlashDeal, Product as ApiProduct } from '@/lib/types/product';
 
 // Types for structural safety
 interface Product {
   id: string;
+  slug: string;
   title: string;
   price: string;
   imageUrl: string;
@@ -29,6 +31,7 @@ function toPriceLabel(price?: number | null) {
 function mapFlashDealToItem(value: FlashDeal): Product {
   return {
     id: value.id,
+    slug: value.productSlug,
     title: value.productName,
     price: toPriceLabel(value.salePrice),
     imageUrl: value.productImageUrl ?? '',
@@ -38,6 +41,7 @@ function mapFlashDealToItem(value: FlashDeal): Product {
 function mapApiProductToItem(value: ApiProduct): Product {
   return {
     id: value.id,
+    slug: value.slug,
     title: value.name,
     price: toPriceLabel(value.price),
     imageUrl: value.primaryImageUrl ?? value.imageUrls?.[0] ?? '',
@@ -47,32 +51,35 @@ function mapApiProductToItem(value: ApiProduct): Product {
 // 1. Internal Product Card Component
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
   return (
-    <div className="flex items-center gap-4 p-4 border border-gray-100 rounded-sm bg-white hover:shadow-sm transition-shadow duration-200 h-[75px]">
+    <Link
+      href={`/store/product/${product.slug}`}
+      className="flex items-center gap-4 p-4 border border-gray-100 rounded-sm bg-white hover:shadow-sm hover:border-[#F5820A] transition-all duration-200 h-[75px] group"
+    >
       {/* Aspect-ratio safe image container */}
-      <div className="relative w-16 h-16   rounded bg-[]">
+      <div className="relative w-16 h-16 shrink-0 rounded bg-[#F5F5F5] overflow-hidden">
         {product.imageUrl ? (
           <Image
             src={product.imageUrl}
             alt={product.title}
             width={64}
             height={64}
-            className=" h-full w-full"
+            className="h-full w-full object-contain transition-transform duration-200 group-hover:scale-105"
           />
         ) : (
-          <div className="h-10 w-10 rounded bg-[#E5E7EB]" />
+          <div className="h-full w-full rounded bg-[#E5E7EB]" />
         )}
       </div>
 
       {/* Content details side */}
       <div className="flex flex-col flex-1 min-w-0">
-        <h3 className="text-xs font-normal text-gray-800 line-clamp-2 leading-tight mb-1.5">
+        <h3 className="text-xs font-normal text-gray-800 line-clamp-2 leading-tight mb-1.5 group-hover:text-[#F5820A] transition-colors">
           {product.title}
         </h3>
         <span className="text-sm font-semibold text-orange-500">
           {product.price}
         </span>
       </div>
-    </div>
+    </Link>
   );
 };
 
