@@ -76,9 +76,9 @@ const FALLBACK_SLIDES: HeroSlide[] = [
   },
 ]
 
-/* ─── Promo card data ─────────────────────────────────────────────── */
+/* ─── Promo card fallbacks ────────────────────────────────────────── */
 
-const PROMO_CARD_1 = {
+const PROMO_CARD_1_FALLBACK = {
   tag: 'SUMMER SALES',
   title: 'New Google\nPixel 6 Pro',
   badge: '29% OFF',
@@ -87,7 +87,7 @@ const PROMO_CARD_1 = {
   imageUrl: '/images/categories/pixel.png',
 }
 
-const PROMO_CARD_2 = {
+const PROMO_CARD_2_FALLBACK = {
   title: 'Xiaomi\nFlipBuds Pro',
   price: '₦10,000',
   ctaText: 'SHOP NOW',
@@ -101,6 +101,8 @@ export function HeroBanner() {
   const [current, setCurrent] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const [slides, setSlides] = useState<HeroSlide[]>(FALLBACK_SLIDES)
+  const [promoCard1, setPromoCard1] = useState(PROMO_CARD_1_FALLBACK)
+  const [promoCard2, setPromoCard2] = useState(PROMO_CARD_2_FALLBACK)
   const touchStartX = useRef<number | null>(null)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -110,10 +112,11 @@ export function HeroBanner() {
   const prev = useCallback(() => setCurrent((c) => (c - 1 + total) % total), [total])
   const goTo = useCallback((i: number) => setCurrent(i), [])
 
-  /* Fetch real banners */
+  /* Fetch real banners + hero promo cards */
   useEffect(() => {
     async function fetchBanners() {
       try {
+        // Main slider — existing /banners endpoint
         const banners = await productsApi.getBanners()
         if (banners.length > 0) {
           setSlides(banners.map(bannerToSlide))
@@ -123,7 +126,47 @@ export function HeroBanner() {
         // static fallback already in state
       }
     }
+
+    async function fetchHeroPromos() {
+      try {
+        const promos = await productsApi.getHeroPromos()
+        if (!promos || promos.length === 0) return
+
+        // Sort by sortOrder so admin controls the order
+        const sorted = [...promos].sort((a, b) => a.sortOrder - b.sortOrder)
+
+        const p1 = sorted[0]
+        if (p1) {
+          setPromoCard1({
+            tag: p1.tag ?? PROMO_CARD_1_FALLBACK.tag,
+            title: p1.title,
+            badge: p1.badge ?? PROMO_CARD_1_FALLBACK.badge,
+            ctaText: p1.ctaText ?? PROMO_CARD_1_FALLBACK.ctaText,
+            linkUrl: p1.linkUrl ?? PROMO_CARD_1_FALLBACK.linkUrl,
+            imageUrl: p1.imageUrl || PROMO_CARD_1_FALLBACK.imageUrl,
+          })
+        }
+
+        const p2 = sorted[1]
+        if (p2) {
+          setPromoCard2({
+            title: p2.title,
+            price: p2.price ?? p2.subTitle ?? PROMO_CARD_2_FALLBACK.price,
+            ctaText: p2.ctaText ?? PROMO_CARD_2_FALLBACK.ctaText,
+            linkUrl: p2.linkUrl ?? PROMO_CARD_2_FALLBACK.linkUrl,
+            imageUrl: p2.imageUrl || PROMO_CARD_2_FALLBACK.imageUrl,
+          })
+        }
+
+        console.log('[HeroBanner] ✅ Hero promos loaded:', sorted.length, 'items')
+      } catch (err) {
+        console.error('[HeroBanner] ❌ Failed to load hero promos:', err)
+        // fallbacks already in state
+      }
+    }
+
     fetchBanners()
+    fetchHeroPromos()
   }, [])
 
   /* Auto-play */
@@ -285,7 +328,7 @@ export function HeroBanner() {
           </div>
 
           {/* Dot indicators — bottom-left */}
-          <div className="absolute bottom-3 sm:bottom-4 left-4 sm:left-6 lg:left-10 flex items-center gap-1.5 z-10">
+          <div className="absolute bottom-3  sm:bottom-4 left-[35px] sm:left-6 lg:left-10 flex items-center gap-1.5 z-10">
             {slides.map((_, i) => (
               <button
                 key={i}
@@ -317,7 +360,7 @@ export function HeroBanner() {
 
           {/* ── Card 1: Google Pixel 6 Pro (Dark) ── */}
           <Link
-            href={PROMO_CARD_1.linkUrl}
+            href={promoCard1.linkUrl}
             className="
               group relative
               bg-[#0B0C0E] rounded-xl lg:rounded-2xl overflow-hidden
@@ -333,19 +376,19 @@ export function HeroBanner() {
           >
             {/* Badge */}
             <span className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 lg:top-4 lg:right-4 bg-[#7B2FBE] text-white text-[9px] sm:text-[10px] font-extrabold px-2 py-1 rounded shadow-lg z-20">
-              {PROMO_CARD_1.badge}
+              {promoCard1.badge}
             </span>
 
             {/* Text — bottom-left */}
             <div className="absolute bottom-0 left-0 z-10 p-3 sm:p-4 lg:p-7 flex flex-col justify-end">
               <p className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold uppercase tracking-widest text-[#F5820A] mb-0.5 sm:mb-1">
-                {PROMO_CARD_1.tag}
+                {promoCard1.tag}
               </p>
               <h3 className="text-white text-sm sm:text-base lg:text-2xl font-extrabold leading-tight whitespace-pre-line mb-2 sm:mb-3 tracking-tight">
-                {PROMO_CARD_1.title}
+                {promoCard1.title}
               </h3>
               <span className="inline-flex items-center gap-1.5 self-start bg-white text-[#0B1528] text-[9px] sm:text-[10px] lg:text-xs font-bold px-3 py-1.5 sm:px-4 sm:py-2 lg:px-5 lg:py-2.5 rounded-lg shadow-md group-hover:bg-[#F3F4F6] transition-all duration-300">
-                {PROMO_CARD_1.ctaText}
+                {promoCard1.ctaText}
                 <FiArrowRight size={10} className="stroke-[2.5]" />
               </span>
             </div>
@@ -353,8 +396,8 @@ export function HeroBanner() {
             {/* Image — right side */}
             <div className="absolute hidden sm:block md:right-0 md:bottom-0 w-[55%] h-[110%] md:pointer-events-none md:select-none z-10">
               <Image
-                src={PROMO_CARD_1.imageUrl}
-                alt={PROMO_CARD_1.title}
+                src={promoCard1.imageUrl}
+                alt={promoCard1.title}
                 fill
                 sizes="(max-width: 640px) 30vw, 25vw"
                 className="object-contain object-right-bottom"
@@ -365,7 +408,7 @@ export function HeroBanner() {
 
           {/* ── Card 2: Xiaomi FlipBuds Pro (Light) ── */}
           <Link
-            href={PROMO_CARD_2.linkUrl}
+            href={promoCard2.linkUrl}
             className="
               group
               bg-[#F5F5F5] border border-neutral-200/80 rounded-xl lg:rounded-2xl overflow-hidden
@@ -388,8 +431,8 @@ export function HeroBanner() {
             ">
               <div className="relative w-full h-full">
                 <Image
-                  src={PROMO_CARD_2.imageUrl}
-                  alt={PROMO_CARD_2.title}
+                  src={promoCard2.imageUrl}
+                  alt={promoCard2.title}
                   fill
                   sizes="(max-width: 640px) 25vw, 150px"
                   className="object-contain object-center"
@@ -408,13 +451,13 @@ export function HeroBanner() {
               lg:flex-1 lg:p-5 xl:p-6 lg:pl-4
             ">
               <h3 className="text-neutral-950 text-xs sm:text-sm lg:text-xl font-extrabold leading-tight whitespace-pre-line mb-0.5 sm:mb-1">
-                {PROMO_CARD_2.title}
+                {promoCard2.title}
               </h3>
               <p className="text-[#F5820A] text-xs sm:text-sm lg:text-lg font-extrabold mb-2 sm:mb-3">
-                {PROMO_CARD_2.price}
+                {promoCard2.price}
               </p>
               <span className="inline-flex items-center gap-1.5 self-start bg-[#F5820A] text-white text-[9px] sm:text-[10px] lg:text-xs font-bold px-3 py-1.5 sm:px-4 sm:py-2 lg:px-5 lg:py-2.5 rounded-lg shadow-md group-hover:bg-[#E06B00] transition-all duration-300">
-                {PROMO_CARD_2.ctaText}
+                {promoCard2.ctaText}
                 <FiArrowRight size={10} className="stroke-[2.5]" />
               </span>
             </div>

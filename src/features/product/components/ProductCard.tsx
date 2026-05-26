@@ -7,6 +7,7 @@ import { FiHeart, FiShoppingCart, FiEye } from 'react-icons/fi'
 import { cn, formatPrice } from '@/lib/utils/format'
 import { Badge } from '@/components/ui/Badge'
 import { useCartStore } from '@/store/cart'
+import { useAddToFavorites } from '@/lib/hooks/useAddToFavorites'
 import { type Product } from '@/lib/types/product'
 import { getDiscountPercent, getStockStatus } from '@/lib/utils/productService'
 
@@ -30,6 +31,7 @@ export function ProductCard({
 
   const addItem = useCartStore((s) => s.addItem)
   const openCart = useCartStore((s) => s.openCart)
+  const { handleAddToFavorites, isLoading: isFavLoading, isFavorited } = useAddToFavorites()
 
   const stockStatus = getStockStatus(product)
   const discountPercent = getDiscountPercent(
@@ -71,7 +73,8 @@ export function ProductCard({
   function handleWishlist(e: React.MouseEvent) {
     e.preventDefault()
     e.stopPropagation()
-
+    // Call the real favorites API; also fire the optional parent callback
+    handleAddToFavorites(product.id)
     onWishlistToggle?.(product.id)
   }
 
@@ -194,6 +197,48 @@ export function ProductCard({
           onError={() => setImgError(true)}
           unoptimized
         />
+
+        {/* Hover action buttons */}
+        {showQuickView && (
+          <div
+            className={cn(
+              'absolute top-2 right-2 flex flex-col gap-1.5 transition-all duration-200',
+              isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'
+            )}
+          >
+            {/* Wishlist */}
+            <button
+              onClick={handleWishlist}
+              disabled={isFavLoading(product.id)}
+              className={cn(
+                'w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors',
+                isFavorited(product.id) || isWishlisted
+                  ? 'bg-[#F5820A] text-white'
+                  : 'bg-white text-[#6B7280] hover:bg-[#F5820A] hover:text-white',
+                isFavLoading(product.id) && 'opacity-50 cursor-wait'
+              )}
+              aria-label={isFavorited(product.id) || isWishlisted ? 'Added to favorites' : 'Add to favorites'}
+            >
+              <FiHeart
+                size={14}
+                className={(isFavorited(product.id) || isWishlisted) ? 'fill-current' : ''}
+              />
+            </button>
+
+            {/* Quick view */}
+            <button
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                // TODO: open quick view modal
+              }}
+              className="w-8 h-8 rounded-full bg-white text-[#6B7280] hover:bg-[#F5820A] hover:text-white flex items-center justify-center shadow-sm transition-colors"
+              aria-label="Quick view"
+            >
+              <FiEye size={14} />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Info */}

@@ -28,7 +28,7 @@ const TRUST_SIGNALS = [
 
 export function TrustSignals() {
   return (
-    <div className="w-full border border-[#E5E7EB] rounded-card">
+    <div className="w-full border border-[#E5E7EB] rounded-[8px]">
       <div className="max-w-content mx-auto md:px-10">
         <div className="grid grid-cols-2 md:grid-cols-4 md:divide-x md:divide-[#E5E7EB]">
           {TRUST_SIGNALS.map(({ icon: Icon, title, subtitle }) => (

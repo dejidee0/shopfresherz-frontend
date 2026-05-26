@@ -5,7 +5,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { FiHeart } from "react-icons/fi";
 import { productsApi } from "@/lib/api/products";
+import { useAddToFavorites } from "@/lib/hooks/useAddToFavorites";
 import type { CategoryWithImage } from "@/lib/types/product";
 
 /* ─── Types ─────────────────────────────────────────────────────────── */
@@ -72,75 +74,126 @@ function CardBadge({ badge, badgeType }: { badge: string; badgeType: BadgeType }
 /* ─── Product Card ───────────────────────────────────────────────────── */
 
 function ProductCard({ product }: { product: AccessoriesProduct }) {
+  const [hovered, setHovered] = useState(false);
+  const { handleAddToFavorites, isLoading, isFavorited } = useAddToFavorites();
+
   return (
-    <Link
-      href={`/store/product/${product.slug}`}
-      className="group relative block overflow-hidden border border-[#E5E7EB] bg-white transition-shadow duration-200 hover:shadow-md"
+    <div
+      className="group relative rounded-[8px] block overflow-hidden border border-[#E5E7EB] bg-white transition-shadow duration-200 hover:shadow-md"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
       {product.badge && product.badgeType && (
         <CardBadge badge={product.badge} badgeType={product.badgeType} />
       )}
 
-      {/* Image area */}
-      <div className="flex h-[148px]   sm:h-[160px]">
-        {product.imageUrl ? (
-          <Image
-            src={product.imageUrl}
-            alt={product.name}
-            width={180}
-            height={180}
-            className="h-full w-full  transition-transform duration-300 group-hover:scale-[1.04]"
-            unoptimized
+      {/* Heart / Add to Favorites — appears on hover */}
+      <div
+        className={`absolute top-2 right-2 z-20 transition-all duration-200 ${
+          hovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-2"
+        }`}
+      >
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleAddToFavorites(product.id);
+          }}
+          disabled={isLoading(product.id)}
+          aria-label={isFavorited(product.id) ? "Added to favorites" : "Add to favorites"}
+          className={`w-7 h-7 bg-white rounded-full shadow flex items-center justify-center transition-colors
+            ${isFavorited(product.id)
+              ? "text-[#F5820A]"
+              : "text-[#6B7280] hover:text-[#F5820A]"}
+            ${isLoading(product.id) ? "opacity-50 cursor-wait" : ""}
+          `}
+        >
+          <FiHeart
+            size={13}
+            className={isFavorited(product.id) ? "fill-current" : ""}
           />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center rounded bg-[#F3F4F6] text-[11px] text-[#9CA3AF]">
-            No image available
-          </div>
-        )}
+        </button>
       </div>
 
-      {/* Info area */}
-      <div className="px-3 py-3 space-y-1.5">
-        {/* Stars + review count */}
-        <div className="flex items-center gap-1.5">
-          <StarRating rating={product.rating} />
-          {product.reviewCount !== undefined && (
-            <span className="text-[10px] text-[#9CA3AF]">
-              ({product.reviewCount.toLocaleString()})
-            </span>
+      <Link href={`/store/product/${product.slug}`} className="block">
+        {/* Image area */}
+        <div className="flex h-[148px] sm:h-[160px]">
+          {product.imageUrl ? (
+            <Image
+              src={product.imageUrl}
+              alt={product.name}
+              width={180}
+              height={180}
+              className="h-full w-full transition-transform duration-300 group-hover:scale-[1.04]"
+              unoptimized
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center rounded bg-[#F3F4F6] text-[11px] text-[#9CA3AF]">
+              No image available
+            </div>
           )}
         </div>
 
-        {/* Name */}
-        <p className="line-clamp-2 text-[12px] font-semibold leading-snug text-[#111111]">
-          {product.name}
-        </p>
+        {/* Info area */}
+        <div className="px-3 py-3 space-y-1.5">
+          {/* Stars + review count */}
+          <div className="flex items-center gap-1.5">
+            <StarRating rating={product.rating} />
+            {product.reviewCount !== undefined && (
+              <span className="text-[10px] text-[#9CA3AF]">
+                ({product.reviewCount.toLocaleString()})
+              </span>
+            )}
+          </div>
 
-        {/* Price row */}
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-[13px] font-bold text-[#F5820A]">
-            ₦{product.price.toLocaleString()}
-          </span>
-          {product.compareAtPrice ? (
-            <span className="text-[11px] text-[#9CA3AF] line-through">
-              ₦{product.compareAtPrice.toLocaleString()}
+          {/* Name */}
+          <p className="line-clamp-2 text-[12px] font-semibold leading-snug text-[#111111]">
+            {product.name}
+          </p>
+
+          {/* Price row */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[13px] font-bold text-[#F5820A]">
+              ₦{product.price.toLocaleString()}
             </span>
-          ) : null}
+            {product.compareAtPrice ? (
+              <span className="text-[11px] text-[#9CA3AF] line-through">
+                ₦{product.compareAtPrice.toLocaleString()}
+              </span>
+            ) : null}
+          </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 }
 
 /* ─── Main Section ───────────────────────────────────────────────────── */
+
+interface AccessoriesPromo {
+  slug: string
+  title: string
+  imageUrl: string
+  price: string
+  ctaText: string
+}
+
+const ACCESSORIES_PROMO_FALLBACK: AccessoriesPromo = {
+  slug: "store/category/all",
+  title: "Xiaomi True Wireless Earbuds",
+  imageUrl: "/images/pod.png",
+  price: "$299 USD",
+  ctaText: "SHOP NOW",
+}
 
 export function ComputerAccessoriesSection() {
   const [categories, setCategories] = useState<CategoryWithImage[]>([]);
   const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
   const [products, setProducts] = useState<AccessoriesProduct[]>([]);
   const [loading, setLoading] = useState(false);
+  const [accessoriesPromo, setAccessoriesPromo] = useState<AccessoriesPromo>(ACCESSORIES_PROMO_FALLBACK);
 
-  /* Load exactly 3 categories */
+  /* Load exactly 3 categories + accessories promo card */
   useEffect(() => {
     async function loadCategories() {
       try {
@@ -159,7 +212,28 @@ export function ComputerAccessoriesSection() {
         console.error("Failed to load categories", err);
       }
     }
+
+    async function loadAccessoriesPromo() {
+      try {
+        const data = await productsApi.getAccessoriesPromo();
+        if (data) {
+          setAccessoriesPromo({
+            slug: data.slug ?? "store/category/all",
+            title: data.title,
+            imageUrl: data.imageUrl || ACCESSORIES_PROMO_FALLBACK.imageUrl,
+            price: data.price ?? ACCESSORIES_PROMO_FALLBACK.price,
+            ctaText: data.ctaText ?? ACCESSORIES_PROMO_FALLBACK.ctaText,
+          });
+          console.log("[AccessoriesPromo] ✅ Loaded:", data.title);
+        }
+      } catch (err) {
+        console.error("[AccessoriesPromo] ❌ Failed to load:", err);
+        // fallback already in state
+      }
+    }
+
     loadCategories();
+    loadAccessoriesPromo();
   }, []);
 
   /* Load products */
@@ -313,19 +387,20 @@ export function ComputerAccessoriesSection() {
               {/* Earbuds image */}
               <div className="flex justify-center w-full">
                 <Image
-                  src="/images/pod.png"
-                  alt="Xiaomi True Wireless Earbuds"
+                  src={accessoriesPromo.imageUrl}
+                  alt={accessoriesPromo.title}
                   width={130}
                   height={130}
                   className="object-contain w-[150px]"
                   priority
+                  unoptimized
                 />
               </div>
 
               <div className="flex flex-col gap-2.5 w-full">
                 {/* Title */}
                 <h3 className="text-white text-center font-bold text-[clamp(18px,5vw,22px)] leading-snug">
-                  Xiaomi True Wireless Earbuds
+                  {accessoriesPromo.title}
                 </h3>
 
                 {/* Description */}
@@ -340,7 +415,7 @@ export function ComputerAccessoriesSection() {
                       Only for:
                     </span>
                     <span className="text-black p-2 rounded-[3px] ml-2 bg-white font-extrabold text-[clamp(14px,4vw,16px)]">
-                      $299 USD
+                      {accessoriesPromo.price}
                     </span>
                   </div>
                 </div>
@@ -348,10 +423,10 @@ export function ComputerAccessoriesSection() {
                 {/* Shop Now button */}
                 <div className="flex justify-center">
                   <Link
-                    href="/store/category/all"
+                    href={`/store/product/${accessoriesPromo.slug}`}
                     className="mt-1 flex gap-[10px] items-center rounded-lg bg-white px-4 py-3 text-[13px] font-bold text-black tracking-wider hover:bg-gray-100 transition-colors"
                   >
-                    <span>SHOP NOW</span>
+                    <span>{accessoriesPromo.ctaText}</span>
                     <span>→</span>
                   </Link>
                 </div>
