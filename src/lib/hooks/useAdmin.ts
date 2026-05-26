@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { adminApi, type DashboardStatsDto, type PagedResult, type OrderDto, type AdminUserDto, type LowStockDto, type BannerDto, type AdminOrdersFilters, type AdminUsersFilters, type UpdateOrderStatusRequest, type AdjustLoyaltyRequest, type CreateBannerRequest, type UpdateBannerRequest, type AdminProductsFilters, type CreateProductRequest, type UpdateProductRequest, type ProductDto, type FlashDealDto, type CreateFlashDealRequest, type UpdateFlashDealRequest, type CouponDto, type CreateCouponRequest, type UpdateCouponRequest } from '@/lib/api/admin'
+import { adminApi, type DashboardStatsDto, type PagedResult, type OrderDto, type AdminUserDto, type LowStockDto, type BannerDto, type AdminOrdersFilters, type AdminUsersFilters, type UpdateOrderStatusRequest, type AdjustLoyaltyRequest, type CreateBannerRequest, type UpdateBannerRequest, type AdminProductsFilters, type CreateProductRequest, type UpdateProductRequest, type ProductDto, type FlashDealDto, type CreateFlashDealRequest, type UpdateFlashDealRequest, type CouponDto, type CreateCouponRequest, type UpdateCouponRequest, CategoryDto } from '@/lib/api/admin'
 import { productsApi } from '@/lib/api/products'
 import { useAuthStore } from '@/store/auth'
 import { toast } from '@/store/toast'
@@ -428,6 +428,63 @@ export function useDeleteCoupon() {
 
     onError: (error: { message?: string }) => {
       toast.error('Failed to delete coupon', error.message ?? 'Please try again')
+    },
+  })
+}
+
+export function useCreateCategory() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (payload: CategoryDto) =>
+      adminApi.createCategory(accessToken!, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+      toast.success('Category created successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to create category', error.message ?? 'Please try again')
+    },
+  })
+}
+
+export function useUpdateCategory() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: CategoryDto }) =>
+      adminApi.updateCategory(accessToken!, id, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+      toast.success('Category updated successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to update category', error.message ?? 'Please try again')
+    },
+  })
+}
+
+export function useDeleteCategory() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: number) =>
+      adminApi.deleteCategory(accessToken!, id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+      toast.success('Category deleted successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to delete category', error.message ?? 'Please try again')
     },
   })
 }
