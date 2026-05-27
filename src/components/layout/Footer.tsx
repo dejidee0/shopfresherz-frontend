@@ -29,15 +29,15 @@ const QUICK_LINKS = [
   // { label: 'About Us', href: '/about' },
   // { label: 'Blog Posts', href: '/blog' },
   // { label: 'Shopping Cart', href: '/cart' },
-  { label: 'Wishlist', href: '/account/wishlist' },
-  { label: 'Customer Help', href: '#' },
+  { label: 'Wishlist', href: '/store/wishlist' },
+  { label: 'Customer Help', href: '/store/need-help' },
   { label: 'Track Order', href: '/account/track' },
 ]
 
 const SOCIAL_LINKS = [
   { label: 'Facebook', href: '#', icon: RiFacebookLine },
   { label: 'Twitter / X', href: '#', icon: RiTwitterXLine },
-  { label: 'Instagram', href: 'https://instagram.com/fresherzgadget', icon: RiInstagramLine },
+  { label: 'Instagram', href: 'https://www.instagram.com/shopfresherz?igsh=MXRhMHNrM3JnbWtteQ==', icon: RiInstagramLine },
   { label: 'WhatsApp', href: 'https://wa.me/2349075308722', icon: RiWhatsappLine },
 ]
 
@@ -178,7 +178,7 @@ export function Footer() {
               ))}
               <li>
                 <a
-                  href="https://instagram.com/fresherzgadget"
+                  href="https://www.instagram.com/shopfresherz?igsh=MXRhMHNrM3JnbWtteQ=="
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-[#6B7280] hover:text-[#F5820A] transition-colors"

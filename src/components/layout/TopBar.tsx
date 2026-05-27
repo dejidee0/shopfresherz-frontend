@@ -29,7 +29,7 @@ export function TopBar() {
             <span>+234 907 530 8722</span>
           </a>
           <a
-            href="https://instagram.com/fresherzgadget"
+            href="https://www.instagram.com/shopfresherz?igsh=MXRhMHNrM3JnbWtteQ=="
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 hover:text-[#F5820A] transition-colors"
