@@ -871,19 +871,19 @@ const BEST_SELLERS: HomeProduct[] = [];
 const NEW_ARRIVALS: HomeProduct[] = [];
 
 // ─── PROMO CARD DATA ──────────────────────────────────────────────────────────
-const BEST_DEALS_PROMO = {
-  image: "/images/categories/image2.png",
-  name: "Xbox Series S - 512GB SSD Console with Wireless Controller - EU Versio...",
-  rating: 4.5,
-  reviewCount: 52677,
-  originalPrice: "10,000",
-  salePrice: "5,000",
-  description:
-    "Games built using the Xbox Series X|S development kit showcase unparalleled load times, visuals.",
-  slug: "xbox-series-s-512gb",
-  badge: "32% OFF",
-  hotBadge: true,
-};
+// const BEST_DEALS_PROMO = {
+//   image: "/images/categories/image2.png",
+//   name: "Xbox Series S - 512GB SSD Console with Wireless Controller - EU Versio...",
+//   rating: 4.5,
+//   reviewCount: 52677,
+//   originalPrice: "10,000",
+//   salePrice: "5,000",
+//   description:
+//     "Games built using the Xbox Series X|S development kit showcase unparalleled load times, visuals.",
+//   slug: "xbox-series-s-512gb",
+//   badge: "32% OFF",
+//   hotBadge: true,
+// };
 
 const NEW_ARRIVALS_PROMO = {
   tag: "COMPUTER & ACCESSORIES",
@@ -892,7 +892,7 @@ const NEW_ARRIVALS_PROMO = {
   subtext: "Computer and accessories",
   label: "starting from",
   price: "100,000",
-  slug: "macbook-pro-14-m2-max",
+  slug: "computer-accessories",
   image: "/images/categories/promo.png",
 };
 
@@ -1166,7 +1166,7 @@ function BestDealsPromoCard({ product }: { product: PromoProduct | null }) {
 
 function NewArrivalsPromoCard() {
   return (
-    <Link href={`/store/product/${NEW_ARRIVALS_PROMO.slug}`} className="flex flex-col h-full overflow-hidden group">
+    <Link href={`/store/categories/${NEW_ARRIVALS_PROMO.slug}`} className="flex flex-col h-full overflow-hidden group">
       {/* Top — Orange branded area styled to match image exactly */}
       <div className="flex flex-col bg-[#F5820A] items-center text-center px-5 pt-[50px] pb-5 text-white flex-1 select-none">
         {/* Category Header */}

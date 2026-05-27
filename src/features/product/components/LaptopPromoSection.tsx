@@ -14,17 +14,17 @@ interface LaptopPromo {
   ctaText: string
 }
 
-const FALLBACK: LaptopPromo = {
-  slug: "macbook-pro",
-  title: "Macbook Pro",
-  imageUrl: "/images/laptop.png",
-  price: "$1999",
-  badge: "Save up to $200.00",
-  ctaText: "Shop Now",
-}
+// const FALLBACK: LaptopPromo = {
+//   slug: "macbook-pro",
+//   title: "Macbook Pro",
+//   imageUrl: "/images/laptop.png",
+//   price: "$1999",
+//   badge: "Save up to $200.00",
+//   ctaText: "Shop Now",
+// }
 
 export function LaptopPromoSection() {
-  const [promo, setPromo] = useState<LaptopPromo>(FALLBACK)
+  const [promo, setPromo] = useState<LaptopPromo>()
 
   useEffect(() => {
     productsApi.getLaptopPromo()
@@ -33,10 +33,10 @@ export function LaptopPromoSection() {
           setPromo({
             slug: data.slug ?? "store/category/all",
             title: data.title,
-            imageUrl: data.imageUrl || FALLBACK.imageUrl,
-            price: data.salePrice ?? data.price ?? FALLBACK.price,
-            badge: data.badge ?? FALLBACK.badge,
-            ctaText: data.ctaText ?? FALLBACK.ctaText,
+            imageUrl: data.imageUrl,
+            price: data.salePrice ?? data.price ?? "",
+            badge: data.badge?? "",
+            ctaText: data.ctaText,
           })
           console.log("[LaptopPromo] ✅ Loaded promo:", data.title)
         }
@@ -55,12 +55,12 @@ export function LaptopPromoSection() {
         <div className="flex flex-col items-start space-y-5">
           {/* Discount Badge */}
           <span className="bg-[#FF9A2E] text-white text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-[2px]">
-            {promo.badge}
+            {promo?.badge}
           </span>
 
           {/* Product Title */}
           <h2 className="text-4xl sm:text-4xl font-bold text-[#111111] tracking-tight">
-            {promo.title}
+            {promo?.title}
           </h2>
 
           {/* Product Specs — kept as static marketing copy */}
@@ -70,10 +70,10 @@ export function LaptopPromoSection() {
 
           {/* Shop Button */}
           <Link
-            href={`/store/product/${promo.slug}`}
+            href={`/store/product/${promo?.slug}`}
             className="inline-flex items-center gap-2 bg-[#FF9A2E] text-white font-semibold text-xs uppercase tracking-wider px-6 py-3 rounded-[4px] hover:bg-[#e68a2e] transition-colors group"
           >
-            {promo.ctaText}
+            {promo?.ctaText}
             <svg
               className="w-4 h-4 transform transition-transform group-hover:translate-x-1"
               fill="none"
@@ -90,12 +90,14 @@ export function LaptopPromoSection() {
         <div className="relative flex justify-center md:justify-end items-center">
           {/* Price Badge Circle */}
           <div className=" max-md:hidden absolute lg:top-[-9] left-4 md:left-12 lg:left-20 z-10 bg-[#FF9A2E] text-white w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center font-bold text-lg sm:text-xl border-4 border-white shadow-sm select-none">
-            {promo.price}
+            {promo?.price}
           </div>
 
           {/* Laptop Image */}
           <div className="w-full max-w-[380px]">
-            <Image
+           {
+            promo?.imageUrl && (
+               <Image
               src={promo.imageUrl}
               alt={promo.title}
               width={500}
@@ -104,6 +106,8 @@ export function LaptopPromoSection() {
               priority
               unoptimized
             />
+            )
+           }
           </div>
         </div>
 

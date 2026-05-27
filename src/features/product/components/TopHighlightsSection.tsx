@@ -1,13 +1,10 @@
+"use client";
 
-
-
-'use client'
-
-import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { productsApi } from '@/lib/api/products';
-import type { FlashDeal, Product as ApiProduct } from '@/lib/types/product';
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { productsApi } from "@/lib/api/products";
+import type { FlashDeal, Product as ApiProduct } from "@/lib/types/product";
 
 // Types for structural safety
 interface Product {
@@ -25,7 +22,7 @@ interface HighlightCategory {
 }
 
 function toPriceLabel(price?: number | null) {
-  return `₦${price?.toLocaleString() ?? '0'}`;
+  return `₦${price?.toLocaleString() ?? "0"}`;
 }
 
 function mapFlashDealToItem(value: FlashDeal): Product {
@@ -34,7 +31,7 @@ function mapFlashDealToItem(value: FlashDeal): Product {
     slug: value.productSlug,
     title: value.productName,
     price: toPriceLabel(value.salePrice),
-    imageUrl: value.productImageUrl ?? '',
+    imageUrl: value.productImageUrl ?? "",
   };
 }
 
@@ -44,7 +41,7 @@ function mapApiProductToItem(value: ApiProduct): Product {
     slug: value.slug,
     title: value.name,
     price: toPriceLabel(value.price),
-    imageUrl: value.primaryImageUrl ?? value.imageUrls?.[0] ?? '',
+    imageUrl: value.primaryImageUrl ?? value.imageUrls?.[0] ?? "",
   };
 }
 
@@ -86,55 +83,60 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
 // 2. Main Exported Component
 export function TopHighlightsSection() {
   const [highlightsData, setHighlightsData] = useState<HighlightCategory[]>([
-    { id: 'flash-sale', title: 'Flash Sale Today', products: [] },
-    { id: 'best-sellers', title: 'Best Sellers', products: [] },
-    { id: 'top-rated', title: 'Top Rated', products: [] },
-    { id: 'new-arrival', title: 'New Arrival', products: [] },
+    { id: "flash-sale", title: "Flash Sale Today", products: [] },
+    { id: "best-sellers", title: "Best Sellers", products: [] },
+    { id: "top-rated", title: "Top Rated", products: [] },
+    { id: "new-arrival", title: "New Arrival", products: [] },
   ]);
 
   useEffect(() => {
     let mounted = true;
 
     async function loadHighlights() {
-      const [flashResult, bestResult, topRatedResult, newResult] = await Promise.allSettled([
-        productsApi.flashDeals(),
-        productsApi.bestSellers(3),
-        productsApi.list({ sortBy: 'best_rated', pageSize: 3 }),
-        productsApi.newArrivals(3),
-      ]);
+      const [flashResult, bestResult, topRatedResult, newResult] =
+        await Promise.allSettled([
+          productsApi.flashDeals(),
+          productsApi.bestSellers(3),
+          productsApi.list({ sortBy: "best_rated", pageSize: 3 }),
+          productsApi.newArrivals(3),
+        ]);
 
       if (!mounted) return;
 
       const flashProducts =
-        flashResult.status === 'fulfilled'
+        flashResult.status === "fulfilled"
           ? flashResult.value.slice(0, 3).map(mapFlashDealToItem)
           : [];
 
       const bestProducts =
-        bestResult.status === 'fulfilled'
+        bestResult.status === "fulfilled"
           ? bestResult.value.slice(0, 3).map(mapApiProductToItem)
           : [];
 
       const topRatedProducts =
-        topRatedResult.status === 'fulfilled'
+        topRatedResult.status === "fulfilled"
           ? topRatedResult.value.data.slice(0, 3).map(mapApiProductToItem)
           : [];
 
       const newProducts =
-        newResult.status === 'fulfilled'
+        newResult.status === "fulfilled"
           ? newResult.value.slice(0, 3).map(mapApiProductToItem)
           : [];
 
       setHighlightsData([
-        { id: 'flash-sale', title: 'Flash Sale Today', products: flashProducts },
-        { id: 'best-sellers', title: 'Best Sellers', products: bestProducts },
-        { id: 'top-rated', title: 'Top Rated', products: topRatedProducts },
-        { id: 'new-arrival', title: 'New Arrival', products: newProducts },
+        {
+          id: "flash-sale",
+          title: "Flash Sale Today",
+          products: flashProducts,
+        },
+        { id: "best-sellers", title: "Best Sellers", products: bestProducts },
+        { id: "top-rated", title: "Top Rated", products: topRatedProducts },
+        { id: "new-arrival", title: "New Arrival", products: newProducts },
       ]);
     }
 
     loadHighlights().catch((error) => {
-      console.error('Failed to load TopHighlightsSection data', error);
+      console.error("Failed to load TopHighlightsSection data", error);
     });
 
     return () => {
@@ -152,7 +154,7 @@ export function TopHighlightsSection() {
             <h2 className="text-xs font-bold tracking-wider text-gray-900 uppercase">
               {category.title}
             </h2>
-            
+
             {/* Inner Vertical Item List */}
             <div className="flex flex-col gap-3">
               {category.products.map((product) => (

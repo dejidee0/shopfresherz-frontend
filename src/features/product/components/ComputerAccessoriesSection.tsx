@@ -178,20 +178,20 @@ interface AccessoriesPromo {
   ctaText: string
 }
 
-const ACCESSORIES_PROMO_FALLBACK: AccessoriesPromo = {
-  slug: "store/category/all",
-  title: "Xiaomi True Wireless Earbuds",
-  imageUrl: "/images/pod.png",
-  price: "$299 USD",
-  ctaText: "SHOP NOW",
-}
+// const ACCESSORIES_PROMO_FALLBACK: AccessoriesPromo = {
+//   slug: "store/category/all",
+//   title: "Xiaomi True Wireless Earbuds",
+//   imageUrl: "/images/pod.png",
+//   price: "$299 USD",
+//   ctaText: "SHOP NOW",
+// }
 
 export function ComputerAccessoriesSection() {
   const [categories, setCategories] = useState<CategoryWithImage[]>([]);
   const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
   const [products, setProducts] = useState<AccessoriesProduct[]>([]);
   const [loading, setLoading] = useState(false);
-  const [accessoriesPromo, setAccessoriesPromo] = useState<AccessoriesPromo>(ACCESSORIES_PROMO_FALLBACK);
+  const [accessoriesPromo, setAccessoriesPromo] = useState<AccessoriesPromo>();
 
   /* Load exactly 3 categories + accessories promo card */
   useEffect(() => {
@@ -220,9 +220,9 @@ export function ComputerAccessoriesSection() {
           setAccessoriesPromo({
             slug: data.slug ?? "store/category/all",
             title: data.title,
-            imageUrl: data.imageUrl || ACCESSORIES_PROMO_FALLBACK.imageUrl,
-            price: data.price ?? ACCESSORIES_PROMO_FALLBACK.price,
-            ctaText: data.ctaText ?? ACCESSORIES_PROMO_FALLBACK.ctaText,
+            imageUrl: data.imageUrl ,
+            price: data.price || "",
+            ctaText: data.ctaText,
           });
           console.log("[AccessoriesPromo] ✅ Loaded:", data.title);
         }
@@ -386,7 +386,9 @@ export function ComputerAccessoriesSection() {
 
               {/* Earbuds image */}
               <div className="flex justify-center w-full">
-                <Image
+                {
+                  accessoriesPromo?.imageUrl && (
+                    <Image
                   src={accessoriesPromo.imageUrl}
                   alt={accessoriesPromo.title}
                   width={130}
@@ -395,12 +397,14 @@ export function ComputerAccessoriesSection() {
                   priority
                   unoptimized
                 />
+                  )
+                }
               </div>
 
               <div className="flex flex-col gap-2.5 w-full">
                 {/* Title */}
                 <h3 className="text-white text-center font-bold text-[clamp(18px,5vw,22px)] leading-snug">
-                  {accessoriesPromo.title}
+                  {accessoriesPromo?.title}
                 </h3>
 
                 {/* Description */}
@@ -415,7 +419,7 @@ export function ComputerAccessoriesSection() {
                       Only for:
                     </span>
                     <span className="text-black p-2 rounded-[3px] ml-2 bg-white font-extrabold text-[clamp(14px,4vw,16px)]">
-                      {accessoriesPromo.price}
+                      {accessoriesPromo?.price}
                     </span>
                   </div>
                 </div>
@@ -423,10 +427,10 @@ export function ComputerAccessoriesSection() {
                 {/* Shop Now button */}
                 <div className="flex justify-center">
                   <Link
-                    href={`/store/product/${accessoriesPromo.slug}`}
+                    href={`/store/product/${accessoriesPromo?.slug}`}
                     className="mt-1 flex gap-[10px] items-center rounded-lg bg-white px-4 py-3 text-[13px] font-bold text-black tracking-wider hover:bg-gray-100 transition-colors"
                   >
-                    <span>{accessoriesPromo.ctaText}</span>
+                    <span>{accessoriesPromo?.ctaText}</span>
                     <span>→</span>
                   </Link>
                 </div>
