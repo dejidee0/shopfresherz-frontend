@@ -90,6 +90,37 @@ export interface BannerDto extends Record<string, unknown> {
   createdAt?: string;
 }
 
+export interface PromoDto {
+  id: string;
+  productId?: string;
+  imageUrl?: string;
+  name?: string;
+  rating?: number;
+  originalPrice?: string;
+  salePrice?: string;
+  description?: string;
+  badge?: string;
+  slug?: string;
+  tag?: string;
+  title?: string;
+  price?: string;
+  ctaText?: string;
+  sortOrder?: number;
+  type?: string;
+  subtitle?: string;
+  buttonText?: string;
+  priceLabel?: string;
+  priceValue?: string;
+  imageAlt?: string;
+  priceBadge?: string;
+}
+
+export interface CreatePromoRequest {
+  productId?: string;
+  tag?: string;
+  ctaText?: string;
+}
+
 export interface CreateBannerRequest {
   title?: string;
   subtitle?: string;
@@ -503,6 +534,55 @@ export const adminApi = {
 
   deleteBanner: (token: string, id: string) =>
     api.delete<void>(`/admin/banners/${encodeURIComponent(id)}`, { token }),
+
+  getHeroPromos: (token: string) =>
+    api.get<PromoDto[]>("/promotions/hero", { token }),
+
+  getBestDealPromo: (token: string) =>
+    api.get<PromoDto[]>("/promotions/best-deal", { token }),
+
+  getAccessoriesPromo: (token: string) =>
+    api.get<PromoDto[]>("/promotions/accessories-promo", { token }),
+
+  getLaptopPromo: (token: string) =>
+    api.get<PromoDto[]>("/promotions/laptop-promo", { token }),
+
+  createHeroPromo: (token: string, payload: CreatePromoRequest) =>
+    api.post<unknown>("/promotions/admin/hero", payload, { token }),
+
+  updateHeroPromo: (token: string, id: string, payload: CreatePromoRequest) =>
+    api.put<void>(`/promotions/admin/hero/${encodeURIComponent(id)}`, payload, {
+      token,
+    }),
+
+  createBestDealPromo: (token: string, payload: CreatePromoRequest) =>
+    api.post<unknown>("/promotions/admin/best-deal", payload, { token }),
+
+  updateBestDealPromo: (token: string, id: string, payload: CreatePromoRequest) =>
+    api.put<void>(`/promotions/admin/best-deal/${encodeURIComponent(id)}`, payload, {
+      token,
+    }),
+
+  createAccessoriesPromo: (token: string, payload: CreatePromoRequest) =>
+    api.post<unknown>("/promotions/admin/accessories-promo", payload, {
+      token,
+    }),
+
+    updateAccessoriesPromo: (token: string, id: string, payload: CreatePromoRequest) =>
+    api.put<void>(`/promotions/admin/accessories-promo/${encodeURIComponent(id)}`, payload, {
+      token,
+    }),
+
+  createLaptopPromo: (token: string, payload: CreatePromoRequest) =>
+    api.post<unknown>("/promotions/admin/laptop-promo", payload, { token }),
+
+  updateLaptopPromo: (token: string, id: string, payload: CreatePromoRequest) =>
+    api.put<void>(`/promotions/admin/laptop-promo/${encodeURIComponent(id)}`, payload, {
+      token,
+    }),
+
+  deletePromo: (token: string, id: string) =>
+    api.delete<void>(`/promotions/admin/${encodeURIComponent(id)}`, { token }),
 
   getProducts: (token: string, filters: AdminProductsFilters = {}) =>
     api.get<PagedResult<ProductDto>>("/products", {
