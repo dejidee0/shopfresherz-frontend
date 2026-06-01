@@ -375,7 +375,7 @@ export function HeroBanner() {
                 onMouseLeave={() => setIsPromoPaused2(false)}
               >
                 <div
-                  className="flex h-full w-fit transition-transform duration-700 ease-in-out"
+                  className="flex h-full w-full transition-transform duration-700 ease-in-out"
                   style={{ transform: `translateX(-${promoIndex2 * 100}%)` }}
                 >
                   {promos.map((p, i) => (
@@ -418,8 +418,8 @@ export function HeroBanner() {
                               className="object-contain object-center" priority={i === 0} />
                           )}
                         </div>
-                        <div className="flex flex-col flex-1 min-w-0 w-fit py-4">
-                          <h3 className="text-neutral-950 w-72 text-base font-extrabold leading-tight mb-1.5 line-clamp-2 text-wrap">
+                        <div className="flex flex-col flex-1 min-w-0 py-4">
+                          <h3 className="text-neutral-950 text-wrap w-72 text-base font-extrabold leading-tight mb-1.5 line-clamp-2">
                             {p.title}
                           </h3>
                           {p.price && (
