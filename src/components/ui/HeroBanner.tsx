@@ -33,6 +33,7 @@ interface PromoCard {
   ctaText?: string;
   linkUrl?: string;
   imageUrl?: string;
+  slug?: string;
 }
 
 function bannerToSlide(banner: Banner): HeroSlide {
@@ -41,73 +42,9 @@ function bannerToSlide(banner: Banner): HeroSlide {
     tag: undefined,
     tagColor: "text-[#A5F3FC]",
     theme: "dark",
-    bgColor: "bg-gradient-to-br from-[#0B1120] via-[#0D2758] to-[#0B4A8D]",
+    bgColor: "bg-linear-to-br from-[#0B1120] via-[#0D2758] to-[#0B4A8D]",
   };
 }
-
-// const FALLBACK_SLIDES: HeroSlide[] = [
-//   {
-//     id: "fallback-1",
-//     tag: "THE BEST PLACE TO PLAY",
-//     tagColor: "text-[#A5F3FC]",
-//     title: "Xbox 360 Console",
-//     subTitle:
-//       "Save up to 50% on select Xbox games. Get 3 months of PC Game Pass for $2 USD.",
-//     ctaText: "SHOP NOW",
-//     linkUrl: "/store/category/games-consoles",
-//     imageUrl: "/images/categories/Image1.png",
-//     sortOrder: 0,
-//     theme: "dark",
-//     bgColor: "bg-gradient-to-br from-[#0B1120] via-[#0D2758] to-[#0B4A8D]",
-//   },
-//   {
-//     id: "fallback-2",
-//     tag: "PREMIUM GAMING GEAR",
-//     tagColor: "text-[#A5F3FC]",
-//     title: "Xbox Elite Controllers",
-//     subTitle:
-//       "Designed for the ultimate gaming experience. Precision engineered for pros.",
-//     ctaText: "SHOP NOW",
-//     linkUrl: "/store/category/games-consoles",
-//     imageUrl: "/images/categories/Image2.png",
-//     sortOrder: 1,
-//     theme: "dark",
-//     bgColor: "bg-gradient-to-br from-[#0B1120] via-[#0D2758] to-[#0B4A8D]",
-//   },
-//   {
-//     id: "fallback-3",
-//     tag: "NEW ARRIVAL",
-//     tagColor: "text-[#A5F3FC]",
-//     title: "PlayStation 5",
-//     subTitle:
-//       "Experience lightning-fast loading, deeper immersion and an all-new generation of gaming.",
-//     ctaText: "SHOP NOW",
-//     linkUrl: "/store/category/games-consoles",
-//     imageUrl: "/images/categories/Image3.png",
-//     sortOrder: 2,
-//     theme: "dark",
-//     bgColor: "bg-gradient-to-br from-[#0B1120] via-[#0D2758] to-[#0B4A8D]",
-//   },
-// ];
-
-/* ─── Promo card fallbacks ────────────────────────────────────────── */
-
-// const PROMO_CARD_1_FALLBACK = {
-//   tag: "SUMMER SALES",
-//   title: "New Google\nPixel 6 Pro",
-//   badge: "29% OFF",
-//   ctaText: "SHOP NOW",
-//   linkUrl: "/store/",
-//   imageUrl: "/images/categories/pixel.png",
-// };
-
-// const PROMO_CARD_2_FALLBACK = {
-//   title: "Xiaomi\nFlipBuds Pro",
-//   price: "₦10,000",
-//   ctaText: "SHOP NOW",
-//   linkUrl: "/store/",
-//   imageUrl: "/images/categories/earpod.png",
-// };
 
 /* ─── Component ───────────────────────────────────────────────────── */
 
@@ -117,10 +54,17 @@ export function HeroBanner() {
   const [isSlideLoading, setIsSlideLoading] = useState(false);
   const [isPromoLoading, setIsPromoLoading] = useState(false);
   const [slides, setSlides] = useState<HeroSlide[]>();
-  const [promoCard1, setPromoCard1] = useState<PromoCard>();
-  const [promoCard2, setPromoCard2] = useState<PromoCard>();
+  const [promos, setPromos] = useState<PromoCard[]>([]);
+
+  const [promoIndex1, setPromoIndex1] = useState(0);
+  const [promoIndex2, setPromoIndex2] = useState(0);
+  const [isPromoPaused1, setIsPromoPaused1] = useState(false);
+  const [isPromoPaused2, setIsPromoPaused2] = useState(false);
+
   const touchStartX = useRef<number | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const promoInterval1Ref = useRef<ReturnType<typeof setInterval> | null>(null);
+  const promoInterval2Ref = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const total = slides?.length || 0;
 
@@ -131,17 +75,14 @@ export function HeroBanner() {
   );
   const goTo = useCallback((i: number) => setCurrent(i), []);
 
-  /* Fetch real banners + hero promo cards */
   useEffect(() => {
     async function fetchBanners() {
       try {
-        // Main slider — existing /banners endpoint
         setIsSlideLoading(true);
         const banners = await productsApi.getBanners();
         if (banners.length > 0) {
           setSlides(banners.map(bannerToSlide));
           setCurrent(0);
-          setIsSlideLoading(false);
         }
       } catch (err) {
         console.error(err);
@@ -153,44 +94,27 @@ export function HeroBanner() {
     async function fetchHeroPromos() {
       try {
         setIsPromoLoading(true);
-        const promos = await productsApi.getHeroPromos();
-        if (!promos || promos.length === 0) return;
+        const raw = await productsApi.getHeroPromos();
+        if (!raw || raw.length === 0) return;
 
-        // Sort by sortOrder so admin controls the order
-        const sorted = [...promos].sort((a, b) => a.sortOrder - b.sortOrder);
+        const sorted = [...raw].sort((a, b) => a.sortOrder - b.sortOrder);
+        const cards: PromoCard[] = sorted.map((p) => ({
+          tag: p.tag,
+          title: p.title,
+          badge: p.badge,
+          price: p.price ?? p.subTitle,
+          ctaText: p.ctaText,
+          linkUrl: p.linkUrl,
+          imageUrl: p.imageUrl,
+          slug: p.slug,
+        }));
 
-        const p1 = sorted[0];
-        if (p1) {
-          setPromoCard1({
-            tag: p1.tag,
-            title: p1.title,
-            badge: p1.badge,
-            ctaText: p1.ctaText,
-            linkUrl: p1.linkUrl,
-            imageUrl: p1.imageUrl,
-          });
-        }
-
-        const p2 = sorted[1];
-        if (p2) {
-          setPromoCard2({
-            title: p2.title,
-            price: p2.price ?? p2.subTitle,
-            ctaText: p2.ctaText,
-            linkUrl: p2.linkUrl,
-            imageUrl: p2.imageUrl,
-          });
-        }
-
-        setIsPromoLoading(false);
-        console.log(
-          "[HeroBanner] ✅ Hero promos loaded:",
-          sorted.length,
-          "items",
-        );
+        setPromos(cards);
+        setPromoIndex1(0);
+        setPromoIndex2(cards.length > 1 ? 1 % cards.length : 0);
+        console.log("[HeroBanner] ✅ Hero promos loaded:", cards.length, "items");
       } catch (err) {
         console.error("[HeroBanner] ❌ Failed to load hero promos:", err);
-        // fallbacks already in state
       } finally {
         setIsPromoLoading(false);
       }
@@ -200,16 +124,28 @@ export function HeroBanner() {
     fetchHeroPromos();
   }, []);
 
-  /* Auto-play */
   useEffect(() => {
     if (isPaused) return;
     intervalRef.current = setInterval(next, 7000);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [isPaused, next]);
 
-  /* Touch swipe */
+  useEffect(() => {
+    if (isPromoPaused1 || promos.length < 2) return;
+    promoInterval1Ref.current = setInterval(() => {
+      setPromoIndex1((i) => (i + 1) % promos.length);
+    }, 5000);
+    return () => { if (promoInterval1Ref.current) clearInterval(promoInterval1Ref.current); };
+  }, [isPromoPaused1, promos.length]);
+
+  useEffect(() => {
+    if (isPromoPaused2 || promos.length < 2) return;
+    promoInterval2Ref.current = setInterval(() => {
+      setPromoIndex2((i) => (i + 1) % promos.length);
+    }, 7000);
+    return () => { if (promoInterval2Ref.current) clearInterval(promoInterval2Ref.current); };
+  }, [isPromoPaused2, promos.length]);
+
   function handleTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0].clientX;
   }
@@ -224,12 +160,13 @@ export function HeroBanner() {
   return (
     <section className="max-w-content mx-auto px-3 sm:px-6 lg:px-10 py-3 sm:py-4 lg:py-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
-        {/* ━━━━━━ LEFT: Auto-playing Slider ━━━━━━ */}
+
+        {/* ━━━━━━ LEFT: Hero Slider ━━━━━━ */}
         {isSlideLoading ? (
           <CarouselSkeleton />
         ) : (
           <div
-            className="lg:col-span-2 relative overflow-hidden rounded-2xl h-[200px] sm:h-[280px] lg:h-[420px]"
+            className="lg:col-span-2 relative overflow-hidden rounded-2xl h-50 sm:h-70 lg:h-105"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
             onTouchStart={handleTouchStart}
@@ -238,7 +175,6 @@ export function HeroBanner() {
             aria-label="Featured products carousel"
             aria-roledescription="carousel"
           >
-            {/* Slide track */}
             <div
               className="flex h-full transition-transform duration-1200 ease-in-out"
               style={{ transform: `translateX(-${current * 100}%)` }}
@@ -251,138 +187,90 @@ export function HeroBanner() {
                     key={s.id}
                     className={cn(
                       "min-w-full h-full",
-                      s.bgColor ??
-                        "bg-gradient-to-br from-[#0B1120] via-[#0D2758] to-[#0B4A8D]",
+                      s.bgColor ?? "bg-linear-to-br from-[#0B1120] via-[#0D2758] to-[#0B4A8D]",
                     )}
                     aria-roledescription="slide"
                     aria-label={s.title}
                   >
-                    {/* 
-                    Mobile/Tablet: image sits as absolute background on the right,
-                    text overlays on the left — clean app-like layout.
-                    Desktop (md+): side-by-side flex row (unchanged).
-                  */}
                     <div className="relative h-full md:flex md:flex-row md:items-center md:px-8 lg:px-10">
-                      {/* ── Mobile/Tablet image (absolute, right side, decorative bg) ── */}
                       <div
                         className={cn(
                           "absolute inset-y-0 right-0 w-[55%] md:hidden pointer-events-none select-none",
                           "transition-all duration-1200 ease-out delay-300 will-change-transform",
-                          isActive
-                            ? "opacity-100 translate-x-0"
-                            : "opacity-0 translate-x-4",
+                          isActive ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4",
                         )}
                       >
                         {s.imageUrl && (
-                          <Image
-                            src={s.imageUrl}
-                            alt={s.title}
-                            fill
-                            sizes="55vw"
+                          <Image src={s.imageUrl} alt={s.title} fill sizes="55vw"
                             className="object-contain object-right-center"
-                            style={{ mixBlendMode: "multiply" }}
-                            priority={i === 0}
-                          />
+                            style={{ mixBlendMode: "multiply" }} priority={i === 0} />
                         )}
                       </div>
 
-                      {/* ── Text block ── */}
                       <div
                         className={cn(
                           "relative z-10 flex flex-col items-start text-left h-full justify-center",
-                          "pl-4 pr-[48%] py-5 sm:pl-6 sm:pr-[50%] sm:py-7 md:flex-1 md:pr-0 md:pl-0 md:py-8 md:items-start",
+                          "pl-4 pr-[48%] py-5 sm:pl-6 sm:pr-[50%] sm:py-7 md:flex-1 md:pr-0 md:pl-0 md:py-8",
                           "transition-all duration-1200 ease-out will-change-transform",
-                          isActive
-                            ? "opacity-100 translate-y-0"
-                            : "opacity-0 translate-y-4",
+                          isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
                         )}
                       >
                         {s.tag && (
-                          <p
-                            className={cn(
-                              "text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-widest mb-1 sm:mb-1.5 md:mb-2 flex items-center gap-1.5",
-                              s.tagColor,
-                              isActive
-                                ? "opacity-100 translate-y-0"
-                                : "opacity-0 translate-y-3",
-                              "transition-all duration-1200 ease-out delay-300",
-                            )}
-                          >
-                            <span className="w-4 h-[2px] bg-current hidden md:inline-block" />
+                          <p className={cn(
+                            "text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-widest mb-1 sm:mb-1.5 md:mb-2 flex items-center gap-1.5",
+                            s.tagColor,
+                            isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3",
+                            "transition-all duration-1200 ease-out delay-300",
+                          )}>
+                            <span className="w-4 h-0.5 bg-current hidden md:inline-block" />
                             {s.tag}
                           </p>
                         )}
-
-                        <h2
-                          className={cn(
-                            "font-extrabold leading-tight mb-1.5 sm:mb-2 md:mb-3",
-                            "text-base sm:text-xl md:text-3xl lg:text-4xl",
-                            dark ? "text-white" : "text-[#111111]",
-                            isActive
-                              ? "opacity-100 translate-y-0"
-                              : "opacity-0 translate-y-4",
-                            "transition-all duration-1200 ease-out delay-400",
-                          )}
-                        >
+                        <h2 className={cn(
+                          "font-extrabold leading-tight mb-1.5 sm:mb-2 md:mb-3",
+                          "text-base sm:text-xl md:text-3xl lg:text-4xl",
+                          dark ? "text-white" : "text-[#111111]",
+                          isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
+                          "transition-all duration-1200 ease-out delay-400",
+                        )}>
                           {s.title}
                         </h2>
-
-                        <p
-                          className={cn(
-                            "leading-relaxed mb-3 sm:mb-4 md:mb-6",
-                            "text-[10px] sm:text-xs md:text-sm",
-                            "max-w-[160px] sm:max-w-[200px] md:max-w-xs",
-                            "hidden xs:block sm:block",
-                            dark ? "text-white/70" : "text-[#6B7280]",
-                            isActive
-                              ? "opacity-100 translate-y-0"
-                              : "opacity-0 translate-y-4",
-                            "transition-all duration-1200 ease-out delay-500",
-                          )}
-                        >
+                        <p className={cn(
+                          "leading-relaxed mb-3 sm:mb-4 md:mb-6",
+                          "text-[10px] sm:text-xs md:text-sm",
+                          "max-w-40 sm:max-w-50 md:max-w-xs",
+                          "hidden xs:block sm:block",
+                          dark ? "text-white/70" : "text-[#6B7280]",
+                          isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
+                          "transition-all duration-1200 ease-out delay-500",
+                        )}>
                           {s.subTitle}
                         </p>
-
-                        <Link
-                          href={s.linkUrl}
-                          className={cn(
-                            "inline-flex items-center gap-1.5",
-                            "text-[10px] sm:text-xs md:text-sm font-semibold",
-                            "px-3 py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3 rounded-lg",
-                            "bg-gradient-to-r from-[#F5820A] to-[#E06B00] text-white",
-                            "hover:shadow-lg hover:shadow-orange-200/50 transition-all active:scale-[0.97]",
-                            isActive
-                              ? "opacity-100 translate-y-0"
-                              : "opacity-0 translate-y-4",
-                            "duration-1200 ease-out delay-600",
-                          )}
-                        >
+                        <Link href={s.linkUrl} className={cn(
+                          "inline-flex items-center gap-1.5",
+                          "text-[10px] sm:text-xs md:text-sm font-semibold",
+                          "px-3 py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3 rounded-lg",
+                          "bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white",
+                          "hover:shadow-lg hover:shadow-orange-200/50 transition-all active:scale-[0.97]",
+                          isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
+                          "duration-1200 ease-out delay-600",
+                        )}>
                           {s.ctaText}
                           <FiArrowRight size={12} />
                         </Link>
                       </div>
 
-                      {/* ── Desktop image (flex col, unchanged from original) ── */}
-                      <div
-                        className={cn(
-                          "hidden md:flex flex-1 items-center justify-center w-full",
-                          "transition-all duration-1200 ease-out delay-300 will-change-transform",
-                          isActive
-                            ? "opacity-100 translate-y-0 scale-100"
-                            : "opacity-0 translate-y-4 scale-[0.98]",
-                        )}
-                      >
-                        <div className="relative w-full h-[300px] sm:h-[340px] md:h-[360px] lg:h-[400px] md:aspect-square md:max-w-[380px] lg:max-w-[440px]">
+                      <div className={cn(
+                        "hidden md:flex flex-1 items-center justify-center w-full",
+                        "transition-all duration-1200 ease-out delay-300 will-change-transform",
+                        isActive ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-4 scale-[0.98]",
+                      )}>
+                        <div className="relative w-full h-75 sm:h-85 md:h-90 lg:h-100 md:aspect-square md:max-w-95 lg:max-w-110">
                           {s.imageUrl && (
-                            <Image
-                              src={s.imageUrl}
-                              alt={s.title}
-                              fill
+                            <Image src={s.imageUrl} alt={s.title} fill
                               sizes="(max-width: 768px) 80vw, 40vw"
                               className="object-contain"
-                              style={{ mixBlendMode: "multiply" }}
-                              priority={i === 0}
-                            />
+                              style={{ mixBlendMode: "multiply" }} priority={i === 0} />
                           )}
                         </div>
                       </div>
@@ -392,12 +280,9 @@ export function HeroBanner() {
               })}
             </div>
 
-            {/* Dot indicators — bottom-left */}
-            <div className="absolute bottom-3  sm:bottom-4 left-[35px] sm:left-6 lg:left-10 flex items-center gap-1.5 z-10">
+            <div className="absolute bottom-3 sm:bottom-4 left-8.75 sm:left-6 lg:left-10 flex items-center gap-1.5 z-10">
               {slides?.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => goTo(i)}
+                <button key={i} onClick={() => goTo(i)}
                   className={cn(
                     "rounded-full transition-all duration-300",
                     i === current
@@ -412,137 +297,161 @@ export function HeroBanner() {
           </div>
         )}
 
-        {/* ━━━━━━ RIGHT: Two Promotional Cards ━━━━━━ */}
-        {/*
-          Mobile: side-by-side row (2 cards next to each other, compact height)
-          Tablet (sm): side-by-side row, slightly taller
-          Desktop (lg): stacked column (original layout, untouched)
-        */}
-        <div
-          className="
-          grid grid-cols-2 gap-3
-          sm:gap-4
-          lg:flex lg:flex-col lg:gap-5 lg:h-[420px]
-        "
-        >
+        {/* ━━━━━━ RIGHT: Two Promo Carousels ━━━━━━ */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:flex lg:flex-col lg:gap-5 lg:h-105">
           {isPromoLoading ? (
             <>
               <HeroPromoSkeleton />
               <HeroPromoSkeleton />
             </>
-            ) : (
-            // /* ── Card 1: Google Pixel 6 Pro (Dark) ── */
+          ) : (
             <>
-              <Link
-                href={promoCard1?.linkUrl ?? "#"}
-                className="
-              group relative
-              bg-[#0B0C0E] rounded-xl lg:rounded-2xl overflow-hidden
-              flex flex-col
-              /* mobile/tablet height */
-              h-[160px] sm:h-[200px]
-              /* desktop: flex-1 to share space equally */
-              lg:flex-1 lg:h-auto
-              transition-all duration-300
-              hover:shadow-2xl hover:shadow-black/40 hover:-translate-y-0.5
-              border border-white/5
-            "
+              {/* ── Card 1: Dark ── */}
+              <div
+                className="group relative bg-[#0B0C0E] rounded-xl lg:rounded-2xl overflow-hidden flex flex-col h-40 sm:h-50 lg:flex-1 lg:h-auto border border-white/5"
+                onMouseEnter={() => setIsPromoPaused1(true)}
+                onMouseLeave={() => setIsPromoPaused1(false)}
               >
-                {/* Badge */}
-                <span className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 lg:top-4 lg:right-4 bg-[#7B2FBE] text-white text-[9px] sm:text-[10px] font-extrabold px-2 py-1 rounded shadow-lg z-20">
-                  {promoCard1?.badge}
-                </span>
-
-                {/* Text — bottom-left */}
-                <div className="absolute bottom-0 left-0 z-10 p-3 sm:p-4 lg:p-7 flex flex-col justify-end">
-                  <p className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold uppercase tracking-widest text-[#F5820A] mb-0.5 sm:mb-1">
-                    {promoCard1?.tag}
-                  </p>
-                  <h3 className="text-white text-sm sm:text-base lg:text-2xl font-extrabold leading-tight whitespace-pre-line mb-2 sm:mb-3 tracking-tight">
-                    {promoCard1?.title}
-                  </h3>
-                  <span className="inline-flex items-center gap-1.5 self-start bg-white text-[#0B1528] text-[9px] sm:text-[10px] lg:text-xs font-bold px-3 py-1.5 sm:px-4 sm:py-2 lg:px-5 lg:py-2.5 rounded-lg shadow-md group-hover:bg-[#F3F4F6] transition-all duration-300">
-                    {promoCard1?.ctaText}
-                    <FiArrowRight size={10} className="stroke-[2.5]" />
-                  </span>
-                </div>
-
-                {/* Image — right side */}
-                <div className="absolute hidden sm:block md:right-0 md:bottom-0 w-[55%] h-[110%] md:pointer-events-none md:select-none z-10">
-                  {promoCard1?.imageUrl && (
-                    <Image
-                      src={promoCard1?.imageUrl ?? ""}
-                      alt={promoCard1?.title ?? ""}
-                      fill
-                      sizes="(max-width: 640px) 30vw, 25vw"
-                      className="object-contain object-right-bottom"
-                      priority
-                    />
-                  )}
-                </div>
-              </Link>
-              {/* ── Card 2: Xiaomi FlipBuds Pro (Light) */}
-              <Link
-                href={promoCard2?.linkUrl ?? "#"}
-                className="
-              group
-              bg-[#F5F5F5] border border-neutral-200/80 rounded-xl lg:rounded-2xl overflow-hidden
-              flex flex-col justify-end
-              /* mobile/tablet height */
-              h-[160px] sm:h-[200px]
-              /* desktop */
-              lg:flex-1 lg:h-auto lg:flex-row lg:items-center lg:justify-start
-              transition-all duration-300
-              hover:shadow-2xl hover:shadow-black/5 hover:-translate-y-0.5
-            "
-              >
-                {/* Image — top on mobile, left on desktop */}
                 <div
-                  className="
-              relative
-              /* mobile/tablet: sits at top, fills most of the card height */
-              absolute inset-x-0 top-0 h-[55%]
-              /* desktop: side-by-side */
-              lg:static lg:h-full lg:w-[130px] xl:w-[150px] lg:shrink-0 lg:ml-4 xl:ml-6
-            "
+                  className="flex h-full w-full transition-transform duration-700 ease-in-out"
+                  style={{ transform: `translateX(-${promoIndex1 * 100}%)` }}
                 >
-                  <div className="relative w-full h-full">
-                    {promoCard2?.imageUrl && (
-                      <Image
-                        src={promoCard2?.imageUrl ?? ""}
-                        alt={promoCard2?.title ?? ""}
-                        fill
-                        sizes="(max-width: 640px) 25vw, 150px"
-                        className="object-contain object-center"
-                        priority
-                      />
-                    )}
+                  {promos.map((p, i) => (
+                    <Link
+                      key={i}
+                      href={p.slug ? `/store/product/${p.slug}` : "#"}
+                      className="min-w-full h-full relative shrink-0 block"
+                    >
+                      {p.badge && (
+                        <span className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 lg:top-4 lg:right-4 bg-[#7B2FBE] text-white text-[9px] sm:text-[10px] font-extrabold px-2 py-1 rounded shadow-lg z-20">
+                          {p.badge}
+                        </span>
+                      )}
+                      <div className="absolute bottom-0 left-0 z-10 p-3 sm:p-4 lg:p-5 flex flex-col justify-end max-w-[55%]">
+                        {p.tag && (
+                          <p className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold uppercase tracking-widest text-[#F5820A] mb-0.5 sm:mb-1">
+                            {p.tag}
+                          </p>
+                        )}
+                        <h3 className="text-white text-xs sm:text-sm lg:text-lg font-extrabold leading-tight mb-2 sm:mb-3 tracking-tight line-clamp-2">
+                          {p.title}
+                        </h3>
+                        <span className="inline-flex items-center gap-1 self-start bg-white text-[#0B1528] text-[9px] sm:text-[10px] font-bold px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg shadow-md group-hover:bg-[#F3F4F6] transition-all duration-300">
+                          {p.ctaText}
+                          <FiArrowRight size={9} className="stroke-[2.5]" />
+                        </span>
+                      </div>
+                      <div className="absolute right-0 bottom-0 w-[48%] h-full pointer-events-none select-none z-10">
+                        {p.imageUrl && (
+                          <Image src={p.imageUrl} alt={p.title ?? ""} fill
+                            sizes="(max-width: 640px) 30vw, 25vw"
+                            className="object-contain object-bottom-right" priority={i === 0} />
+                        )}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+
+                {promos.length > 1 && (
+                  <div className="absolute bottom-2 left-3 flex items-center gap-1 z-20">
+                    {promos.map((_, i) => (
+                      <button key={i} onClick={() => setPromoIndex1(i)}
+                        className={cn(
+                          "rounded-full transition-all duration-300",
+                          i === promoIndex1
+                            ? "w-3 h-1 bg-[#F5820A]"
+                            : "w-1 h-1 bg-white/40 hover:bg-white/70",
+                        )}
+                        aria-label={`Go to promo ${i + 1}`} />
+                    ))}
                   </div>
+                )}
+              </div>
+
+              {/* ── Card 2: Light ── */}
+              <div
+                className="group relative bg-[#F5F5F5] border border-neutral-200/80 rounded-xl lg:rounded-2xl overflow-hidden flex flex-col h-40 sm:h-50 lg:flex-1 lg:h-auto"
+                onMouseEnter={() => setIsPromoPaused2(true)}
+                onMouseLeave={() => setIsPromoPaused2(false)}
+              >
+                <div
+                  className="flex h-full w-fit transition-transform duration-700 ease-in-out"
+                  style={{ transform: `translateX(-${promoIndex2 * 100}%)` }}
+                >
+                  {promos.map((p, i) => (
+                    <Link
+                      key={i}
+                      href={p.slug ? `/store/product/${p.slug}` : "#"}
+                      className="min-w-full h-full relative shrink-0"
+                    >
+                      {/* ── Mobile/tablet: image top-right absolute, text bottom-left ── */}
+                      <div className="lg:hidden absolute inset-0 flex items-end">
+                        <div className="absolute top-0 right-0 w-[48%] h-full pointer-events-none select-none">
+                          {p.imageUrl && (
+                            <Image src={p.imageUrl} alt={p.title ?? ""} fill
+                              sizes="25vw"
+                              className="object-contain object-top-right" priority={i === 0} />
+                          )}
+                        </div>
+                        <div className="relative z-10 p-3 sm:p-4 flex flex-col max-w-[55%]">
+                          <h3 className="text-neutral-950 text-xs sm:text-sm font-extrabold leading-tight mb-1 line-clamp-2">
+                            {p.title}
+                          </h3>
+                          {p.price && (
+                            <p className="text-[#F5820A] text-xs sm:text-sm font-extrabold mb-2">
+                              {p.price}
+                            </p>
+                          )}
+                          <span className="inline-flex items-center gap-1 self-start bg-[#F5820A] text-white text-[9px] sm:text-[10px] font-bold px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg shadow-md group-hover:bg-[#E06B00] transition-all duration-300">
+                            {p.ctaText}
+                            <FiArrowRight size={9} className="stroke-[2.5]" />
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* ── Desktop: clean flex row, no absolute conflicts ── */}
+                      <div className="hidden lg:flex flex-row items-center h-full w-full px-4 gap-3">
+                        <div className="relative w-28 shrink-0 self-stretch">
+                          {p.imageUrl && (
+                            <Image src={p.imageUrl} alt={p.title ?? ""} fill
+                              sizes="112px"
+                              className="object-contain object-center" priority={i === 0} />
+                          )}
+                        </div>
+                        <div className="flex flex-col flex-1 min-w-0 w-fit py-4">
+                          <h3 className="text-neutral-950 w-72 text-base font-extrabold leading-tight mb-1.5 line-clamp-2 text-wrap">
+                            {p.title}
+                          </h3>
+                          {p.price && (
+                            <p className="text-[#F5820A] text-base font-extrabold mb-3">
+                              {p.price}
+                            </p>
+                          )}
+                          <span className="inline-flex items-center gap-1.5 self-start bg-[#F5820A] text-white text-xs font-bold px-4 py-2 rounded-lg shadow-md group-hover:bg-[#E06B00] transition-all duration-300">
+                            {p.ctaText}
+                            <FiArrowRight size={10} className="stroke-[2.5]" />
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
 
-                {/* Text — bottom on mobile, right on desktop */}
-                <div
-                  className="
-              relative z-10
-              /* mobile/tablet: bottom portion */
-              p-3 sm:p-4
-              flex flex-col
-              /* desktop */
-              lg:flex-1 lg:p-5 xl:p-6 lg:pl-4
-            "
-                >
-                  <h3 className="text-neutral-950 text-xs sm:text-sm lg:text-xl font-extrabold leading-tight whitespace-pre-line mb-0.5 sm:mb-1">
-                    {promoCard2?.title}
-                  </h3>
-                  <p className="text-[#F5820A] text-xs sm:text-sm lg:text-lg font-extrabold mb-2 sm:mb-3">
-                    {promoCard2?.price}
-                  </p>
-                  <span className="inline-flex items-center gap-1.5 self-start bg-[#F5820A] text-white text-[9px] sm:text-[10px] lg:text-xs font-bold px-3 py-1.5 sm:px-4 sm:py-2 lg:px-5 lg:py-2.5 rounded-lg shadow-md group-hover:bg-[#E06B00] transition-all duration-300">
-                    {promoCard2?.ctaText}
-                    <FiArrowRight size={10} className="stroke-[2.5]" />
-                  </span>
-                </div>
-              </Link>
+                {promos.length > 1 && (
+                  <div className="absolute bottom-2 left-3 flex items-center gap-1 z-20">
+                    {promos.map((_, i) => (
+                      <button key={i} onClick={() => setPromoIndex2(i)}
+                        className={cn(
+                          "rounded-full transition-all duration-300",
+                          i === promoIndex2
+                            ? "w-3 h-1 bg-[#F5820A]"
+                            : "w-1 h-1 bg-neutral-400/50 hover:bg-neutral-500/70",
+                        )}
+                        aria-label={`Go to promo ${i + 1}`} />
+                    ))}
+                  </div>
+                )}
+              </div>
             </>
           )}
         </div>
