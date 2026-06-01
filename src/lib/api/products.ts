@@ -242,5 +242,6 @@ export const productsApi = {
       subTitle?: string
       price?: string
       sortOrder: number
+      slug?: string
     }>>("/promotions/hero"),
 };
