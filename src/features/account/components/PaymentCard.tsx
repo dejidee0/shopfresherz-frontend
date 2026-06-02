@@ -39,7 +39,7 @@ export function PaymentCard({ card, onDelete, onEdit }: PaymentCardProps) {
 
   // API returns full cardNumber — derive last 4 digits
   const last4 = card.cardNumber?.slice(-4) ?? '••••'
-  const type  = normaliseType(card.type)
+  const type  = normaliseType(card.cardType)
 
   function copyNumber() {
     navigator.clipboard.writeText(`**** **** **** ${last4}`)
@@ -73,7 +73,7 @@ export function PaymentCard({ card, onDelete, onEdit }: PaymentCardProps) {
       {/* Cardholder + logo */}
       <div className="flex items-center justify-between">
         {CARD_LOGO[type]}
-        <span className="text-xs text-white/80 font-medium">{card.cardholderName}</span>
+        <span className="text-xs text-white/80 font-medium">{card.cardHolderName}</span>
       </div>
 
       {/* Default badge */}

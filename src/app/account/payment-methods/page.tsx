@@ -62,8 +62,10 @@ export default function PaymentMethodsPage() {
   // Map PaymentMethod → PaymentCardDto for the edit form's initialData
   function toInitialData(card: PaymentMethod): Partial<PaymentCardDto> {
     return {
-      cardType:      card.type,
-      cardHolderName: card.cardholderName,
+      cardType:      card.cardType,
+      cardHolderName: card.cardHolderName,
+      expiryMonth:   card.expiryMonth,
+      expiryYear:    card.expiryYear,
       // cardNumber omitted in edit — user can't see/change the full number
       isDefault:     card.isDefault,
     }
