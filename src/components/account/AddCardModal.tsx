@@ -51,9 +51,16 @@ export default function AddCardModal({
 
   // Sync form when initialData changes (e.g. opening edit for different card)
   useEffect(() => {
-    setForm({ ...EMPTY, ...initialData })
-    setError(null)
-  }, [initialData, isOpen])
+  setForm({
+    cardType:       initialData?.cardType       ?? EMPTY.cardType,
+    cardNumber:     initialData?.cardNumber     ?? EMPTY.cardNumber,
+    cardHolderName: initialData?.cardHolderName ?? EMPTY.cardHolderName,
+    expiryMonth:    initialData?.expiryMonth    ?? EMPTY.expiryMonth,
+    expiryYear:     initialData?.expiryYear     ?? EMPTY.expiryYear,
+    isDefault:      initialData?.isDefault      ?? EMPTY.isDefault,
+  })
+  setError(null)
+}, [initialData, isOpen])
 
   function set<K extends keyof PaymentCardDto>(key: K, value: PaymentCardDto[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))

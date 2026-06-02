@@ -35,11 +35,14 @@ export type UpdateAddressRequest = Partial<CreateAddressRequest>;
 
 export interface PaymentMethod {
   id: string;
-  type: "visa" | "mastercard" | "verve";
+  cardType: "visa" | "mastercard" | "verve";
   cardNumber: string;
   balance?: number; // shown on card chip in dashboard
   currency?: string;
-  cardholderName: string;
+  cardHolderName: string;
+  expiryMonth: number;
+  expiryYear: number;
+  cvv: string;  // shown on card chip in dashboard
   isDefault: boolean;
 }
 
