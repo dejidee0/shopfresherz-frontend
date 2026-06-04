@@ -10,7 +10,7 @@ export interface CloudinaryUploadResult {
 export async function uploadToCloudinary(file: File): Promise<string> {
   const formData = new FormData()
   formData.append('file', file)
-  formData.append('upload_preset', 'shop-fresherz') // You'll need to create this preset in Cloudinary
+  formData.append('upload_preset', 'shopfresherz') // You'll need to create this preset in Cloudinary
   formData.append('cloud_name', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!)
 
   const response = await fetch(
