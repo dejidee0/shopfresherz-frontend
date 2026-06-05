@@ -113,7 +113,7 @@ const AdminProductsPage = () => {
     {
       key: "category",
       header: "CATEGORY",
-      render: (row) => <span>{row.category}</span>,
+      render: (row) => <span>{row.category.name}</span>,
     },
     {
       key: "price",

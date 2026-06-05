@@ -1,100 +1,93 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/auth";
 import { useCartStore } from "@/store/cart";
 
-import { BillingStep } from "@/features/checkout/components/BillingStep";
 import { DeliveryStep } from "@/features/checkout/components/DeliveryStep";
 import { PaymentStep } from "@/features/checkout/components/PaymentStep";
 import { ReviewStep } from "@/features/checkout/components/ReviewStep";
 import { RegisteredCheckout } from "@/features/checkout/components/RegisteredCheckout";
 
 import {
-  EMPTY_BILLING,
   EMPTY_CARD,
-  type BillingForm,
   type DeliveryMethod,
   type PaymentMethod,
   type CardForm,
   type CouponState,
 } from "@/features/checkout/types/checkout";
-import { accountApi, type Address, type PaymentMethod as SavedCard } from "@/lib/api/account";
+import {
+  accountApi,
+  type Address,
+  type PaymentMethod as SavedCard,
+} from "@/lib/api/account";
 
 type CheckoutStep = 1 | 2 | 3 | 4;
 
 const COUPONS: Record<string, { type: "percent" | "fixed"; value: number }> = {
-  SAVE10: { type: "percent", value: 10 },
-  FRESH10: { type: "percent", value: 10 },
-  WELCOME5000: { type: "fixed", value: 5000 },
+  SAVE10:      { type: "percent", value: 10   },
+  FRESH10:     { type: "percent", value: 10   },
+  WELCOME5000: { type: "fixed",   value: 5000 },
 };
 
+export function SAVED_CARDS_QUERY_KEY(token: string | null | undefined) {
+  return ["checkout-saved-cards", token] as const;
+}
+
 export default function CheckoutPage() {
-  const router = useRouter();
-  const token = useAuthStore((s) => s.accessToken);
+  const router   = useRouter();
+  const token    = useAuthStore((s) => s.accessToken);
   const { isAuthenticated } = useAuthStore();
-  const items = useCartStore((s) => s.items);
-  const subtotal = useCartStore((s) => s.subtotal());
-  const couponCode = useCartStore((s) => s.couponCode);
-  const setCartCoupon = useCartStore((s) => s.setCoupon);
+  const items           = useCartStore((s) => s.items);
+  const subtotal        = useCartStore((s) => s.subtotal());
+  const couponCode      = useCartStore((s) => s.couponCode);
+  const setCartCoupon   = useCartStore((s) => s.setCoupon);
   const removeCartCoupon = useCartStore((s) => s.removeCoupon);
 
-  const [addresses, setAddresses] = useState<Address[]>([]);
+  // ── Addresses ─────────────────────────────────────────────────────────────
+  const { data: addresses = [] } = useQuery<Address[]>({
+    queryKey: ["checkout-addresses", token],
+    queryFn:  () => accountApi.getAddresses(token!),
+    enabled:  !!token,
+  });
+
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
 
-  // Saved payment cards from account
-  const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
+  useMemo(() => {
+    if (addresses.length === 0 || selectedAddressId) return;
+    const def = addresses.find((a) => a.isDefault) ?? addresses[0];
+    if (def) setSelectedAddressId(def.id);
+  }, [addresses]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Saved cards ───────────────────────────────────────────────────────────
+  const { data: savedCards = [] } = useQuery<SavedCard[]>({
+    queryKey: SAVED_CARDS_QUERY_KEY(token),
+    queryFn:  () => accountApi.getPaymentMethods(token!),
+    enabled:  !!token,
+  });
+
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
-
-  const hasSavedAddress = isAuthenticated && addresses.length > 0;
-
-  const [step, setStep] = useState<CheckoutStep>(1);
-  const [billing, setBilling] = useState<BillingForm>(EMPTY_BILLING);
-  const [delivery, setDelivery] = useState<DeliveryMethod>("standard");
   const [payment, setPayment] = useState<PaymentMethod | null>(null);
+
+  useMemo(() => {
+    if (savedCards.length === 0 || selectedCardId) return;
+    const def = savedCards.find((c) => c.isDefault) ?? null;
+    if (def) { setSelectedCardId(def.id); setPayment("card"); }
+  }, [savedCards]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Step + form state ─────────────────────────────────────────────────────
+  const [step,     setStep]     = useState<CheckoutStep>(1);
+  const [delivery, setDelivery] = useState<DeliveryMethod>("standard");
   const [cardForm, setCardForm] = useState<CardForm>(EMPTY_CARD);
-  const [coupon, setCoupon] = useState<CouponState>({
-    code: couponCode ?? "",
+  const [coupon,   setCoupon]   = useState<CouponState>({
+    code:    couponCode ?? "",
     applied: !!couponCode,
   });
 
-  useEffect(() => {
-    setCoupon({ code: couponCode ?? "", applied: !!couponCode });
-  }, [couponCode]);
-
-  // Fetch saved addresses + payment cards
-  useEffect(() => {
-    if (!token) return;
-    let isMounted = true;
-
-    accountApi.getAddresses(token)
-      .then((data) => {
-        if (!isMounted) return;
-        setAddresses(data);
-        const defaultAddr = data.find((a) => a.isDefault) ?? data[0];
-        if (defaultAddr) setSelectedAddressId(defaultAddr.id);
-      })
-      .catch((err) => console.error("Failed to load addresses:", err));
-
-    accountApi.getPaymentMethods(token)
-      .then((data) => {
-        if (!isMounted) return;
-        setSavedCards(data);
-        // Pre-select default card; if none set payment to null (user must choose)
-        const defaultCard = data.find((c) => c.isDefault) ?? null;
-        if (defaultCard) {
-          setSelectedCardId(defaultCard.id);
-          setPayment("card");
-        }
-      })
-      .catch((err) => console.error("Failed to load payment methods:", err));
-
-    return () => { isMounted = false; };
-  }, [token]);
-
   const deliveryFee = useMemo(() => {
-    if (delivery === "pickup") return 0;
+    if (delivery === "pickup")  return 0;
     if (delivery === "express") return 3500;
     return subtotal >= 50000 ? 0 : 1500;
   }, [delivery, subtotal]);
@@ -105,29 +98,18 @@ export default function CheckoutPage() {
   };
 
   const handleApplyCoupon = () => {
-    const code = coupon.code.trim().toUpperCase();
+    const code   = coupon.code.trim().toUpperCase();
     const config = COUPONS[code];
-
-    if (!code) {
-      setCoupon({ code: "", applied: false, error: "Enter a coupon code." });
-      return;
-    }
-    if (!config) {
-      removeCartCoupon();
-      setCoupon({ code, applied: false, error: "Invalid coupon code." });
-      return;
-    }
+    if (!code)   { setCoupon({ code: "", applied: false, error: "Enter a coupon code." }); return; }
+    if (!config) { removeCartCoupon(); setCoupon({ code, applied: false, error: "Invalid coupon code." }); return; }
     if (subtotal <= 0) {
       removeCartCoupon();
       setCoupon({ code, applied: false, error: "Add items to your cart before applying a coupon." });
       return;
     }
-
-    const discount =
-      config.type === "percent"
-        ? Math.round(subtotal * (config.value / 100))
-        : Math.min(config.value, subtotal);
-
+    const discount = config.type === "percent"
+      ? Math.round(subtotal * (config.value / 100))
+      : Math.min(config.value, subtotal);
     setCartCoupon(code, discount);
     setCoupon({ code, applied: true });
   };
@@ -138,17 +120,20 @@ export default function CheckoutPage() {
   };
 
   const handlePlaceOrder = async () => {
-    // TODO: await checkoutApi.placeOrder({ items, billing, delivery, payment, cardForm, coupon })
+    // TODO: await checkoutApi.placeOrder(...)
     router.push("/store/checkout/confirmation");
   };
 
   const sidebarProps = {
     coupon,
-    onCouponChange: handleCouponChange,
-    onApplyCoupon: handleApplyCoupon,
-    onRemoveCoupon: handleRemoveCoupon,
+    onCouponChange:  handleCouponChange,
+    onApplyCoupon:   handleApplyCoupon,
+    onRemoveCoupon:  handleRemoveCoupon,
     deliveryFee,
   };
+
+  // Resolve selected address object for ReviewStep
+  const selectedAddress = addresses.find((a) => a.id === selectedAddressId) ?? addresses[0] ?? null;
 
   if (items.length === 0) {
     return (
@@ -167,79 +152,24 @@ export default function CheckoutPage() {
     );
   }
 
-  if (hasSavedAddress) {
-    return (
-      <div className="max-w-content mx-auto px-4 sm:px-6 lg:px-10 py-6 min-h-[60vh]">
-        {step === 1 && (
-          <RegisteredCheckout
-            {...sidebarProps}
-            addresses={addresses}
-            selectedAddressId={selectedAddressId}
-            onSelectAddress={setSelectedAddressId}
-            delivery={delivery}
-            deliveryFee={deliveryFee}
-            savedCards={savedCards}
-            selectedCardId={selectedCardId}
-            onSelectCard={(id) => {
-              setSelectedCardId(id);
-              setPayment("card");
-            }}
-            selectedPayment={payment}
-            onSelectPayment={setPayment}
-            onEditDelivery={() => setStep(2)}
-            onEditPayment={() => setStep(3)}
-            onPlaceOrder={() => setStep(4)}
-          />
-        )}
-
-        {step === 2 && (
-          <DeliveryStep
-            selected={delivery}
-            onSelect={setDelivery}
-            onBack={() => setStep(1)}
-            onContinue={() => setStep(1)}
-            {...sidebarProps}
-          />
-        )}
-
-        {step === 3 && (
-          <PaymentStep
-            selected={payment ?? "card"}
-            onSelect={(m) => {
-              setPayment(m);
-              if (m !== "card") setSelectedCardId(null);
-            }}
-            cardForm={cardForm}
-            setCardForm={setCardForm}
-            onBack={() => setStep(1)}
-            onContinue={() => setStep(1)}
-            {...sidebarProps}
-          />
-        )}
-
-        {step === 4 && (
-          <ReviewStep
-            billing={billing}
-            delivery={delivery}
-            payment={payment ?? "card"}
-            onBack={() => setStep(1)}
-            onPlaceOrder={handlePlaceOrder}
-            {...sidebarProps}
-          />
-        )}
-      </div>
-    );
-  }
-
-  // Guest / no saved addresses — full form flow
   return (
     <div className="max-w-content mx-auto px-4 sm:px-6 lg:px-10 py-6 min-h-[60vh]">
       {step === 1 && (
-        <BillingStep
-          form={billing}
-          setForm={setBilling}
-          onContinue={() => setStep(2)}
+        <RegisteredCheckout
           {...sidebarProps}
+          addresses={addresses}
+          selectedAddressId={selectedAddressId}
+          onSelectAddress={setSelectedAddressId}
+          delivery={delivery}
+          deliveryFee={deliveryFee}
+          savedCards={savedCards}
+          selectedCardId={selectedCardId}
+          onSelectCard={(id) => { setSelectedCardId(id); setPayment("card"); }}
+          selectedPayment={payment}
+          onSelectPayment={setPayment}
+          onEditDelivery={() => setStep(2)}
+          onEditPayment={() => setStep(3)}
+          onPlaceOrder={() => setStep(4)}
         />
       )}
 
@@ -248,7 +178,7 @@ export default function CheckoutPage() {
           selected={delivery}
           onSelect={setDelivery}
           onBack={() => setStep(1)}
-          onContinue={() => setStep(3)}
+          onContinue={() => setStep(1)}
           {...sidebarProps}
         />
       )}
@@ -256,21 +186,21 @@ export default function CheckoutPage() {
       {step === 3 && (
         <PaymentStep
           selected={payment ?? "card"}
-          onSelect={setPayment}
+          onSelect={(m) => { setPayment(m); if (m !== "card") setSelectedCardId(null); }}
           cardForm={cardForm}
           setCardForm={setCardForm}
-          onBack={() => setStep(2)}
-          onContinue={() => setStep(4)}
+          onBack={() => setStep(1)}
+          onContinue={() => setStep(1)}
           {...sidebarProps}
         />
       )}
 
       {step === 4 && (
         <ReviewStep
-          billing={billing}
+          selectedAddress={selectedAddress}
           delivery={delivery}
           payment={payment ?? "card"}
-          onBack={() => setStep(3)}
+          onBack={() => setStep(1)}
           onPlaceOrder={handlePlaceOrder}
           {...sidebarProps}
         />

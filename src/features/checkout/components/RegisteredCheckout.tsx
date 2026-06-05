@@ -123,8 +123,8 @@ export function RegisteredCheckout({
 
   // Payment is ready if: a saved card is selected, or a non-card method is chosen
   const paymentReady =
-    (selectedPayment === 'card' && !!selectedCardId) ||
-    (selectedPayment !== null && selectedPayment !== 'card')
+    (selectedPayment === 'card' && !!selectedCardId && selectedAddressId !== null) ||
+    (selectedPayment !== null && selectedPayment !== 'card' && selectedAddressId !== null)
 
   const PAYMENT_METHOD_LABELS: Record<string, string> = {
     card:            'Card',
@@ -253,7 +253,7 @@ export function RegisteredCheckout({
               onClick={onEditPayment}
               className="text-xs text-[#F5820A] font-medium hover:underline flex items-center gap-0.5"
             >
-              Change <FiChevronRight size={12} />
+              Add Card / Change <FiChevronRight size={12} />
             </button>
           </div>
 
