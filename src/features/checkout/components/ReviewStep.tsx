@@ -3,15 +3,16 @@
 import Image from 'next/image'
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi'
 import { useCartStore } from '@/store/cart'
+import { useAuthStore } from '@/store/auth'
 import { cn, formatPrice } from '@/lib/utils/format'
 import { OrderSummary, CheckoutLayout, StepIndicator } from './CheckoutShared'
 import {
-  type BillingForm,
   type DeliveryMethod,
   type PaymentMethod,
   type CouponState,
   DELIVERY_OPTIONS,
 } from '../types/checkout'
+import type { Address } from '@/lib/api/account'
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
@@ -19,13 +20,14 @@ function DetailRow({ label, value }: { label: string; value: string }) {
       <span className="text-xs font-bold uppercase tracking-wider text-[#9CA3AF] shrink-0 w-24">
         {label}
       </span>
-      <span className="text-sm text-[#111111] text-right">{value}</span>
+      <span className="text-sm text-[#111111] text-right">{value || '—'}</span>
     </div>
   )
 }
 
 interface Props {
-  billing: BillingForm
+  // Address selected in RegisteredCheckout
+  selectedAddress: Address | null
   delivery: DeliveryMethod
   payment: PaymentMethod
   coupon: CouponState
@@ -38,7 +40,7 @@ interface Props {
 }
 
 export function ReviewStep({
-  billing,
+  selectedAddress,
   delivery,
   payment,
   coupon,
@@ -49,22 +51,39 @@ export function ReviewStep({
   onBack,
   onPlaceOrder,
 }: Props) {
-  const items = useCartStore((s) => s.items)
-  const subtotal = useCartStore((s) => s.subtotal())
+  const { user } = useAuthStore()
+  const items          = useCartStore((s) => s.items)
+  const subtotal       = useCartStore((s) => s.subtotal())
   const discountAmount = useCartStore((s) => s.discountAmount)
-  const total = Math.max(0, subtotal - discountAmount) + deliveryFee + Math.max(0, subtotal - discountAmount) * 0.075
-  const deliveryLabel = DELIVERY_OPTIONS.find((d) => d.id === delivery)?.label ?? delivery
+  const taxable        = Math.max(0, subtotal - discountAmount)
+  const total          = taxable + deliveryFee + taxable * 0.075
 
   const paymentLabel: Record<PaymentMethod, string> = {
-    card: 'Debit/Credit Card',
-    bank_transfer: 'Bank Transfer',
+    card:            'Debit / Credit Card',
+    bank_transfer:   'Bank Transfer',
     pay_on_delivery: 'Pay on Delivery',
   }
 
   const deliveryDetail = (() => {
     const opt = DELIVERY_OPTIONS.find((d) => d.id === delivery)
-    return opt ? `${opt.label} - ${opt.subtitle}` : deliveryLabel
+    return opt ? `${opt.label} — ${opt.subtitle}` : delivery
   })()
+
+  // Build full address string from the selected Address object
+  const addressLine = selectedAddress
+    ? [
+        selectedAddress.line1,
+        selectedAddress.line2,
+        selectedAddress.city,
+        selectedAddress.state,
+        selectedAddress.postalCode,
+        'Nigeria',
+      ]
+        .filter(Boolean)
+        .join(', ')
+    : '—'
+
+  const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || '—'
 
   return (
     <CheckoutLayout
@@ -81,17 +100,17 @@ export function ReviewStep({
       <StepIndicator step={4} />
       <h2 className="text-lg font-bold text-[#111111] mb-5">Review Your Order</h2>
 
+      {/* ── Cart items ── */}
       <div className="bg-white border border-[#E5E7EB] rounded-lg overflow-hidden mb-4">
         {items.length === 0 && (
           <p className="p-4 text-sm text-[#6B7280]">Your cart is empty.</p>
         )}
-
         {items.map((item, i) => (
           <div
             key={item.id}
             className={cn(
               'flex items-center gap-4 px-4 py-3',
-              i < items.length - 1 && 'border-b border-[#F5F5F5]'
+              i < items.length - 1 && 'border-b border-[#F5F5F5]',
             )}
           >
             <div className="w-14 h-14 rounded bg-[#F5F5F5] shrink-0 overflow-hidden">
@@ -106,7 +125,7 @@ export function ReviewStep({
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-[#111111] line-clamp-1">{item.name}</p>
               <p className="text-xs text-[#6B7280] mt-0.5">
-                Qty {item.quantity} x {formatPrice(item.price)}
+                Qty {item.quantity} × {formatPrice(item.price)}
               </p>
             </div>
             <p className="text-sm font-bold text-[#111111] shrink-0">
@@ -116,18 +135,18 @@ export function ReviewStep({
         ))}
       </div>
 
+      {/* ── Delivery details ── */}
       <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 sm:p-5 mb-6">
-        <p className="text-sm font-bold text-[#111111] mb-1">Delivery Details</p>
-        <div className="mt-2">
-          <DetailRow label="Name" value={`${billing.firstName} ${billing.lastName}`.trim() || '-'} />
-          <DetailRow label="Email" value={billing.email || '-'} />
-          <DetailRow label="Phone" value={billing.phone || '-'} />
-          <DetailRow label="Address" value={billing.address || '-'} />
-          <DetailRow label="Delivery" value={deliveryDetail} />
-          <DetailRow label="Payment" value={paymentLabel[payment]} />
-        </div>
+        <p className="text-sm font-bold text-[#111111] mb-2">Delivery Details</p>
+        <DetailRow label="Name"     value={fullName} />
+        <DetailRow label="Email"    value={user?.email    || '—'} />
+        <DetailRow label="Phone"    value={user?.phone    || '—'} />
+        <DetailRow label="Address"  value={addressLine} />
+        <DetailRow label="Delivery" value={deliveryDetail} />
+        <DetailRow label="Payment"  value={paymentLabel[payment]} />
       </div>
 
+      {/* ── Actions ── */}
       <div className="flex gap-3">
         <button
           onClick={onBack}
@@ -140,7 +159,7 @@ export function ReviewStep({
           disabled={items.length === 0}
           className="flex-1 text-xs md:text-base h-12 rounded bg-[#F5820A] text-white font-bold flex items-center justify-center gap-2 hover:bg-[#E06B00] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          PLACE ORDER - {formatPrice(total)} <FiArrowRight className='hidden md:flex' size={15} />
+          PLACE ORDER — {formatPrice(total)} <FiArrowRight className="hidden md:flex" size={15} />
         </button>
       </div>
     </CheckoutLayout>
