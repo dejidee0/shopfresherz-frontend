@@ -33,6 +33,8 @@ interface ContentRow {
 export interface PromoRow {
   id: string;
   title: string;
+  productId?: string;
+  productName?: string;
   subtitle?: string;
   ctaText?: string;
   imageUrl?: string;
