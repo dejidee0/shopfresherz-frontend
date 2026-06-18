@@ -9,6 +9,7 @@ interface AddContentModalProps {
   /** When provided the modal runs in edit mode — fields prefilled, calls updateBanner */
   initialData?: {
     id: string;
+    tag: string;
     title: string;
     subtitle?: string;
     cta: string;
@@ -19,6 +20,7 @@ interface AddContentModalProps {
 
 export interface ContentFormData {
   title: string;
+  tag: string;
   subtitle: string;
   cta: string;
   imageFile: File | null;
@@ -29,6 +31,7 @@ export interface ContentFormData {
 
 const EMPTY_FORM: ContentFormData = {
   title: "",
+  tag: "",
   subtitle: "",
   cta: "",
   imageFile: null,
@@ -53,13 +56,14 @@ const AddContentModal = ({ isOpen, onClose, initialData }: AddContentModalProps)
   useEffect(() => {
     if (isOpen && initialData) {
       setForm({
-        title:        initialData.title        ?? "",
-        subtitle:     initialData.subtitle      ?? "",
-        cta:          initialData.cta           ?? "",
-        imgUrl:       initialData.imgUrl        ?? "",
-        linkUrl:      initialData.linkUrl       ?? "",
+        title:        initialData.title    ?? "",
+        tag:          initialData.tag      ?? "",
+        subtitle:     initialData.subtitle ?? "",
+        cta:          initialData.cta      ?? "",
+        imgUrl:       initialData.imgUrl   ?? "",
+        linkUrl:      initialData.linkUrl  ?? "",
         imageFile:    null,
-        imagePreview: initialData.imgUrl        ?? "",  // show existing image as preview
+        imagePreview: initialData.imgUrl   ?? "",
       });
     } else if (isOpen && !initialData) {
       setForm(EMPTY_FORM);
@@ -91,7 +95,6 @@ const AddContentModal = ({ isOpen, onClose, initialData }: AddContentModalProps)
       setErrors((prev) => ({ ...prev, imageFile: "Please select a valid image file" }));
       return;
     }
-    // Revoke previous blob if any
     if (form.imagePreview?.startsWith("blob:")) URL.revokeObjectURL(form.imagePreview);
     const previewUrl = URL.createObjectURL(file);
     setForm((prev) => ({ ...prev, imageFile: file, imagePreview: previewUrl, imgUrl: "" }));
@@ -107,10 +110,10 @@ const AddContentModal = ({ isOpen, onClose, initialData }: AddContentModalProps)
 
   const validate = (): boolean => {
     const e: typeof errors = {};
-    if (!form.title.trim())               e.title    = "Title is required";
-    if (!form.cta.trim())                 e.cta      = "CTA text is required";
-    if (!form.linkUrl.trim())             e.linkUrl  = "Link URL is required";
-    if (!form.imageFile && !form.imgUrl)  e.imageFile = "An image is required";
+    if (!form.title.trim())              e.title     = "Title is required";
+    if (!form.cta.trim())                e.cta       = "CTA text is required";
+    if (!form.linkUrl.trim())            e.linkUrl   = "Link URL is required";
+    if (!form.imageFile && !form.imgUrl) e.imageFile = "An image is required";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -137,7 +140,8 @@ const AddContentModal = ({ isOpen, onClose, initialData }: AddContentModalProps)
 
       const payload = {
         title:    form.title,
-        subtitle: form.subtitle,
+        tag:      form.tag || undefined,   // ← added
+        subtitle: form.subtitle || undefined,
         imageUrl,
         linkUrl:  form.linkUrl,
         ctaText:  form.cta,
@@ -150,7 +154,6 @@ const AddContentModal = ({ isOpen, onClose, initialData }: AddContentModalProps)
         await createBannerMutation.mutateAsync(payload);
       }
 
-      // Cleanup blob URL if present
       if (form.imagePreview?.startsWith("blob:")) URL.revokeObjectURL(form.imagePreview);
       onClose();
     } catch {
@@ -197,7 +200,7 @@ const AddContentModal = ({ isOpen, onClose, initialData }: AddContentModalProps)
             <input
               type="text"
               value={form.title}
-              onChange={(e) => { set("title", e.target.value); clearError("title") }}
+              onChange={(e) => { set("title", e.target.value); clearError("title"); }}
               placeholder="Banner Title"
               className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
             />
@@ -216,13 +219,24 @@ const AddContentModal = ({ isOpen, onClose, initialData }: AddContentModalProps)
             />
           </div>
 
+          {/* Tag */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Tag</label>
+            <input
+              type="text"
+              value={form.tag}
+              onChange={(e) => set("tag", e.target.value)}
+              placeholder="e.g. New Arrival, Hot Deal"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
+            />
+          </div>
+
           {/* Image */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Image <span className="text-red-500">*</span>
             </label>
             <div className="space-y-3">
-              {/* Upload trigger — hidden once an image is selected */}
               {!form.imagePreview && (
                 <>
                   <input
@@ -242,7 +256,6 @@ const AddContentModal = ({ isOpen, onClose, initialData }: AddContentModalProps)
                 </>
               )}
 
-              {/* Preview */}
               {form.imagePreview && (
                 <div className="relative inline-block">
                   <img
@@ -270,7 +283,6 @@ const AddContentModal = ({ isOpen, onClose, initialData }: AddContentModalProps)
                   value={form.imgUrl}
                   onChange={(e) => {
                     set("imgUrl", e.target.value);
-                    // If typing a URL, clear any selected file
                     if (e.target.value && form.imageFile) {
                       if (form.imagePreview?.startsWith("blob:")) URL.revokeObjectURL(form.imagePreview);
                       setForm((prev) => ({ ...prev, imageFile: null, imagePreview: e.target.value }));
@@ -292,7 +304,7 @@ const AddContentModal = ({ isOpen, onClose, initialData }: AddContentModalProps)
             <input
               type="text"
               value={form.linkUrl}
-              onChange={(e) => { set("linkUrl", e.target.value); clearError("linkUrl") }}
+              onChange={(e) => { set("linkUrl", e.target.value); clearError("linkUrl"); }}
               placeholder="/category/phones"
               className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
             />
@@ -307,7 +319,7 @@ const AddContentModal = ({ isOpen, onClose, initialData }: AddContentModalProps)
             <input
               type="text"
               value={form.cta}
-              onChange={(e) => { set("cta", e.target.value); clearError("cta") }}
+              onChange={(e) => { set("cta", e.target.value); clearError("cta"); }}
               placeholder="Shop Now"
               className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
             />

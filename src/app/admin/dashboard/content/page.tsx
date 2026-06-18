@@ -21,6 +21,7 @@ import { PromoDto } from "@/lib/api/admin";
 
 interface ContentRow {
   id: string;
+  tag: string;
   title: string;
   subtitle?: string;
   cta: string;
@@ -299,6 +300,7 @@ const AdminContentPage = () => {
     if (!banners) return [];
     return toArray(banners).map((b) => ({
       id: b.id,
+      tag: b.tag,
       title: b.title ?? "Untitled",
       subtitle: b.subtitle,
       cta: b.ctaText ?? "Learn More",
@@ -427,6 +429,7 @@ const AdminContentPage = () => {
             modalState.data
               ? {
                   id: modalState.data.id,
+                  tag: modalState.data.tag,
                   title: modalState.data.title,
                   subtitle: modalState.data.subtitle,
                   cta: modalState.data.cta,
