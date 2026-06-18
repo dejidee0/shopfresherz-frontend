@@ -33,8 +33,6 @@ interface ContentRow {
 export interface PromoRow {
   id: string;
   title: string;
-  productId?: string;
-  productName?: string;
   subtitle?: string;
   ctaText?: string;
   imageUrl?: string;
@@ -300,7 +298,7 @@ const AdminContentPage = () => {
     if (!banners) return [];
     return toArray(banners).map((b) => ({
       id: b.id,
-      tag: b.tag,
+      tag: (b.tag as string | undefined) ?? "",
       title: b.title ?? "Untitled",
       subtitle: b.subtitle,
       cta: b.ctaText ?? "Learn More",
