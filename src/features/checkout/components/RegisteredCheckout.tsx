@@ -9,8 +9,10 @@ import { OrderSummary, CheckoutLayout } from './CheckoutShared'
 import type { CouponState, DeliveryMethod, PaymentMethod } from '../types/checkout'
 import { useAuthStore } from '@/store/auth'
 import { useCartStore } from '@/store/cart'
+import { toast } from '@/store/toast'
 import { formatPrice } from '@/lib/utils/format'
-import type { Address, PaymentMethod as SavedCard } from '@/lib/api/account'
+import type { Address, CreateAddressRequest, PaymentMethod as SavedCard } from '@/lib/api/account'
+import AddAddressModal from '@/components/account/AddAddressModal'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -78,6 +80,7 @@ interface Props {
   addresses: Address[]
   selectedAddressId: string | null
   onSelectAddress: (id: string) => void
+  onAddAddress: (data: CreateAddressRequest) => Promise<void>
   // Payment
   savedCards: SavedCard[]
   selectedCardId: string | null
@@ -102,6 +105,7 @@ export function RegisteredCheckout({
   addresses,
   selectedAddressId,
   onSelectAddress,
+  onAddAddress,
   savedCards,
   selectedCardId,
   onSelectCard,
@@ -118,6 +122,8 @@ export function RegisteredCheckout({
   const total = taxableAmount + deliveryFee + taxableAmount * 0.075
 
   const [showAllAddresses, setShowAllAddresses] = useState(false)
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false)
+  const [isAddingAddress, setIsAddingAddress] = useState(false)
 
   const visibleAddresses = showAllAddresses ? addresses : addresses.slice(0, 2)
 
@@ -132,7 +138,28 @@ export function RegisteredCheckout({
     pay_on_delivery: 'Pay on Delivery',
   }
 
+  const handleAddAddress = async (data: CreateAddressRequest) => {
+    setIsAddingAddress(true)
+
+    try {
+      await onAddAddress(data)
+      setShowAllAddresses(true)
+      setIsAddressModalOpen(false)
+      toast.success('Address added successfully')
+    } catch (error) {
+      const message =
+        error && typeof error === 'object' && 'message' in error && typeof error.message === 'string'
+          ? error.message
+          : 'Failed to add address.'
+      toast.error('Address not added', message)
+    } finally {
+      setIsAddingAddress(false)
+    }
+  }
+
+
   return (
+    <>
     <CheckoutLayout
       sidebar={
         <OrderSummary
@@ -212,7 +239,7 @@ export function RegisteredCheckout({
             )}
 
             <button
-              onClick={() => {/* TODO: open add-address modal */}}
+              onClick={() => setIsAddressModalOpen(true)}
               className="mt-1 flex items-center gap-2 text-xs text-[#6B7280] font-medium hover:text-[#F5820A] transition-colors self-start"
             >
               <span className="w-4 h-4 rounded-full border border-dashed border-current flex items-center justify-center">
@@ -304,7 +331,7 @@ export function RegisteredCheckout({
               })}
 
               {/* Other payment methods as secondary options */}
-              {(['bank_transfer', 'pay_on_delivery'] as PaymentMethod[]).map((method) => {
+              {(['bank_transfer', ] as PaymentMethod[]).map((method) => {
                 const isSelected = selectedPayment === method
                 return (
                   <button
@@ -331,7 +358,7 @@ export function RegisteredCheckout({
           ) : (
             /* No saved cards — show all payment options */
             <div className="flex flex-col gap-2">
-              {(['card', 'bank_transfer', 'pay_on_delivery'] as PaymentMethod[]).map((method) => {
+              {(['card', 'bank_transfer', ] as PaymentMethod[]).map((method) => {
                 const isSelected = selectedPayment === method
                 return (
                   <button
@@ -380,5 +407,14 @@ export function RegisteredCheckout({
         </button>
       </div>
     </CheckoutLayout>
+
+    <AddAddressModal
+      key={isAddressModalOpen ? 'checkout-new-address' : 'checkout-address-closed'}
+      isOpen={isAddressModalOpen}
+      isSubmitting={isAddingAddress}
+      onClose={() => setIsAddressModalOpen(false)}
+      onSubmit={handleAddAddress}
+    />
+    </>
   )
 }

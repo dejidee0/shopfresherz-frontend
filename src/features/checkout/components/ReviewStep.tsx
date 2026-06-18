@@ -35,8 +35,9 @@ interface Props {
   onApplyCoupon: () => void
   onRemoveCoupon?: () => void
   deliveryFee: number
+  isPlacingOrder?: boolean
   onBack: () => void
-  onPlaceOrder: () => void
+  onPlaceOrder: () => void | Promise<void>
 }
 
 export function ReviewStep({
@@ -48,6 +49,7 @@ export function ReviewStep({
   onApplyCoupon,
   onRemoveCoupon,
   deliveryFee,
+  isPlacingOrder = false,
   onBack,
   onPlaceOrder,
 }: Props) {
@@ -156,10 +158,10 @@ export function ReviewStep({
         </button>
         <button
           onClick={onPlaceOrder}
-          disabled={items.length === 0}
+          disabled={items.length === 0 || isPlacingOrder}
           className="flex-1 text-xs md:text-base h-12 rounded bg-[#F5820A] text-white font-bold flex items-center justify-center gap-2 hover:bg-[#E06B00] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          PLACE ORDER — {formatPrice(total)} <FiArrowRight className="hidden md:flex" size={15} />
+          {isPlacingOrder ? 'PLACING ORDER...' : `PLACE ORDER — ${formatPrice(total)}`} <FiArrowRight className="hidden md:flex" size={15} />
         </button>
       </div>
     </CheckoutLayout>

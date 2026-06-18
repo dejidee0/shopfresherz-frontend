@@ -21,8 +21,11 @@ import {
 import {
   accountApi,
   type Address,
+  type CreateAddressRequest,
   type PaymentMethod as SavedCard,
 } from "@/lib/api/account";
+import { checkoutApi } from "@/lib/api/checkout";
+import { toast } from "@/store/toast";
 
 type CheckoutStep = 1 | 2 | 3 | 4;
 
@@ -36,6 +39,10 @@ export function SAVED_CARDS_QUERY_KEY(token: string | null | undefined) {
   return ["checkout-saved-cards", token] as const;
 }
 
+export function CHECKOUT_ADDRESSES_QUERY_KEY(token: string | null | undefined) {
+  return ["checkout-addresses", token] as const;
+}
+
 export default function CheckoutPage() {
   const router   = useRouter();
   const token    = useAuthStore((s) => s.accessToken);
@@ -43,12 +50,14 @@ export default function CheckoutPage() {
   const items           = useCartStore((s) => s.items);
   const subtotal        = useCartStore((s) => s.subtotal());
   const couponCode      = useCartStore((s) => s.couponCode);
+  const discountAmount  = useCartStore((s) => s.discountAmount);
   const setCartCoupon   = useCartStore((s) => s.setCoupon);
   const removeCartCoupon = useCartStore((s) => s.removeCoupon);
+  const clearCart       = useCartStore((s) => s.clearCart);
 
   // ── Addresses ─────────────────────────────────────────────────────────────
-  const { data: addresses = [] } = useQuery<Address[]>({
-    queryKey: ["checkout-addresses", token],
+  const { data: addresses = [], refetch: refetchAddresses } = useQuery<Address[]>({
+    queryKey: CHECKOUT_ADDRESSES_QUERY_KEY(token),
     queryFn:  () => accountApi.getAddresses(token!),
     enabled:  !!token,
   });
@@ -85,6 +94,7 @@ export default function CheckoutPage() {
     code:    couponCode ?? "",
     applied: !!couponCode,
   });
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
   const deliveryFee = useMemo(() => {
     if (delivery === "pickup")  return 0;
@@ -119,9 +129,98 @@ export default function CheckoutPage() {
     setCoupon({ code: "", applied: false });
   };
 
+  const handleAddAddress = async (data: CreateAddressRequest) => {
+    if (!token) {
+      throw new Error("Please sign in before adding a delivery address.");
+    }
+
+    const addressId = await accountApi.addAddress(token, data);
+    await refetchAddresses();
+    setSelectedAddressId(addressId);
+  };
+
+  // Resolve selected address object for ReviewStep
+  const selectedAddress = addresses.find((a) => a.id === selectedAddressId) ?? addresses[0] ?? null;
+
   const handlePlaceOrder = async () => {
-    // TODO: await checkoutApi.placeOrder(...)
-    router.push("/store/checkout/confirmation");
+    if (!token || !isAuthenticated) {
+      toast.error("Please sign in", "You need to sign in before placing an order.");
+      return;
+    }
+
+    if (!selectedAddressId || !selectedAddress) {
+      toast.error("Select a delivery address", "Choose where you want this order delivered.");
+      return;
+    }
+
+    if (isPlacingOrder) return;
+
+    const taxable = Math.max(0, subtotal - discountAmount);
+    const tax = taxable * 0.075;
+    const total = taxable + deliveryFee + tax;
+    const deliveryMethod = delivery === "express" ? "Express" : delivery === "pickup" ? "Pickup" : "Standard";
+    const paymentMethod =
+      payment === "bank_transfer" ? "Transfer" : payment === "pay_on_delivery" ? "POD" : "Card";
+    const appliedCouponCode = coupon.applied ? coupon.code.trim().toUpperCase() : undefined;
+
+    setIsPlacingOrder(true);
+
+    try {
+      const order = await checkoutApi.placeOrder(token, {
+        items: items.map((item) => ({
+          productId: item.productId,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          image: item.image,
+        })),
+        addressId: selectedAddressId,
+        shippingAddressId: selectedAddressId,
+        inlineAddress: {
+          label: selectedAddress.label,
+          line1: selectedAddress.line1,
+          line2: selectedAddress.line2,
+          city: selectedAddress.city,
+          state: selectedAddress.state,
+          postalCode: selectedAddress.postalCode,
+        },
+        deliveryMethod,
+        delivery: {
+          method: deliveryMethod,
+          fee: deliveryFee,
+        },
+        paymentMethod,
+        payment: {
+          method: paymentMethod,
+          savedCardId: selectedCardId ?? undefined,
+        },
+        pricing: {
+          subtotal,
+          discountAmount,
+          deliveryFee,
+          tax,
+          total,
+        },
+        couponCode: appliedCouponCode,
+        coupon: appliedCouponCode
+          ? {
+              code: appliedCouponCode,
+              discountAmount,
+            }
+          : undefined,
+      });
+
+      clearCart();
+      router.push(`/store/checkout/confirmation?orderNumber=${order.orderNumber}`);
+    } catch (error) {
+      const message =
+        error && typeof error === "object" && "message" in error && typeof error.message === "string"
+          ? error.message
+          : "Unable to place your order. Please try again.";
+      toast.error("Order failed", message);
+    } finally {
+      setIsPlacingOrder(false);
+    }
   };
 
   const sidebarProps = {
@@ -131,9 +230,6 @@ export default function CheckoutPage() {
     onRemoveCoupon:  handleRemoveCoupon,
     deliveryFee,
   };
-
-  // Resolve selected address object for ReviewStep
-  const selectedAddress = addresses.find((a) => a.id === selectedAddressId) ?? addresses[0] ?? null;
 
   if (items.length === 0) {
     return (
@@ -160,6 +256,7 @@ export default function CheckoutPage() {
           addresses={addresses}
           selectedAddressId={selectedAddressId}
           onSelectAddress={setSelectedAddressId}
+          onAddAddress={handleAddAddress}
           delivery={delivery}
           deliveryFee={deliveryFee}
           savedCards={savedCards}
@@ -200,6 +297,7 @@ export default function CheckoutPage() {
           selectedAddress={selectedAddress}
           delivery={delivery}
           payment={payment ?? "card"}
+          isPlacingOrder={isPlacingOrder}
           onBack={() => setStep(1)}
           onPlaceOrder={handlePlaceOrder}
           {...sidebarProps}
