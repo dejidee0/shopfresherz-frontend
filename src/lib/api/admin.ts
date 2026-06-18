@@ -77,6 +77,7 @@ export interface LowStockDto extends Record<string, unknown> {
 
 export interface BannerDto extends Record<string, unknown> {
   id: string;
+  tag?: string;
   title?: string;
   subtitle?: string;
   imageUrl: string;
