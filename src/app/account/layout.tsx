@@ -7,9 +7,9 @@ import { useRequireAuth } from '@/lib/hooks/useRequireAuth'
 import { PageSpinner } from '@/components/ui/Spinner'
 
 export default function AccountOverallLayout({ children }: { children: React.ReactNode }) {
-  const { user, isAuthenticated } = useRequireAuth({ role: 'Customer', redirectTo: '/' })
+  const { user, isAuthenticated, isLoading } = useRequireAuth({ role: 'Customer', redirectTo: '/' })
 
-  if (!user || !isAuthenticated){
+  if (isLoading || !user || !isAuthenticated){
     return <PageSpinner/>
   }
 

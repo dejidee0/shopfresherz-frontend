@@ -187,7 +187,8 @@ export function HeroBanner() {
                     key={s.id}
                     className={cn(
                       "min-w-full h-full",
-                      s.bgColor ?? "bg-linear-to-br from-[#0B1120] via-[#0D2758] to-[#0B4A8D]",
+                      // s.bgColor ?? "bg-linear-to-br from-[#0B1120] via-[#0D2758] to-[#0B4A8D]",
+                       "bg-black",
                     )}
                     aria-roledescription="slide"
                     aria-label={s.title}

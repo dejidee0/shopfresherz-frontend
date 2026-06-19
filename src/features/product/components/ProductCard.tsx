@@ -53,7 +53,7 @@ export function ProductCard({
 
   const imageSrc = imgError
     ? "/images/device-placeholder.jpg"
-    : (product.imageUrls?.[0] ?? "/images/device-placeholder.jpg");
+    : (product.imageUrls?.[0] ?? "/images/No-Image-Placeholder.svg");
 
   function handleAddToCart(e: React.MouseEvent) {
     e.preventDefault();

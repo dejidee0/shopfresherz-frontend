@@ -341,7 +341,7 @@ function NewArrivalsPromoCard() {
   return (
     <Link href={`/store/categories/${NEW_ARRIVALS_PROMO.slug}`} className="flex flex-col h-full overflow-hidden group">
       {/* Top — Orange branded area styled to match image exactly */}
-      <div className="flex flex-col bg-[#F5820A] items-center text-center px-5 pt-[50px] pb-5 text-white flex-1 select-none">
+      <div className="flex flex-col bg-[#F5820A] items-center text-center px-5 pt-12.5 pb-5 text-white flex-1 select-none">
         {/* Category Header */}
         <p className="text-[11px] font-bold tracking-wide uppercase opacity-90 mb-1">
           COMPUTER & ACCESSORIES
@@ -368,7 +368,7 @@ function NewArrivalsPromoCard() {
         </div>
 
         {/* Action Button */}
-        <div className="w-full max-w-[180px] h-10 flex items-center justify-center gap-2 bg-white text-[#F5820A] text-xs font-bold rounded shadow-sm group-hover:bg-[#F0F0F0] transition-all active:scale-[0.98]">
+        <div className="w-full max-w-45 h-10 flex items-center justify-center gap-2 bg-white text-[#F5820A] text-xs font-bold rounded shadow-sm group-hover:bg-[#F0F0F0] transition-all active:scale-[0.98]">
           SHOP NOW <FaArrowRight size={11} className="text-[#F5820A]" />
         </div>
       </div>
@@ -654,7 +654,7 @@ export default function HomePage() {
       <div className="col-span-4 row-span-2 flex flex-col">
         
         {/* NEW ADDITION: Inline Header for Featured Products & Categories */}
-        <div className="flex  justify-between pb-[10px]  bg-white">
+        <div className="flex  justify-between pb-2.5  bg-white">
           {/* Subtitle/Text side */}
           <div className="text-[22px] font-bold uppercase tracking-wider text-[#111111]">
             Featured Products
@@ -707,7 +707,7 @@ export default function HomePage() {
 
     {/* Mobile Layout */}
     <div className="sm:hidden">
-     <div className="flex  justify-between pb-[10px]  bg-white">
+     <div className="flex  justify-between pb-2.5  bg-white">
           {/* Subtitle/Text side */}
           <div className="text-[18px] font-bold uppercase tracking-wider text-[#111111]">
             Featured <br/> Products
