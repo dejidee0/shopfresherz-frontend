@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { HiXMark, HiPrinter, HiChevronDown } from "react-icons/hi2";
+import { HiXMark, HiChevronDown } from "react-icons/hi2";
 import { MdPerson, MdLocalShipping, MdPayment } from "react-icons/md";
+import { useUpdateOrderStatus } from "@/lib/hooks/useAdmin";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -80,6 +81,18 @@ const paymentStyles = {
   REFUNDED: "bg-gray-100 text-gray-500 border border-gray-200",
 };
 
+function generateTrackingNumber() {
+  const date = new Date();
+  const datePart = [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+  ].join("");
+  const randomPart = Math.random().toString(36).slice(2, 8).toUpperCase();
+
+  return `SFZ-TRK-${datePart}-${randomPart}`;
+}
+
 // ─── Section label ────────────────────────────────────────────────────────────
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -110,6 +123,7 @@ export default function OrderDetailsModal({
   onTrackingSave,
   onCancelOrder,
 }: OrderDetailsModalProps) {
+  const updateOrderStatusMutation = useUpdateOrderStatus();
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus>(
     order?.status ?? "Pending"
   );
@@ -117,23 +131,35 @@ export default function OrderDetailsModal({
     order?.trackingNumber ?? ""
   );
 
-  // Sync local state when a new order is passed in
-  if (order && order.status !== selectedStatus && !isOpen) {
-    setSelectedStatus(order.status);
-    setTrackingNumber(order.trackingNumber ?? "");
-  }
-
   if (!isOpen || !order) return null;
 
   const vat = order.subtotal * order.vatRate;
   const total = order.subtotal + order.deliveryFee + vat;
 
-  const handleStatusUpdate = () => {
-    onStatusUpdate?.(order.orderId, selectedStatus);
+  const handleStatusUpdate = async () => {
+    try {
+      await updateOrderStatusMutation.mutateAsync({
+        orderNumber: order.orderId,
+        payload: { status: selectedStatus },
+      });
+      onStatusUpdate?.(order.orderId, selectedStatus);
+    } catch {
+      // Error toast is handled by useUpdateOrderStatus.
+    }
   };
 
-  const handleTrackingSave = () => {
-    onTrackingSave?.(order.orderId, trackingNumber);
+  const handleTrackingSave = async () => {
+    try{
+       await updateOrderStatusMutation.mutateAsync({
+        orderNumber: order.orderId,
+        payload: { status: selectedStatus, trackingNumber: trackingNumber },
+      });
+      //  onTrackingSave?.(order.orderId, trackingNumber);
+    } catch{}
+  };
+
+  const handleGenerateTrackingNumber = () => {
+    setTrackingNumber(generateTrackingNumber());
   };
 
   const handleCancel = () => {
@@ -153,7 +179,7 @@ export default function OrderDetailsModal({
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto">
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] overflow-y-auto">
         {/* ── Header ── */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 sticky top-0 bg-white z-10 rounded-t-2xl">
           <div className="flex items-center gap-3">
@@ -177,7 +203,7 @@ export default function OrderDetailsModal({
 
         <div className="p-5 sm:p-6 space-y-4">
           {/* ── Top grid: line items + sidebar ── */}
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_260px] gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_260px] gap-4">
             {/* Left column */}
             <div className="space-y-4">
               {/* Line Items */}
@@ -190,7 +216,7 @@ export default function OrderDetailsModal({
                       className="flex items-center gap-4 pt-4 first:pt-0"
                     >
                       {/* Product image / placeholder */}
-                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center shrink-0 overflow-hidden border border-gray-100">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-linear-to-br from-gray-100 to-gray-50 flex items-center justify-center shrink-0 overflow-hidden border border-gray-100">
                         {item.image ? (
                           <img
                             src={item.image}
@@ -359,9 +385,10 @@ export default function OrderDetailsModal({
                   </div>
                   <button
                     onClick={handleStatusUpdate}
+                    disabled={updateOrderStatusMutation.isPending}
                     className="px-4 py-2.5 bg-[#F97316] text-white text-sm font-bold rounded-lg hover:bg-orange-500 transition-colors shadow-sm shadow-orange-200 whitespace-nowrap"
                   >
-                    Update Status
+                    {updateOrderStatusMutation.isPending ? "Updating..." : "Update Status"}
                   </button>
                 </div>
               </div>
@@ -371,20 +398,30 @@ export default function OrderDetailsModal({
                 <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">
                   Tracking Number
                 </label>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-col lg:flex-row">
                   <input
                     type="text"
                     value={trackingNumber}
                     onChange={(e) => setTrackingNumber(e.target.value)}
                     placeholder="e.g. TRK-9022384755"
                     className="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
-                  />
+                  /> 
+                 <div className="flex gap-2">
+                   <button
+                    type="button"
+                    onClick={handleGenerateTrackingNumber}
+                    className="px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-bold rounded-lg hover:border-[#F97316] hover:text-[#F97316] transition-colors whitespace-nowrap"
+                  >
+                    Generate
+                  </button>
                   <button
                     onClick={handleTrackingSave}
+                    disabled={updateOrderStatusMutation.isPending}
                     className="px-4 py-2.5 bg-gray-800 text-white text-sm font-bold rounded-lg hover:bg-gray-700 transition-colors whitespace-nowrap"
                   >
-                    Save
+                     {updateOrderStatusMutation.isPending ? "Saving..." : "Save"}
                   </button>
+                 </div>
                 </div>
               </div>
             </div>
@@ -393,10 +430,10 @@ export default function OrderDetailsModal({
 
         {/* ── Footer ── */}
         <div className="flex items-center gap-3 px-5 sm:px-6 py-4 border-t border-gray-100 sticky bottom-0 bg-white rounded-b-2xl">
-          <button className="flex items-center gap-2 px-5 py-2.5 bg-[#F97316] text-white text-sm font-bold rounded-xl hover:bg-orange-500 transition-colors shadow-sm shadow-orange-200">
+          {/* <button className="flex items-center gap-2 px-5 py-2.5 bg-[#F97316] text-white text-sm font-bold rounded-xl hover:bg-orange-500 transition-colors shadow-sm shadow-orange-200">
             <HiPrinter size={16} />
             Print Invoice
-          </button>
+          </button> */}
           <button
             onClick={handleCancel}
             className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:text-red-500 transition-colors"

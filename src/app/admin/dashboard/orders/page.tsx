@@ -54,7 +54,11 @@ const AdminOrderPage = () => {
   };
 
   const handleStatusUpdate = (orderId: string, status: string) => {
-    updateOrderStatusMutation.mutate({ orderNumber: orderId, payload: { status } });
+    setSelectedOrder((current: any) =>
+      current && (current.orderNumber || current.id) === orderId
+        ? { ...current, status }
+        : current
+    );
   };
 
   const handleTrackingSave = (orderId: string, tracking: string) => {

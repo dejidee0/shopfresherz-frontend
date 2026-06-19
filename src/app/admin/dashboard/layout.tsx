@@ -3,16 +3,21 @@
 import AdminNavbar from "@/components/admin/Navbar";
 import Sidebar from "@/components/admin/Sidebar";
 import { SidebarProvider } from "@/components/admin/SidebarContext";
+import { PageSpinner } from "@/components/ui/Spinner";
 import { useRequireAuth } from "@/lib/hooks/useRequireAuth";
 import { usePathname } from "next/navigation";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const pageTitle = path.split(/[\\\/]/).at(-1) ?? "";
-  const { user, isAuthenticated } = useRequireAuth({
+  const { user, isAuthenticated, isLoading } = useRequireAuth({
       role: "SuperAdmin",
       redirectTo: "/",
     });
+
+  if (isLoading || !user || !isAuthenticated) {
+    return <PageSpinner />;
+  }
 
   return (
     <SidebarProvider>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { HiXMark, HiArrowUpTray, HiChevronDown } from "react-icons/hi2";
 import { useCreateProduct, useUpdateProduct } from "@/lib/hooks/useAdmin";
-import { uploadToCloudinary } from "@/lib/utils/cloudinary";
+import { deleteFromCloudinary, uploadToCloudinary } from "@/lib/utils/cloudinary";
 
 interface AddProductModalProps {
   isOpen: boolean;
@@ -145,24 +145,38 @@ export default function AddProductModal({
   };
 
   const handleImageUpload = async (files: FileList) => {
-    setIsUploading(true);
-    try {
-      const uploadPromises = Array.from(files).map((file) =>
-        uploadToCloudinary(file),
+  setIsUploading(true);
+  try {
+    const incomingFiles = Array.from(files);
+
+    if (isEditing) {
+      // Replace mode: delete all existing Cloudinary images, then upload new ones
+      const deletePromises = form.imageUrls.map((url) =>
+        deleteFromCloudinary(url).catch(console.error) // non-blocking
       );
+      await Promise.all(deletePromises);
+
+      const uploadPromises = incomingFiles.map((file) => uploadToCloudinary(file));
       const urls = await Promise.all(uploadPromises);
+
+      setForm((prev) => ({ ...prev, imageUrls: urls })); // replace, not append
+    } else {
+      // Create mode: append as before
+      const uploadPromises = incomingFiles.map((file) => uploadToCloudinary(file));
+      const urls = await Promise.all(uploadPromises);
+
       setForm((prev) => ({
         ...prev,
-        // images: [...prev.images, ...Array.from(files)],
         imageUrls: [...prev.imageUrls, ...urls],
       }));
-    } catch (error) {
-      console.error("Failed to upload images:", error);
-      alert("Failed to upload images. Please try again.");
-    } finally {
-      setIsUploading(false);
     }
-  };
+  } catch (error) {
+    console.error("Failed to upload images:", error);
+    alert("Failed to upload images. Please try again.");
+  } finally {
+    setIsUploading(false);
+  }
+};
 
   const handleSubmit = async () => {
     if (!form.name || !form.price) {
@@ -194,7 +208,10 @@ export default function AddProductModal({
         imageUrls: form.imageUrls,
       };
 
-      console.log('Submitting product payload:', JSON.stringify(productData, null, 2))
+      console.log(
+        "Submitting product payload:",
+        JSON.stringify(productData, null, 2),
+      );
 
       if (isEditing && editingProduct) {
         await updateProductMutation.mutateAsync({
@@ -402,6 +419,7 @@ export default function AddProductModal({
                 <label
                   htmlFor="image-upload"
                   className="border-2 border-dashed border-gray-200 rounded-lg w-16 h-16 flex items-center justify-center cursor-pointer hover:border-[#F97316] hover:bg-orange-50 transition-all group"
+                  title={isEditing ? "Replace all images" : "Add images"}
                 >
                   <HiArrowUpTray
                     size={20}
@@ -424,10 +442,13 @@ export default function AddProductModal({
                         className="w-16 h-16 object-cover rounded-lg border"
                       />
                       <button
-                        onClick={() => {
+                        onClick={async () => {
+                          const urlToRemove = form.imageUrls[index];
+                          await deleteFromCloudinary(urlToRemove).catch(
+                            console.error,
+                          );
                           setForm((prev) => ({
                             ...prev,
-                            // images: prev.images.filter((_, i) => i !== index),
                             imageUrls: prev.imageUrls.filter(
                               (_, i) => i !== index,
                             ),

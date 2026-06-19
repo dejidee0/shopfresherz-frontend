@@ -28,3 +28,19 @@ export async function uploadToCloudinary(file: File): Promise<string> {
   const data: CloudinaryUploadResult = await response.json()
   return data.secure_url
 }
+
+export async function deleteFromCloudinary(imageUrl: string): Promise<void> {
+  // Extract public_id from the Cloudinary URL
+  // URL format: https://res.cloudinary.com/<cloud>/image/upload/v<version>/<public_id>.<ext>
+  const regex = /\/upload\/(?:v\d+\/)?(.+)\.[a-z]+$/i;
+  const match = imageUrl.match(regex);
+  if (!match) return;
+
+  const publicId = match[1];
+
+  await fetch('/api/cloudinary/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ publicId }),
+  });
+}

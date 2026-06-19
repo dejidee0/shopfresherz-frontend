@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { HiXMark, HiArrowUpTray } from "react-icons/hi2";
 import { useCreateBanner, useUpdateBanner } from "@/lib/hooks/useAdmin";
-import { uploadToCloudinary } from "@/lib/utils/cloudinary";
+import { deleteFromCloudinary, uploadToCloudinary } from "@/lib/utils/cloudinary";
 
 interface AddContentModalProps {
   isOpen: boolean;
@@ -101,10 +101,15 @@ const AddContentModal = ({ isOpen, onClose, initialData }: AddContentModalProps)
     clearError("imageFile");
   };
 
-  const handleRemoveImage = () => {
-    if (form.imagePreview?.startsWith("blob:")) URL.revokeObjectURL(form.imagePreview);
-    setForm((prev) => ({ ...prev, imageFile: null, imagePreview: "", imgUrl: "" }));
-  };
+ const handleRemoveImage = async () => {
+  if (form.imagePreview?.startsWith("blob:")) {
+    URL.revokeObjectURL(form.imagePreview);
+  } else if (form.imgUrl) {
+    // It's an existing Cloudinary image — delete it
+    await deleteFromCloudinary(form.imgUrl).catch(console.error);
+  }
+  setForm((prev) => ({ ...prev, imageFile: null, imagePreview: "", imgUrl: "" }));
+};
 
   // ── Validation ──────────────────────────────────────────────────────────────
 
@@ -129,13 +134,17 @@ const AddContentModal = ({ isOpen, onClose, initialData }: AddContentModalProps)
       if (form.imageFile) {
         setIsUploading(true);
         try {
-          imageUrl = await uploadToCloudinary(form.imageFile);
-        } catch {
-          setErrors((prev) => ({ ...prev, imageFile: "Failed to upload image. Please try again." }));
-          return;
-        } finally {
-          setIsUploading(false);
+        // If editing and there was a previous saved image, delete it first
+        if (isEditMode && initialData?.imgUrl) {
+          await deleteFromCloudinary(initialData.imgUrl).catch(console.error);
         }
+        imageUrl = await uploadToCloudinary(form.imageFile);
+      } catch {
+        setErrors((prev) => ({ ...prev, imageFile: "Failed to upload image. Please try again." }));
+        return;
+      } finally {
+        setIsUploading(false);
+      }
       }
 
       const payload = {
@@ -250,6 +259,7 @@ const AddContentModal = ({ isOpen, onClose, initialData }: AddContentModalProps)
                   <label
                     htmlFor="banner-image-upload"
                     className="border-2 border-dashed border-gray-200 rounded-lg w-24 h-24 flex items-center justify-center cursor-pointer hover:border-[#F97316] hover:bg-orange-50 transition-all group"
+                    title={isEditMode ? "Replace all images" : "Add images"}
                   >
                     <HiArrowUpTray size={24} className="text-gray-400 group-hover:text-[#F97316]" />
                   </label>

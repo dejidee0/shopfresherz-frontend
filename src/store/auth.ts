@@ -9,10 +9,12 @@ interface AuthState {
   accessToken: string | null
   refreshToken: string | null
   isAuthenticated: boolean
+  hasHydrated: boolean
 
   // Actions
   setAuth: (user: User, accessToken: string, refreshToken: string) => void
   updateUser: (partial: Partial<User>) => void
+  setHasHydrated: (hasHydrated: boolean) => void
   logout: () => void
 
   // Derived helpers
@@ -28,12 +30,15 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       refreshToken: null,
       isAuthenticated: false,
+      hasHydrated: false,
 
       setAuth: (user, accessToken, refreshToken) =>
         set({ user, accessToken, refreshToken, isAuthenticated: true }),
 
       updateUser: (partial) =>
         set((s) => ({ user: s.user ? { ...s.user, ...partial } : null })),
+
+      setHasHydrated: (hasHydrated) => set({ hasHydrated }),
 
       logout: () =>
         set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false }),
@@ -50,6 +55,9 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'sf-auth',
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true)
+      },
       partialize: (s) => ({
         user: s.user,
         accessToken: s.accessToken,

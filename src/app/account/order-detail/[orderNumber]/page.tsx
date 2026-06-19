@@ -11,7 +11,7 @@ import { OrderTimeline } from '@/features/account/components/OrderTimeline'
 import { DataTable, type ColumnDef } from '@/components/ui/DataTable'
 import { useAuthStore } from '@/store/auth'
 import { formatPrice, formatDate } from '@/lib/utils/format'
-import { accountApi, OrderDetail, OrderLineItem } from '@/lib/api/account'
+import { accountApi, OrderDetail, OrderLineItem, OrderStep } from '@/lib/api/account'
 
 // ─── Line items table columns ─────────────────────────────────────────────────
 
@@ -23,7 +23,7 @@ const LINE_ITEM_COLUMNS: ColumnDef<OrderLineItem>[] = [
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 bg-[#F5F5F5] rounded shrink-0 overflow-hidden">
           <Image
-            src={row.productImage || '/images/Rbag.png'}
+            src={row.productImage || '/images/No-Image-Placeholder.svg'}
             alt={row.productName}
             width={48}
             height={48}
@@ -67,18 +67,32 @@ const LINE_ITEM_COLUMNS: ColumnDef<OrderLineItem>[] = [
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function OrderDetailPage() {
-  const { id } = useParams<{ id: string }>()
+  const { orderNumber } = useParams<{ orderNumber: string }>()
   const { accessToken } = useAuthStore()
   const [order, setOrder] = useState<OrderDetail | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (!accessToken || !id) return
-    accountApi.getOrderDetail(accessToken, id)
+    if (!accessToken || !orderNumber) return
+    accountApi.getOrderDetail(accessToken, orderNumber)
       .then(setOrder)
       .catch(() => {})
       .finally(() => setIsLoading(false))
-  }, [accessToken, id])
+  }, [accessToken, orderNumber])
+
+
+  function getOrderSteps(orderStatus: string): OrderStep[]{
+    if (orderStatus == "pending"){
+      return [{label: "pending", status: "pending" }]
+    }
+    else if (orderStatus == "active"){
+      return [{label: "active", status: "active"}]
+    }
+    else if (orderStatus == "completed"){
+      return [{label: "completed", status: "completed"}]
+    }
+    else return []
+  }
 
   return (
     <AccountLayout
@@ -151,7 +165,8 @@ export default function OrderDetailPage() {
 
             {/* Progress stepper */}
             <div className="px-6 pb-2">
-              <OrderStepper steps={order.steps} />
+              {/* <OrderStepper steps={order.steps} /> */}
+              <OrderStepper steps={getOrderSteps(order.status)} />
             </div>
 
             {/* Order activity timeline */}

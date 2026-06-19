@@ -277,7 +277,7 @@ export function useUpdateOrderStatus() {
     onError: (error: { message?: string }) => {
       toast.error('Failed to update order status', error.message ?? 'Please try again')
     },
-  })
+  }) 
 }
 
 // ─── useAdjustUserLoyalty ──────────────────────────────────────────────────────

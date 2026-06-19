@@ -7,8 +7,8 @@ import { useAuthStore } from '@/store/auth'
 type RequiredRole = 'Customer' | 'Admin' | 'SuperAdmin' | 'any'
 
 interface Options {
-  role?: RequiredRole   // default 'any' — just requires login
-  redirectTo?: string   // default '/auth/login'
+  role?: RequiredRole
+  redirectTo?: string
 }
 
 /**
@@ -20,16 +20,16 @@ interface Options {
  */
 export function useRequireAuth({ role = 'any', redirectTo = '/auth/login' }: Options = {}) {
   const router = useRouter()
-  const { user, isAuthenticated } = useAuthStore()
+  const { user, isAuthenticated, hasHydrated } = useAuthStore()
 
   useEffect(() => {
-    // Not logged in → go to login
+    if (!hasHydrated) return
+
     if (!isAuthenticated || !user) {
       router.replace(redirectTo)
       return
     }
 
-    // Wrong role → go to their correct home
     if (role !== 'any') {
       const isAdmin = user.role === 'Admin' || user.role === 'SuperAdmin'
       const needsAdmin = role === 'Admin' || role === 'SuperAdmin'
@@ -40,7 +40,7 @@ export function useRequireAuth({ role = 'any', redirectTo = '/auth/login' }: Opt
         router.replace('/admin/dashboard')
       }
     }
-  }, [isAuthenticated, user, role, redirectTo, router])
+  }, [hasHydrated, isAuthenticated, user, role, redirectTo, router])
 
-  return { user, isAuthenticated }
+  return { user, isAuthenticated, isLoading: !hasHydrated }
 }
