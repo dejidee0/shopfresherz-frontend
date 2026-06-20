@@ -234,10 +234,10 @@ function ShopFresherzAuth() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-[#f7faf8] px-4 py-10 sm:px-6 lg:px-8">
+    <section className="relative overflow-hidden bg-[#f7faf8] md:px-4 py-10  lg:px-8">
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,23,42,0.045)_1px,transparent_1px),linear-gradient(180deg,rgba(15,23,42,0.045)_1px,transparent_1px)] bg-[size:48px_48px]" />
 
-      <div className="relative mx-auto grid w-full max-w-6xl overflow-hidden rounded-lg border border-slate-200 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.12)] lg:grid-cols-[1.05fr_0.95fr]">
+      <div className="relative mx-auto grid w-full max-w-6xl  rounded-lg border border-slate-200 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.12)] lg:grid-cols-[1.05fr_0.95fr]">
         <aside className="hidden border-r border-slate-200 bg-[#fbfdfc] p-8 lg:flex lg:flex-col lg:justify-between xl:p-10">
           <div>
             <div className="flex items-center gap-3">
@@ -304,7 +304,7 @@ function ShopFresherzAuth() {
           </div>
         </aside>
 
-        <div className="p-6 sm:p-8 lg:p-10">
+        <div className="p-2 md:p-6 lg:p-10">
           <div className="mb-8 flex items-center gap-3 lg:hidden">
             <div className="grid h-10 w-10 place-items-center rounded-lg bg-[#F5820A] text-lg text-white">
               <FiShoppingBag />
@@ -326,7 +326,7 @@ function ShopFresherzAuth() {
                   key={authMode}
                   type="button"
                   onClick={() => switchMode(authMode)}
-                  className={`h-11 rounded-md text-sm font-bold transition ${
+                  className={`h-8 md:h-11 rounded-md text-sm font-bold transition ${
                     active
                       ? "bg-white text-slate-950 shadow-sm"
                       : "text-slate-500 hover:text-slate-900"
@@ -342,10 +342,10 @@ function ShopFresherzAuth() {
             <p className="text-[11px] font-bold uppercase text-[#F5820A]">
               {isSignup ? "New here?" : "Welcome back"}
             </p>
-            <h2 className="mt-2 text-2xl font-extrabold text-slate-950 sm:text-3xl">
+            <h2 className="mt-2 text-lg md:text-2xl font-extrabold text-slate-950 sm:text-3xl">
               {isSignup ? "Create your ShopFresherz account" : "Access your account"}
             </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <p className="mt-2 text-xs md:text-sm md:leading-6 text-slate-600">
               {isSignup
                 ? "Set up your account to save wishlists, track orders, and shop faster."
                 : "Sign in to continue shopping, track orders, and manage your gadgets."}
@@ -450,7 +450,7 @@ function ShopFresherzAuth() {
             <button
               type="submit"
               disabled={loading || googlePending}
-              className="mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#F5820A] text-sm font-extrabold uppercase text-white shadow-lg shadow-orange-200 transition hover:-translate-y-0.5 hover:bg-[#df7408] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+              className="mt-1 flex h-10 md:h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#F5820A] text-sm font-extrabold uppercase text-white shadow-lg shadow-orange-200 transition hover:-translate-y-0.5 hover:bg-[#df7408] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
             >
               {loading ? (
                 <>
@@ -482,7 +482,7 @@ function ShopFresherzAuth() {
               theme="outline"
               size="large"
               shape="rectangular"
-              width={googleButtonWidth}
+              // width={googleButtonWidth}
               text={isSignup ? "signup_with" : "signin_with"}
             />
           </div>
