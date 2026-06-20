@@ -23,14 +23,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
-        <section className="relative overflow-hidden bg-[#f7faf8] px-4 py-10 sm:px-6 lg:px-8">
-          {children}
+        {children}
 
-          {/* Global UI overlays — mounted here so they're above everything,
+        {/* Global UI overlays — mounted here so they're above everything,
           including CartDrawer (z-40), ChatWidget (z-50), and Lightbox (z-9999) */}
-          <Toaster />
-          <ConfirmDialog />
-        </section>
+        <Toaster />
+        <ConfirmDialog />
       </GoogleOAuthProvider>
     </QueryClientProvider>
   );
