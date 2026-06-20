@@ -20,12 +20,29 @@ export interface AuthResponse {
   refreshToken: string
 }
 
+export interface ForgotPasswordPayload {
+  email: string
+}
+
+export interface ResetPasswordPayload {
+  email: string
+  otp: string
+  newPassword: string
+  confirmNewPassword: string
+}
+
 export const authApi = {
   login: (payload: LoginPayload) =>
     api.post<AuthResponse>('/auth/login', payload),
 
   register: (payload: RegisterPayload) =>
     api.post<AuthResponse>('/auth/register', payload),
+
+  forgotPassword: (payload: ForgotPasswordPayload) =>
+    api.post<void>('/auth/forgot-password', payload),
+
+  resetPassword: (payload: ResetPasswordPayload) =>
+    api.post<void>('/auth/reset-password', payload),
 
   logout: (token: string) =>
     api.post<void>('/auth/logout', {}, { token }),

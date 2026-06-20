@@ -104,7 +104,7 @@ export interface InlineOrderAddress {
 }
 
 export type DeliveryMethod = "Standard" | "Express" | string;
-export type PaymentMethodType = "Card" | "Transfer" | "USSD" | "POD" | string;
+export type PaymentMethodType = "Card" | "BankTransfer" | "USSD" | "POD" | string;
 
 export interface CreateOrderRequest {
   addressId?: string;

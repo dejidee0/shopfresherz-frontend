@@ -160,7 +160,7 @@ export default function CheckoutPage() {
     const total = taxable + deliveryFee + tax;
     const deliveryMethod = delivery === "express" ? "Express" : delivery === "pickup" ? "Pickup" : "Standard";
     const paymentMethod =
-      payment === "bank_transfer" ? "Transfer" : payment === "pay_on_delivery" ? "POD" : "Card";
+      payment === "bank_transfer" ? "BankTransfer" : payment === "pay_on_delivery" ? "POD" : "Card";
     const appliedCouponCode = coupon.applied ? coupon.code.trim().toUpperCase() : undefined;
 
     setIsPlacingOrder(true);

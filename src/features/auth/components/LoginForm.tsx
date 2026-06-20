@@ -161,7 +161,7 @@ function SignInForm() {
 
       <div className="flex items-center justify-end">
         <Link
-          href="/auth/forgot-password"
+          href="/auth/forget-password"
           className="text-xs text-[#F5820A] hover:underline font-medium"
         >
           Forgot password?
