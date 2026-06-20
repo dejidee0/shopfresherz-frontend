@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   FiArrowRight,
@@ -16,7 +16,9 @@ import {
   FiZap,
 } from "react-icons/fi";
 import { FaApple } from "react-icons/fa";
-import { useLogin, useRegister } from "@/lib/hooks/useAuth";
+import { useLogin, useRegister, useGoogleAuth } from "@/lib/hooks/useAuth";
+import { GoogleOAuthProvider, GoogleLogin, type CredentialResponse } from "@react-oauth/google";
+import { toast } from "@/store/toast";
 
 type AuthMode = "signin" | "signup";
 
@@ -157,6 +159,11 @@ function ShopFresherzAuth() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
+  const { mutate: googleAuth, isPending: googlePending } = useGoogleAuth();
+
+  const googleButtonContainerRef = useRef<HTMLDivElement>(null);
+  const [googleButtonWidth, setGoogleButtonWidth] = useState<number>();
+
   const { mutate: login, isPending: loginPending, error: loginError } = useLogin();
   const {
     mutate: register,
@@ -180,6 +187,29 @@ function ShopFresherzAuth() {
   const switchMode = (nextMode: AuthMode) => {
     setMode(nextMode);
     resetForm();
+  };
+
+
+  useEffect(() => {
+    if (!googleButtonContainerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width;
+      if (width) setGoogleButtonWidth(Math.floor(width));
+    });
+    observer.observe(googleButtonContainerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const handleGoogleSuccess = (credentialResponse: CredentialResponse) => {
+    if (!credentialResponse.credential) {
+      toast.error("Google sign in failed", "No credential returned from Google.");
+      return;
+    }
+    googleAuth(credentialResponse.credential);
+  };
+
+  const handleGoogleError = () => {
+    toast.error("Google sign in failed", "Could not complete Google sign-in. Please try again.");
   };
 
   const handleSubmit = (event: React.FormEvent) => {
@@ -419,7 +449,7 @@ function ShopFresherzAuth() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || googlePending}
               className="mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#F5820A] text-sm font-extrabold uppercase text-white shadow-lg shadow-orange-200 transition hover:-translate-y-0.5 hover:bg-[#df7408] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
             >
               {loading ? (
@@ -444,22 +474,21 @@ function ShopFresherzAuth() {
             <div className="h-px flex-1 bg-slate-200" />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              className="flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-800 shadow-sm transition hover:border-[#F5820A]/40 hover:bg-orange-50"
-            >
-              <GoogleIcon />
-              Google
-            </button>
-            <button
-              type="button"
-              className="flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white text-sm font-bold text-slate-800 shadow-sm transition hover:border-[#F5820A]/40 hover:bg-orange-50"
-            >
-              <FaApple />
-              Apple
-            </button>
+         <div className="grid grid-cols-1 gap-3">
+          <div ref={googleButtonContainerRef} className="w-full">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              theme="outline"
+              size="large"
+              shape="rectangular"
+              width={googleButtonWidth}
+              text={isSignup ? "signup_with" : "signin_with"}
+            />
           </div>
+         </div>
+
+
 
           <p className="mt-6 text-center text-sm text-slate-500">
             Need help?{" "}

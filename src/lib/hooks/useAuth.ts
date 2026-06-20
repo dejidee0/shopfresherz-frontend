@@ -89,3 +89,32 @@ export function useLogout() {
     },
   })
 }
+
+export function useGoogleAuth() {
+  const { setAuth, redirectPath } = useAuthStore()
+  const router = useRouter()
+
+  return useMutation({
+    mutationFn: (idToken: string) => authApi.googleLogin({ idToken }),
+
+    onSuccess: (data) => {
+      setAuth(data.user, data.accessToken, data.refreshToken)
+
+      toast.success(
+        `Welcome, ${data.user.firstName}!`,
+        'You have been signed in successfully.'
+      )
+
+      router.push(redirectPath())
+    },
+
+    onError: (error: { message?: string; status?: number }) => {
+      const message =
+        error.status === 401
+          ? 'Google sign-in failed. Please try again.'
+          : error.message ?? 'Something went wrong. Please try again.'
+
+      toast.error('Google sign in failed', message)
+    },
+  })
+}
