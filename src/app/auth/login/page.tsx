@@ -474,7 +474,7 @@ function ShopFresherzAuth() {
             <div className="h-px flex-1 bg-slate-200" />
           </div>
 
-         <div className="grid grid-cols-1 gap-3">
+         <div className="grid grid-cols-1 gap-3 w-full">
           <div ref={googleButtonContainerRef} className="w-full">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}

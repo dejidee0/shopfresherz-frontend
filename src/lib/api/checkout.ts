@@ -57,6 +57,69 @@ export interface PlaceOrderRequest {
   guestSessionId?: string;
 }
 
+export interface InitiatePaymentRequest {
+  items: CheckoutOrderItem[];
+  addressId?: string;
+  shippingAddressId?: string;
+  inlineAddress?: CheckoutInlineAddress;
+  deliveryMethod: "Standard" | "Express" | "Pickup" | string;
+  // delivery: CheckoutDelivery;
+  paymentMethod: "Card" | "Transfer" | "POD" | string;
+  // payment: CheckoutPayment;
+  pricing: CheckoutPricing;
+  couponCode?: string;
+  // coupon?: CheckoutCoupon;
+  // notes?: string;
+  guestEmail?: string;
+  guestName?: string;
+  guestPhone?: string;
+}
+
+export interface BankDetails {
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
+  instructions: string;
+}
+
+export interface FlutterWaveConfig {
+  public_key: string;
+  tx_ref: string;
+  amount: number;
+  currency: string;
+  customer: {
+    email: string;
+    name: string;
+    phone_number: string;
+  };
+  meta: {
+    pendingOrderId: string;
+  };
+  customizations: {
+    title: string;
+    description: string;
+    logo: string;
+  };
+}
+
+export interface InitiatePaymentResponse {
+  pendingOrderId: string;
+  paymentMethod: string;
+  bankDetails: BankDetails;
+  flutterwaveConfig: FlutterWaveConfig;
+}
+
+export interface ConfirmOrderRequest {
+  pendingOrderId: string;
+  transactionId: string;
+  txRef: string;
+  status: string;
+}
+
+export interface ConfirmOrderResponse {
+  orderNumber: string;
+}
+
 export interface PlaceOrderResponse {
   orderId: string;
   orderNumber: string;
@@ -68,4 +131,10 @@ export interface PlaceOrderResponse {
 export const checkoutApi = {
   placeOrder: (token: string, payload: PlaceOrderRequest) =>
     api.post<PlaceOrderResponse>("/orders", payload, { token }),
+
+  initiatePayment: (token: string, payload: InitiatePaymentRequest) =>
+    api.post<InitiatePaymentResponse>("/checkout/initiate-payment", payload, { token }),
+
+  confirmOrder: async (token: string, payload: ConfirmOrderRequest) =>
+    api.post<ConfirmOrderResponse>("/checkout/confirm-order", payload, { token }),
 };
