@@ -28,13 +28,7 @@ export default function OrderSuccessPage() {
           </p>
         </div>
 
-        <p className='text-xs'>* If you selected Bank Transfer as Payment Method, Please make payment and send proof of payment via WhatsApp to +2349075308722 to complete your order.</p>
-        <div className='text-xs'>
-          <p className='font-semibold'>Bank Details:</p>
-          <p>Bank Name: <span className='font-semibold'>KudaBank </span></p>
-          <p>Account Name: <span className='font-semibold'> FRESHERZ GADGETS HUB LTD</span></p>
-          <p>Account Number: <span className='font-bold'>3002733251</span></p>
-        </div>
+       
 
         {/* CTA */}
         <Link

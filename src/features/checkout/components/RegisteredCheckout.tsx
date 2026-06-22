@@ -144,13 +144,15 @@ export function RegisteredCheckout({
   const visibleAddresses = showAllAddresses ? addresses : addresses.slice(0, 2);
 
   // Payment is ready if: a saved card is selected, or a non-card method is chosen
-  const paymentReady =
-    (selectedPayment === "card" &&
-      !!selectedCardId &&
-      selectedAddressId !== null) ||
-    (selectedPayment !== null &&
-      selectedPayment !== "card" &&
-      selectedAddressId !== null);
+  // const paymentReady =
+  //   (selectedPayment === "card" &&
+  //     !!selectedCardId &&
+  //     selectedAddressId !== null) ||
+  //   (selectedPayment !== null &&
+  //     selectedPayment !== "card" &&
+  //     selectedAddressId !== null);
+
+  const paymentReady = selectedAddressId !== null;
 
   const PAYMENT_METHOD_LABELS: Record<string, string> = {
     card: "Card",
@@ -296,169 +298,7 @@ export function RegisteredCheckout({
             </p>
           </SummarySection>
 
-          {/* ── Payment Method ───────────────────────────────────────────────── */}
-          <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 sm:p-5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <FiCreditCard size={15} className="text-[#F5820A] shrink-0" />
-                <p className="text-xs font-bold uppercase tracking-wider text-[#6B7280]">
-                  Payment Method
-                </p>
-              </div>
-              <button
-                onClick={onEditPayment}
-                className="text-xs text-[#F5820A] font-medium hover:underline flex items-center gap-0.5"
-              >
-                Add Card / Change <FiChevronRight size={12} />
-              </button>
-            </div>
-
-            {savedCards.length > 0 ? (
-              <div className="flex flex-col gap-2">
-                {savedCards.map((card) => {
-                  const isSelected =
-                    card.id === selectedCardId && selectedPayment === "card";
-                  return (
-                    <button
-                      key={card.id}
-                      onClick={() => onSelectCard(card.id)}
-                      className={`w-full text-left flex items-center gap-3 p-3 rounded-lg border transition-all duration-150 ${
-                        isSelected
-                          ? "border-[#F5820A] bg-[#FFF7F0]"
-                          : "border-[#E5E7EB] bg-white hover:border-[#F5820A]/40 hover:bg-[#FFFAF5]"
-                      }`}
-                    >
-                      {/* Radio */}
-                      <span
-                        className={`shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${
-                          isSelected ? "border-[#F5820A]" : "border-[#D1D5DB]"
-                        }`}
-                      >
-                        {isSelected && (
-                          <span className="w-2 h-2 rounded-full bg-[#F5820A]" />
-                        )}
-                      </span>
-
-                      {/* Card visual */}
-                      <div className="flex flex-col flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-[#111111]">
-                            {cardBrandLabel(card)}
-                          </span>
-                          {card.isDefault && (
-                            <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-[#FEF3C7] text-[#92400E]">
-                              Default
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-xs text-[#6B7280] mt-0.5 font-mono tracking-widest">
-                          {maskNumber(card.cardNumber?.slice(-4))}
-                        </p>
-                        {card.expiryMonth && card.expiryYear && (
-                          <p className="text-[11px] text-[#9CA3AF] mt-0.5">
-                            Expires {String(card.expiryMonth).padStart(2, "0")}/
-                            {String(card.expiryYear).slice(-2)}
-                          </p>
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
-
-                {/* Other payment methods as secondary options */}
-                {(["bank_transfer"] as PaymentMethod[]).map((method) => {
-                  const isSelected = selectedPayment === method;
-                  return (
-                    <button
-                      key={method}
-                      onClick={() => {
-                        onSelectPayment(method);
-                      }}
-                      className={`w-full text-left flex items-center gap-3 p-3 rounded-lg border transition-all duration-150 ${
-                        isSelected
-                          ? "border-[#F5820A] bg-[#FFF7F0]"
-                          : "border-[#E5E7EB] bg-white hover:border-[#F5820A]/40 hover:bg-[#FFFAF5]"
-                      }`}
-                    >
-                      <span
-                        className={`shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${
-                          isSelected ? "border-[#F5820A]" : "border-[#D1D5DB]"
-                        }`}
-                      >
-                        {isSelected && (
-                          <span className="w-2 h-2 rounded-full bg-[#F5820A]" />
-                        )}
-                      </span>
-                      <span className="text-sm font-medium text-[#111111]">
-                        {PAYMENT_METHOD_LABELS[method]}
-                        <div className={`text-xs ${isSelected ? "flex-1" : "hidden"}`}>
-                        <p className="font-semibold">Bank Details:</p>
-                        <p>
-                          Bank Name:{" "}
-                          <span className="font-semibold">KudaBank </span>
-                        </p>
-                        <p>
-                          Account Name:{" "}
-                          <span className="font-semibold">
-                            {" "}
-                            FRESHERZ GADGETS HUB LTD
-                          </span>
-                        </p>
-                        <p>
-                          Account Number:{" "}
-                          <span className="font-bold">3002733251</span>
-                        </p>
-                      </div>
-                      </span>
-                      
-                    </button>
-                  );
-                })}
-              </div>
-            ) : (
-              /* No saved cards — show all payment options */
-              <div className="flex flex-col gap-2">
-                {(["card", "bank_transfer"] as PaymentMethod[]).map(
-                  (method) => {
-                    const isSelected = selectedPayment === method;
-                    return (
-                      <button
-                        key={method}
-                        onClick={() => onSelectPayment(method)}
-                        className={`w-full text-left flex items-center gap-3 p-3 rounded-lg border transition-all duration-150 ${
-                          isSelected
-                            ? "border-[#F5820A] bg-[#FFF7F0]"
-                            : "border-[#E5E7EB] bg-white hover:border-[#F5820A]/40 hover:bg-[#FFFAF5]"
-                        }`}
-                      >
-                        <span
-                          className={`shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${
-                            isSelected ? "border-[#F5820A]" : "border-[#D1D5DB]"
-                          }`}
-                        >
-                          {isSelected && (
-                            <span className="w-2 h-2 rounded-full bg-[#F5820A]" />
-                          )}
-                        </span>
-                        <span className="text-sm font-medium text-[#111111]">
-                          {PAYMENT_METHOD_LABELS[method]}
-                        </span>
-                      </button>
-                    );
-                  },
-                )}
-              </div>
-            )}
-
-            {/* No payment selected warning */}
-            {!paymentReady && (
-              <div className="mt-3 flex items-center gap-1.5 text-xs text-amber-600">
-                <FiAlertCircle size={13} />
-                Please select a payment method to continue.
-              </div>
-            )}
-          </div>
-
+          
           {/* ── Place Order ──────────────────────────────────────────────────── */}
           <button
             onClick={onPlaceOrder}
