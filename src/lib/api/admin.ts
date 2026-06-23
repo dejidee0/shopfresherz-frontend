@@ -127,6 +127,7 @@ export interface CreateBannerRequest {
   subtitle?: string;
   imageUrl: string;
   linkUrl?: string;
+  tag?: string;
   ctaText?: string;
   position?: string;
   sortOrder?: number;

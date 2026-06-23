@@ -479,7 +479,7 @@ function ShopFresherzAuth() {
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={handleGoogleError}
-              theme="outline"
+              theme="outline" 
               size="large"
               shape="rectangular"
               // width={googleButtonWidth}

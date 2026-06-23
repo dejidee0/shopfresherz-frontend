@@ -26,7 +26,7 @@ export function FlutterwavePaymentTrigger({ config, onSuccess, onClose }: Props)
     onClose();
   }
 },
-      onClose,
+      onClose, 
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
