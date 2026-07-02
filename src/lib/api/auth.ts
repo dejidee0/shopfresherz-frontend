@@ -18,6 +18,19 @@ export interface AuthResponse {
   user: User;
   accessToken: string;
   refreshToken: string;
+  expiresAt: string;
+}
+
+export interface RefreshPayload {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface RefreshResponse {
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: string;
+  user: User;
 }
 
 export interface ForgotPasswordPayload {
@@ -57,11 +70,9 @@ export const authApi = {
 
   logout: (token: string) => api.post<void>("/auth/logout", {}, { token }),
 
-  /** Exchange refresh token for a new access token */
-  refresh: (refreshToken: string) =>
-    api.post<Pick<AuthResponse, "accessToken">>("/auth/refresh", {
-      refreshToken,
-    }),
+  /** Exchange the current access + refresh token pair for a new one */
+  refresh: (payload: RefreshPayload) =>
+    api.post<RefreshResponse>("/auth/refresh", payload),
 
   /** Validate current token + return fresh user object */
   me: (token: string) => api.get<User>("/auth/me", { token }),

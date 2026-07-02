@@ -5,8 +5,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/Toaster";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { useSessionManager } from "@/lib/hooks/useSessionManager";
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  useSessionManager();
+
   const [queryClient] = useState(
     () =>
       new QueryClient({
