@@ -6,8 +6,41 @@ import {
 } from 'react-icons/fi'
 import { cn } from '@/lib/utils/format'
 import type { OrderStep } from '@/lib/api/account'
+import type { OrderStatus } from '@/lib/types/order'
 
 const STEP_ICONS = [FiShoppingBag, FiPackage, FiTruck, FiCheckCircle]
+const STEP_LABELS = ['Order Placed', 'Processing', 'Shipped', 'Delivered']
+
+// Which of the 4 stepper stages each backend OrderStatus has reached.
+const STAGE_INDEX: Partial<Record<OrderStatus, number>> = {
+  Pending: 0,
+  AwaitingPayment: 0,
+  Paid: 1,
+  Processing: 1,
+  Shipped: 2,
+  Delivered: 3,
+}
+
+const TERMINAL_STATUSES: OrderStatus[] = ['Cancelled', 'RefundRequested', 'Refunded']
+
+/** Maps a real order status (e.g. "Processing", "Shipped") to the 4-stage stepper. */
+export function getOrderSteps(status: OrderStatus): OrderStep[] {
+  // Cancelled/refunded orders stop progressing — only "Order Placed" holds,
+  // since we don't know which stage it reached before it was cancelled.
+  if (TERMINAL_STATUSES.includes(status)) {
+    return STEP_LABELS.map((label, i) => ({
+      label,
+      status: i === 0 ? 'completed' : 'pending',
+    }))
+  }
+
+  const current = STAGE_INDEX[status] ?? 0
+
+  return STEP_LABELS.map((label, i) => ({
+    label,
+    status: i < current ? 'completed' : i === current ? 'active' : 'pending',
+  }))
+}
 
 interface OrderStepperProps {
   steps: OrderStep[]

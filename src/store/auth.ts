@@ -8,11 +8,13 @@ interface AuthState {
   user: User | null
   accessToken: string | null
   refreshToken: string | null
+  expiresAt: string | null
   isAuthenticated: boolean
   hasHydrated: boolean
 
   // Actions
-  setAuth: (user: User, accessToken: string, refreshToken: string) => void
+  setAuth: (user: User, accessToken: string, refreshToken: string, expiresAt: string) => void
+  setTokens: (accessToken: string, refreshToken: string, expiresAt: string) => void
   updateUser: (partial: Partial<User>) => void
   setHasHydrated: (hasHydrated: boolean) => void
   logout: () => void
@@ -20,6 +22,7 @@ interface AuthState {
   // Derived helpers
   isAdmin: () => boolean
   isCustomer: () => boolean
+  isSessionExpired: () => boolean
   redirectPath: () => '/admin/dashboard' | '/store'
 }
 
@@ -29,11 +32,15 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       accessToken: null,
       refreshToken: null,
+      expiresAt: null,
       isAuthenticated: false,
       hasHydrated: false,
 
-      setAuth: (user, accessToken, refreshToken) =>
-        set({ user, accessToken, refreshToken, isAuthenticated: true }),
+      setAuth: (user, accessToken, refreshToken, expiresAt) =>
+        set({ user, accessToken, refreshToken, expiresAt, isAuthenticated: true }),
+
+      setTokens: (accessToken, refreshToken, expiresAt) =>
+        set({ accessToken, refreshToken, expiresAt }),
 
       updateUser: (partial) =>
         set((s) => ({ user: s.user ? { ...s.user, ...partial } : null })),
@@ -41,7 +48,7 @@ export const useAuthStore = create<AuthState>()(
       setHasHydrated: (hasHydrated) => set({ hasHydrated }),
 
       logout: () =>
-        set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false }),
+        set({ user: null, accessToken: null, refreshToken: null, expiresAt: null, isAuthenticated: false }),
 
       isAdmin: () => {
         const role = get().user?.role
@@ -49,6 +56,11 @@ export const useAuthStore = create<AuthState>()(
       },
 
       isCustomer: () => get().user?.role === 'Customer',
+
+      isSessionExpired: () => {
+        const expiresAt = get().expiresAt
+        return expiresAt ? Date.now() >= new Date(expiresAt).getTime() : false
+      },
 
       redirectPath: () =>
         get().isAdmin() ? '/admin/dashboard' : '/store',
@@ -62,6 +74,7 @@ export const useAuthStore = create<AuthState>()(
         user: s.user,
         accessToken: s.accessToken,
         refreshToken: s.refreshToken,
+        expiresAt: s.expiresAt,
         isAuthenticated: s.isAuthenticated,
       }),
     }

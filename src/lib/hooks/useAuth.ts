@@ -16,7 +16,7 @@ export function useLogin() {
     mutationFn: (payload: LoginPayload) => authApi.login(payload),
 
     onSuccess: (data) => {
-      setAuth(data.user, data.accessToken, data.refreshToken)
+      setAuth(data.user, data.accessToken, data.refreshToken, data.expiresAt)
 
       toast.success(
         `Welcome back, ${data.user.firstName}!`,
@@ -50,7 +50,7 @@ export function useRegister() {
     mutationFn: (payload: RegisterPayload) => authApi.register(payload),
 
     onSuccess: (data) => {
-      setAuth(data.user, data.accessToken, data.refreshToken)
+      setAuth(data.user, data.accessToken, data.refreshToken, data.expiresAt)
 
       toast.success(
         'Account created!',
@@ -98,7 +98,7 @@ export function useGoogleAuth() {
     mutationFn: (idToken: string) => authApi.googleLogin({ idToken }),
 
     onSuccess: (data) => {
-      setAuth(data.user, data.accessToken, data.refreshToken)
+      setAuth(data.user, data.accessToken, data.refreshToken, data.expiresAt)
 
       toast.success(
         `Welcome, ${data.user.firstName}!`,

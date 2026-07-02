@@ -6,12 +6,12 @@ import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { FiArrowLeft, FiPlus } from 'react-icons/fi'
 import { AccountLayout } from '@/features/account/components/AccountLayout'
-import { OrderStepper } from '@/features/account/components/OrderStepper'
+import { OrderStepper, getOrderSteps } from '@/features/account/components/OrderStepper'
 import { OrderTimeline } from '@/features/account/components/OrderTimeline'
 import { DataTable, type ColumnDef } from '@/components/ui/DataTable'
 import { useAuthStore } from '@/store/auth'
 import { formatPrice, formatDate } from '@/lib/utils/format'
-import { accountApi, OrderDetail, OrderLineItem, OrderStep } from '@/lib/api/account'
+import { accountApi, OrderDetail, OrderLineItem } from '@/lib/api/account'
 
 // ─── Line items table columns ─────────────────────────────────────────────────
 
@@ -80,19 +80,6 @@ export default function OrderDetailPage() {
       .finally(() => setIsLoading(false))
   }, [accessToken, orderNumber])
 
-
-  function getOrderSteps(orderStatus: string): OrderStep[]{
-    if (orderStatus == "pending"){
-      return [{label: "pending", status: "pending" }]
-    }
-    else if (orderStatus == "active"){
-      return [{label: "active", status: "active"}]
-    }
-    else if (orderStatus == "completed"){
-      return [{label: "completed", status: "completed"}]
-    }
-    else return []
-  }
 
   return (
     <AccountLayout
