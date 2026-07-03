@@ -45,39 +45,58 @@ function mapApiProductToItem(value: ApiProduct): Product {
   };
 }
 
-// 1. Internal Product Card Component
-const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
+// 1. Internal Product Row Component
+const ProductRow: React.FC<{ product: Product }> = ({ product }) => {
   return (
     <Link
       href={`/store/product/${product.slug}`}
-      className="flex items-center gap-4 p-4 border border-white/[0.08] rounded-[10px] bg-[#141414] hover:border-[#F97316]/60 hover:shadow-[0_14px_34px_rgba(249,115,22,0.14)] transition-all duration-200 h-[75px] group"
+      className="group flex items-center gap-3 cursor-pointer border-b border-white/[0.03] transition-colors duration-150 hover:bg-white/[0.03]"
+      style={{ padding: "14px 20px" }}
     >
-      {/* Aspect-ratio safe image container */}
-      <div className="relative w-16 h-16 shrink-0 rounded bg-[#1F1F1F] overflow-hidden">
+      {/* Image box */}
+      <div
+        className="shrink-0 overflow-hidden"
+        style={{
+          width: "60px",
+          height: "60px",
+          background: "#1F1F1F",
+          borderRadius: "10px",
+          border: "1px solid rgba(255,255,255,0.06)",
+        }}
+      >
         {product.imageUrl ? (
-          <Image
-            src={product.imageUrl}
-            alt={product.title}
-            width={64}
-            height={64}
-            className="h-full w-full object-contain transition-transform duration-200 group-hover:scale-105"
-          />
+          <div className="h-full w-full p-1.5">
+            <Image
+              src={product.imageUrl}
+              alt={product.title}
+              width={60}
+              height={60}
+              className="h-full w-full object-contain transition-transform duration-200 group-hover:scale-105"
+            />
+          </div>
         ) : (
-          <div className="h-full w-full rounded bg-white/[0.08]" />
+          <div className="h-full w-full bg-white/[0.08]" />
         )}
       </div>
 
-      {/* Content details side */}
+      {/* Info */}
       <div className="flex flex-col flex-1 min-w-0">
-        <h3 className="text-xs font-normal text-[#D7D7D7] line-clamp-2 leading-tight mb-1.5 group-hover:text-[#F97316] transition-colors">
+        <h3 className="text-[12px] font-medium text-white line-clamp-2 leading-tight transition-colors duration-150 group-hover:text-[#F97316]">
           {product.title}
         </h3>
-        <span className="text-sm font-semibold text-orange-500">
+        <span className="mt-1 text-[13px] font-bold text-[#F97316]">
           {product.price}
         </span>
       </div>
     </Link>
   );
+};
+
+const COLUMN_ICONS: Record<string, string> = {
+  "flash-sale": "⚡",
+  "best-sellers": "🔥",
+  "top-rated": "⭐",
+  "new-arrival": "✨",
 };
 
 // 2. Main Exported Component
@@ -145,20 +164,33 @@ export function TopHighlightsSection() {
   }, []);
 
   return (
-    <section className="w-full max-w-6xl mx-auto px-4 py-8">
-      {/* Clean responsive grid boundaries */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8">
+    <section className="w-full bg-[#0D0D0D] px-4 md:px-8 py-14">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {highlightsData.map((category) => (
-          <div key={category.id} className="flex flex-col gap-4">
-            {/* Structural Category Header */}
-            <h2 className="text-xs font-bold tracking-wider text-white uppercase">
-              {category.title}
-            </h2>
+          <div
+            key={category.id}
+            className="overflow-hidden transition-all duration-300 hover:border-[rgba(249,115,22,0.2)]"
+            style={{
+              background: "#141414",
+              border: "1px solid rgba(255,255,255,0.06)",
+              borderRadius: "16px",
+            }}
+          >
+            {/* Column header */}
+            <div
+              className="flex items-center gap-2 border-b border-white/[0.06]"
+              style={{ padding: "16px 20px", background: "rgba(249,115,22,0.05)" }}
+            >
+              <span aria-hidden="true">{COLUMN_ICONS[category.id]}</span>
+              <h2 className="text-[12px] font-bold uppercase tracking-[0.8px] text-white">
+                {category.title}
+              </h2>
+            </div>
 
-            {/* Inner Vertical Item List */}
-            <div className="flex flex-col gap-3">
+            {/* Product rows */}
+            <div className="flex flex-col">
               {category.products.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductRow key={product.id} product={product} />
               ))}
             </div>
           </div>

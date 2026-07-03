@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { productsApi } from "@/lib/api/products";
 
@@ -13,15 +12,6 @@ interface LaptopPromo {
   badge: string
   ctaText: string
 }
-
-// const FALLBACK: LaptopPromo = {
-//   slug: "macbook-pro",
-//   title: "Macbook Pro",
-//   imageUrl: "/images/laptop.png",
-//   price: "$1999",
-//   badge: "Save up to $200.00",
-//   ctaText: "Shop Now",
-// }
 
 export function LaptopPromoSection() {
   const [promo, setPromo] = useState<LaptopPromo>()
@@ -35,7 +25,7 @@ export function LaptopPromoSection() {
             title: data.title,
             imageUrl: data.imageUrl,
             price: data.salePrice ?? data.price ?? "",
-            badge: data.badge?? "",
+            badge: data.badge ?? "",
             ctaText: data.ctaText,
           })
           console.log("[LaptopPromo] ✅ Loaded promo:", data.title)
@@ -47,70 +37,194 @@ export function LaptopPromoSection() {
       })
   }, [])
 
+  const featuredHref = promo?.slug ? `/store/product/${promo.slug}` : "/store/category/all";
+
   return (
-    <section className="bg-[#f5f5f7] py-12 px-6 sm:px-12 md:px-16 lg:px-24 flex items-center justify-center min-h-[400px]">
-      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-        
-        {/* Left Content Column */}
-        <div className="flex flex-col items-start space-y-5">
-          {/* Discount Badge */}
-          <span className="bg-[#FF9A2E] text-white text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-[2px]">
-            {promo?.badge}
+    <section className="bg-[#0A0A0A]">
+      <div
+        className="grid grid-cols-1 md:grid-cols-2 gap-5 px-4 md:px-8 pb-14"
+        style={{ paddingTop: "8px" }}
+      >
+        {/* ── LEFT CARD — Flash Sale ─────────────────────────────────── */}
+        <div
+          className="relative overflow-hidden"
+          style={{
+            background: "linear-gradient(135deg, #F97316 0%, #C2410C 60%, #9A3412 100%)",
+            borderRadius: "24px",
+            padding: "48px 40px",
+            minHeight: "280px",
+            border: "1px solid rgba(249,115,22,0.3)",
+            boxShadow: "0 20px 60px rgba(249,115,22,0.2)",
+          }}
+        >
+          <div
+            className="pointer-events-none absolute"
+            style={{
+              width: "250px",
+              height: "250px",
+              borderRadius: "50%",
+              background: "radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%)",
+              top: "-60px",
+              right: "-60px",
+            }}
+          />
+
+          <span
+            className="inline-flex items-center uppercase"
+            style={{
+              background: "rgba(255,255,255,0.2)",
+              color: "#fff",
+              fontSize: "11px",
+              fontWeight: 700,
+              letterSpacing: "0.8px",
+              padding: "4px 12px",
+              borderRadius: "20px",
+              marginBottom: "16px",
+            }}
+          >
+            ⚡ FLASH SALE
           </span>
 
-          {/* Product Title */}
-          <h2 className="text-4xl sm:text-4xl font-bold text-white tracking-tight">
-            {promo?.title}
+          <h2
+            className="text-white"
+            style={{ fontSize: "32px", fontWeight: 700, letterSpacing: "-0.5px", lineHeight: 1.15 }}
+          >
+            Up to 40% Off Top Brands
           </h2>
 
-          {/* Product Specs — kept as static marketing copy */}
-          <p className="text-[#333333] md:w-[350px] text-lg sm:text-xl font-normal leading-relaxed max-w-md">
-            Apple M1 Max Chip. 32GB Unified Memory, 1TB SSD Storage
+          <p
+            style={{
+              fontSize: "14px",
+              color: "rgba(255,255,255,0.75)",
+              marginTop: "10px",
+              marginBottom: "24px",
+              maxWidth: "340px",
+            }}
+          >
+            Limited time deals on iPhones, Samsung, Sony and more.
           </p>
 
-          {/* Shop Button */}
           <Link
-            href={`/store/product/${promo?.slug}`}
-            className="inline-flex items-center gap-2 bg-[#FF9A2E] text-white font-semibold text-xs uppercase tracking-wider px-6 py-3 rounded-[4px] hover:bg-[#e68a2e] transition-colors group"
+            href="/store/category/all"
+            className="inline-flex items-center transition-transform duration-200 hover:scale-[1.03]"
+            style={{
+              background: "#fff",
+              color: "#F97316",
+              fontWeight: 700,
+              borderRadius: "10px",
+              padding: "12px 24px",
+              fontSize: "14px",
+              border: "none",
+              cursor: "pointer",
+            }}
           >
-            {promo?.ctaText}
-            <svg
-              className="w-4 h-4 transform transition-transform group-hover:translate-x-1"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
+            View All Deals →
           </Link>
+
+          <span
+            className="float absolute select-none"
+            style={{
+              right: "40px",
+              bottom: "32px",
+              fontSize: "72px",
+              opacity: 0.9,
+              filter: "drop-shadow(0 0 20px rgba(249,115,22,0.4))",
+            }}
+            aria-hidden="true"
+          >
+            ⚡
+          </span>
         </div>
 
-        {/* Right Image Column with Floating Price */}
-        <div className="relative flex justify-center md:justify-end items-center">
-          {/* Price Badge Circle */}
-          <div className=" max-md:hidden absolute lg:top-[-9] left-4 md:left-12 lg:left-20 z-10 bg-[#FF9A2E] text-white w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center font-bold text-lg sm:text-xl border-4 border-white shadow-sm select-none">
-            {promo?.price}
-          </div>
+        {/* ── RIGHT CARD — MacBook / Premium Tech ────────────────────── */}
+        <div
+          className="relative overflow-hidden"
+          style={{
+            background: "linear-gradient(135deg, #0D1B3E 0%, #162040 40%, #1a2744 100%)",
+            borderRadius: "24px",
+            padding: "48px 40px",
+            minHeight: "280px",
+            border: "1px solid rgba(99,179,237,0.15)",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
+          }}
+        >
+          <div
+            className="pointer-events-none absolute"
+            style={{
+              width: "250px",
+              height: "250px",
+              borderRadius: "50%",
+              background: "radial-gradient(circle, rgba(99,179,237,0.08) 0%, transparent 70%)",
+              top: "-60px",
+              right: "-60px",
+            }}
+          />
 
-          {/* Laptop Image */}
-          <div className="w-full max-w-[380px]">
-           {
-            promo?.imageUrl && (
-               <Image
-              src={promo.imageUrl}
-              alt={promo.title}
-              width={500}
-              height={300}
-              className="object-contain w-full h-auto"
-              priority
-              unoptimized
-            />
-            )
-           }
-          </div>
+          <span
+            className="inline-flex items-center uppercase"
+            style={{
+              background: "rgba(99,179,237,0.15)",
+              color: "#60A5FA",
+              fontSize: "11px",
+              fontWeight: 700,
+              letterSpacing: "0.8px",
+              padding: "4px 12px",
+              borderRadius: "20px",
+              marginBottom: "16px",
+            }}
+          >
+            🖥️ FEATURED
+          </span>
+
+          <h2
+            className="text-white"
+            style={{ fontSize: "32px", fontWeight: 700, letterSpacing: "-0.5px", lineHeight: 1.15 }}
+          >
+            {promo?.title ?? "MacBook Pro M4 — Built for Creators"}
+          </h2>
+
+          <p
+            style={{
+              fontSize: "14px",
+              color: "rgba(255,255,255,0.75)",
+              marginTop: "10px",
+              maxWidth: "360px",
+            }}
+          >
+            M4 chip, 24-hour battery, Liquid Retina XDR display. The ultimate creative machine.
+          </p>
+
+          <p
+            style={{
+              fontSize: "20px",
+              fontWeight: 700,
+              color: "#60A5FA",
+              marginTop: "8px",
+              marginBottom: "20px",
+            }}
+          >
+            {promo?.price ? `From ${promo.price}` : "From ₦2,750,000"}
+          </p>
+
+          <Link href={featuredHref} className="sf-btn-primary">
+            {promo?.ctaText ?? "Shop MacBooks →"}
+          </Link>
+
+          <span
+            className="float absolute select-none"
+            style={{
+              right: "40px",
+              bottom: "32px",
+              fontSize: "72px",
+              opacity: 0.9,
+              filter: "drop-shadow(0 0 20px rgba(99,179,237,0.4))",
+              animationDelay: "-2s",
+            }}
+            aria-hidden="true"
+          >
+            💻
+          </span>
         </div>
-
       </div>
     </section>
   );

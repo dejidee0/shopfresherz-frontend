@@ -96,16 +96,16 @@ export function PaymentCard({ card, onDelete, onEdit }: PaymentCardProps) {
         {menuOpen && (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-            <div className="absolute right-0 top-8 bg-white rounded-card shadow-lg border border-[#E5E7EB] z-20 py-1 min-w-32">
+            <div className="absolute right-0 top-8 bg-[#1A1A1A] rounded-card shadow-lg border border-white/[0.1] z-20 py-1 min-w-32">
               <button
                 onClick={() => { onEdit(card.id); setMenuOpen(false) }}
-                className="flex items-center gap-2.5 w-full px-4 py-2 text-sm text-[#111111] hover:bg-orange-50 hover:text-[#F97316] transition-colors"
+                className="flex items-center gap-2.5 w-full px-4 py-2 text-sm text-white hover:bg-[#F97316]/10 hover:text-[#F97316] transition-colors"
               >
                 <FiEdit2 size={13} /> Edit Card
               </button>
               <button
                 onClick={() => { onDelete(card.id); setMenuOpen(false) }}
-                className="flex items-center gap-2.5 w-full px-4 py-2 text-sm text-[#EF4444] hover:bg-red-50 transition-colors"
+                className="flex items-center gap-2.5 w-full px-4 py-2 text-sm text-[#EF4444] hover:bg-red-500/10 transition-colors"
               >
                 <FiTrash2 size={13} /> Delete Card
               </button>

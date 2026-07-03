@@ -97,10 +97,10 @@ export function AccountLayout({
             />
 
             {/* Drawer */}
-            <div className="fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl lg:hidden flex flex-col">
+            <div className="fixed inset-y-0 left-0 z-50 w-72 bg-[#0D0D0D] border-r border-white/[0.08] shadow-xl lg:hidden flex flex-col">
               {/* Drawer header */}
-              <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100">
-                <p className="text-sm font-semibold text-[#111111]">My Account</p>
+              <div className="flex items-center justify-between px-4 py-4 border-b border-white/[0.06]">
+                <p className="text-sm font-semibold text-white">My Account</p>
                 <button
                   onClick={() => setSidebarOpen(false)}
                   className="text-gray-400 hover:text-[#F97316] transition-colors p-1"

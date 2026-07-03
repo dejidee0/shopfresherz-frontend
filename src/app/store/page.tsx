@@ -149,7 +149,7 @@ function ProductCard({ product }: { product: HomeProduct }) {
       </button>
 
       <Link href={`/store/product/${product.slug}`} className="flex flex-col flex-1 z-10">
-        <div className="h-[190px] sm:h-[200px] bg-[#1A1A1A] overflow-hidden flex items-center justify-center">
+        <div className="product-image h-[190px] sm:h-[200px] bg-[#1A1A1A] overflow-hidden flex items-center justify-center">
           {imageSrc ? (
             <Image
               src={imageSrc}

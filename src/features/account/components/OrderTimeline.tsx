@@ -38,8 +38,8 @@ export function OrderTimeline({ activities }: OrderTimelineProps) {
                 className={cn(
                   'w-8 h-8 rounded-full flex items-center justify-center border-2 shrink-0',
                   isFirst
-                    ? 'border-[#F97316] bg-orange-50 text-[#F97316]'
-                    : 'border-[#E5E7EB] bg-white text-[#6B7280]'
+                    ? 'border-[#F97316] bg-[#F97316]/10 text-[#F97316]'
+                    : 'border-white/[0.15] bg-[#1A1A1A] text-[#888888]'
                 )}
               >
                 <Icon size={14} />

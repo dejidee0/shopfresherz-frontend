@@ -181,9 +181,13 @@ export function Navbar() {
       <header className="bg-[#0A0A0A] border-b border-white/[0.06]">
         <div className="px-4 md:px-8 py-3.5 flex items-center gap-4 lg:gap-6">
           <Link href="/store" className="shrink-0 flex items-center gap-2.5">
-            <span className="w-[38px] h-[38px] rounded-[10px] bg-linear-to-br from-[#F97316] to-[#EA580C] text-white flex items-center justify-center text-base font-bold leading-none shadow-[0_4px_12px_rgba(249,115,22,0.4)]">
-              SF
-            </span>
+            <Image
+              src="/icons/logo-mark.png"
+              alt="ShopFresherz"
+              width={38}
+              height={38}
+              style={{ borderRadius: '10px', objectFit: 'contain' }}
+            />
             <span className="flex flex-col leading-none">
               <span className="text-[17px] font-bold text-white tracking-[-0.3px]">ShopFresherz</span>
               <span className="mt-1 text-[9px] text-[#555555] uppercase tracking-[2px]">
@@ -341,9 +345,13 @@ export function Navbar() {
           <div className="fixed inset-y-0 right-0 z-50 w-72 bg-[#0D0D0D] shadow-2xl md:hidden flex flex-col border-l border-white/[0.08]">
             <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
               <Link href="/store" onClick={closeMenu} className="flex items-center gap-2.5">
-                <span className="w-8 h-8 rounded-[8px] bg-[#F97316] text-white flex items-center justify-center text-sm font-bold">
-                  SF
-                </span>
+                <Image
+                  src="/icons/logo-mark.png"
+                  alt="ShopFresherz"
+                  width={32}
+                  height={32}
+                  style={{ borderRadius: '8px', objectFit: 'contain' }}
+                />
                 <span className="flex flex-col leading-none">
                   <span className="text-sm font-bold text-white">ShopFresherz</span>
                   <span className="mt-1 text-[9px] text-[#555555] uppercase tracking-[1.5px]">

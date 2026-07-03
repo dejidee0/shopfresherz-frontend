@@ -204,15 +204,49 @@ body {
   border-radius: 14px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-  transform-style: preserve-3d;
+  transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
   position: relative;
+}
+.product-card::before,
+.sf-product-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, rgba(249,115,22,0.03) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+.product-card::after,
+.sf-product-card::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #F97316, transparent);
+  opacity: 0;
+  transition: opacity 0.35s ease;
 }
 .product-card:hover,
 .sf-product-card:hover {
-  transform: translateY(-8px) scale(1.01);
+  transform: translateY(-10px) scale(1.015);
   border-color: rgba(249,115,22,0.35);
-  box-shadow: 0 24px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(249,115,22,0.1), var(--shadow-orange-glow);
+  box-shadow:
+    0 30px 60px rgba(0,0,0,0.7),
+    0 0 0 1px rgba(249,115,22,0.1),
+    0 0 40px rgba(249,115,22,0.08);
+}
+.product-card:hover::before,
+.sf-product-card:hover::before { opacity: 1; }
+.product-card:hover::after,
+.sf-product-card:hover::after { opacity: 1; }
+
+.product-card .product-image,
+.sf-product-card .product-image {
+  transition: transform 0.4s ease;
+}
+.product-card:hover .product-image,
+.sf-product-card:hover .product-image {
+  transform: scale(1.08);
 }
 
 .sf-card-3d {
@@ -289,4 +323,60 @@ body {
   font-size: 14px;
   color: var(--text-secondary);
   margin-top: 4px;
+}
+
+/* ── Hero entrance animations ─────────────────────────────────────── */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.hero-title { animation: slideInLeft 0.6s ease forwards; }
+.hero-subtitle { animation: fadeInUp 0.6s ease 0.1s both; }
+.hero-price { animation: fadeInUp 0.6s ease 0.2s both; }
+.hero-buttons { animation: fadeInUp 0.6s ease 0.3s both; }
+.hero-badge { animation: scaleIn 0.4s ease forwards; }
+
+/* ── Hero side cards ──────────────────────────────────────────────── */
+.side-card {
+  transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+  cursor: pointer;
+}
+.side-card:hover {
+  transform: translateX(-4px) translateY(-2px);
+  border-color: rgba(249,115,22,0.4) !important;
+  box-shadow: 4px 8px 24px rgba(0,0,0,0.5),
+              0 0 20px rgba(249,115,22,0.1) !important;
+}
+
+/* ── Floating decorative elements ─────────────────────────────────── */
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+.float { animation: floatY 4s ease-in-out infinite; }
+
+/* ── Section entrance animations ──────────────────────────────────── */
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease forwards;
+}
+.animate-delay-1 { animation-delay: 0.1s; }
+.animate-delay-2 { animation-delay: 0.2s; }
+.animate-delay-3 { animation-delay: 0.3s; }
+.animate-delay-4 { animation-delay: 0.4s; }
+
+/* ── Trust bar icons ──────────────────────────────────────────────── */
+.trust-icon {
+  transition: all 0.25s ease;
+}
+.trust-icon:hover {
+  transform: scale(1.1) rotate(5deg);
 }

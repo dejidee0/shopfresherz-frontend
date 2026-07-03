@@ -78,8 +78,8 @@ export function OrderStepper({ steps }: OrderStepperProps) {
                 isCompleted
                   ? 'bg-[#F97316] border-[#F97316] text-white'
                   : isActive
-                  ? 'bg-white border-[#F97316] text-[#F97316]'
-                  : 'bg-white border-[#E5E7EB] text-[#D1D5DB]'
+                  ? 'bg-[#1A1A1A] border-[#F97316] text-[#F97316]'
+                  : 'bg-[#1A1A1A] border-white/[0.15] text-[#555555]'
               )}
             >
               <Icon size={16} />

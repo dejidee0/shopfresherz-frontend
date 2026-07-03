@@ -2,15 +2,16 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   FiArrowRight,
-  FiCheck,
   FiEye,
   FiEyeOff,
   FiLock,
   FiMail,
   FiUser,
 } from "react-icons/fi";
+import AuthLeftPanel from "@/features/auth/components/AuthLeftPanel";
 import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { useGoogleAuth, useLogin, useRegister } from "@/lib/hooks/useAuth";
 import { toast } from "@/store/toast";
@@ -156,35 +157,18 @@ export default function ShopFresherzAuth() {
 
   return (
     <section className="grid min-h-screen bg-[#0A0A0A] lg:grid-cols-[45%_55%]">
-      <aside className="relative hidden overflow-hidden bg-linear-to-br from-[#F97316] via-[#C2410C] to-[#7C1900] lg:flex lg:items-center lg:justify-center">
-        <div className="absolute -left-16 top-16 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute bottom-10 right-8 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
-        <div className="relative text-center">
-          <div className="text-[120px] font-black tracking-[-4px] text-white [text-shadow:0_0_35px_rgba(255,255,255,0.35)]">
-            SF
-          </div>
-          <div className="mt-2 text-[26px] font-bold text-white">ShopFresherz</div>
-          <div className="mt-1 text-[15px] text-white/70">Fresh Tech, Every Time</div>
-          <div className="mt-8 space-y-3 text-left text-sm text-white/80">
-            {[
-              "100% Authentic Products",
-              "Secure Payments via Flutterwave",
-              "Fast Delivery Across Nigeria",
-            ].map((item) => (
-              <p key={item} className="flex items-center gap-2">
-                <FiCheck /> {item}
-              </p>
-            ))}
-          </div>
-        </div>
-      </aside>
+      <AuthLeftPanel />
 
       <main className="flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-[420px]">
+        <div className="w-full max-w-[440px]">
           <div className="mb-8 flex items-center gap-3 lg:hidden">
-            <div className="grid h-10 w-10 place-items-center rounded-lg bg-linear-to-br from-[#F97316] to-[#EA580C] text-lg font-bold text-white">
-              SF
-            </div>
+            <Image
+              src="/icons/logo-mark.png"
+              alt="ShopFresherz"
+              width={40}
+              height={40}
+              style={{ borderRadius: '10px', objectFit: 'contain' }}
+            />
             <div>
               <p className="text-base font-extrabold text-white">ShopFresherz</p>
               <p className="text-[10px] font-bold uppercase tracking-[1.5px] text-[#F97316]">
@@ -193,7 +177,7 @@ export default function ShopFresherzAuth() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 rounded-lg border border-white/[0.08] bg-[#141414] p-1">
+          <div className="grid grid-cols-2 gap-1 rounded-[12px] bg-[#141414] p-1">
             {(["signin", "signup"] as AuthMode[]).map((authMode) => {
               const active = mode === authMode;
               return (
@@ -201,8 +185,8 @@ export default function ShopFresherzAuth() {
                   key={authMode}
                   type="button"
                   onClick={() => switchMode(authMode)}
-                  className={`h-11 rounded-md text-sm font-bold transition ${
-                    active ? "bg-[#242424] text-white" : "text-[#666666] hover:text-white"
+                  className={`h-11 rounded-[9px] text-sm font-medium transition-all duration-200 ${
+                    active ? "bg-[#2A2A2A] text-white" : "text-[#555555] hover:text-white"
                   }`}
                 >
                   {authMode === "signin" ? "Sign in" : "Create account"}
@@ -271,7 +255,7 @@ export default function ShopFresherzAuth() {
             <button
               type="submit"
               disabled={loading || googlePending}
-              className="sf-btn-primary mt-1 h-12 w-full text-sm font-extrabold uppercase disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+              className="sf-btn-primary mt-1 h-[52px] w-full rounded-[12px] text-[15px] font-bold disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
             >
               {loading ? (
                 <>

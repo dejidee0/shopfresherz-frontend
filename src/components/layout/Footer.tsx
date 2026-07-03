@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { RiInstagramLine, RiTwitterXLine, RiWhatsappLine } from 'react-icons/ri'
 
 const QUICK_LINKS = [
@@ -38,9 +39,13 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] lg:gap-12">
           <div>
             <Link href="/" className="mb-4 inline-flex items-center gap-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-linear-to-br from-[#F97316] to-[#EA580C] text-sm font-bold leading-none text-white shadow-[0_4px_12px_rgba(249,115,22,0.35)]">
-                SF
-              </span>
+              <Image
+                src="/icons/logo-mark.png"
+                alt="ShopFresherz"
+                width={36}
+                height={36}
+                style={{ borderRadius: '10px', objectFit: 'contain' }}
+              />
               <span className="flex flex-col leading-none">
                 <span className="text-base font-bold text-white">ShopFresherz</span>
                 <span className="mt-1 text-[11px] text-[#444444]">Gadget Store</span>

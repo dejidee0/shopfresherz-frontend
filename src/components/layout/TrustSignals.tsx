@@ -37,7 +37,7 @@ export function TrustSignals() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-white/[0.04]">
         {TRUST_SIGNALS.map(({ icon: Icon, iconBg, iconColor, title, subtitle }) => (
           <div key={title} className="flex items-center gap-3.5 px-6 py-5">
-            <span className={`w-11 h-11 rounded-[12px] flex items-center justify-center shrink-0 ${iconBg}`}>
+            <span className={`trust-icon w-11 h-11 rounded-[12px] flex items-center justify-center shrink-0 ${iconBg}`}>
               <Icon className={iconColor} size={20} />
             </span>
             <span className="min-w-0">

@@ -194,62 +194,75 @@ export function HeroBanner() {
                 return (
                   <div
                     key={s.id}
-                    className="min-w-full min-h-[480px]"
+                    className="relative min-w-full min-h-[480px] overflow-hidden rounded-[24px]"
                     aria-roledescription="slide"
                     aria-label={s.title}
                   >
-                    <div className="relative grid min-h-[480px] grid-cols-1 md:grid-cols-[1fr_42%] items-end gap-5 px-6 py-10 sm:px-12 sm:py-12">
+                    {s.imageUrl ? (
+                      <>
+                        <Image
+                          src={s.imageUrl}
+                          alt={s.title}
+                          fill
+                          sizes="(max-width: 1024px) 100vw, 70vw"
+                          style={{ objectFit: "cover", objectPosition: "center right" }}
+                          priority={i === 0}
+                        />
+                        <div
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            zIndex: 1,
+                            background:
+                              "linear-gradient(to right, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.7) 45%, rgba(0,0,0,0.15) 100%)",
+                          }}
+                        />
+                      </>
+                    ) : (
                       <div className="pointer-events-none absolute right-0 top-0 h-[300px] w-[300px] rounded-full bg-[radial-gradient(circle,rgba(249,115,22,0.08)_0%,transparent_70%)]" />
-                      <div
-                        className={cn(
-                          "relative z-10 max-w-xl pb-6 transition-all duration-700",
-                          isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-                        )}
-                      >
-                        <span className="sf-badge sf-badge-orange mb-4">{s.tag ?? "Fresh Deal"}</span>
+                    )}
 
-                        <h1 className="text-[34px] sm:text-[44px] font-bold leading-[1.1] text-white tracking-[-1.5px]">
-                          {leadingTitle}{" "}
-                          {lastWord && <span className="text-[#F97316] sf-text-glow">{lastWord}</span>}
-                        </h1>
-
-                        <p className="mt-3 max-w-[420px] text-[15px] leading-[1.6] text-[#888888]">
-                          {s.subTitle}
-                        </p>
-
-                        <div className="mt-5 flex items-center gap-3 flex-wrap">
-                          <span className="text-[34px] font-bold text-white">Fresh Deal</span>
-                          <span className="text-base text-[#555555] line-through">Regular Price</span>
-                          <span className="sf-badge sf-badge-orange">Save More</span>
-                        </div>
-
-                        <div className="mt-6 flex items-center gap-3">
-                          <Link
-                            href={s.linkUrl}
-                            className="sf-btn-primary"
-                          >
-                            {s.ctaText || "Shop Now"} <FiArrowRight size={15} />
-                          </Link>
-                          <Link
-                            href={s.linkUrl}
-                            className="sf-btn-ghost"
-                          >
-                            Learn More
-                          </Link>
-                        </div>
+                    <div
+                      className={cn(
+                        "absolute bottom-0 left-0 right-0 p-7 sm:p-12 transition-all duration-700",
+                        isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
+                      )}
+                      style={{ zIndex: 2 }}
+                    >
+                      <div className="hero-badge block" style={{ marginBottom: "16px" }}>
+                        <span className="sf-badge sf-badge-orange">{s.tag ?? "Fresh Deal"}</span>
                       </div>
 
-                      <div className="relative hidden h-[360px] md:block">
-                        {s.imageUrl && (
-                          <Image
-                            src={s.imageUrl}
-                            alt={s.title}
-                            fill
-                            sizes="(max-width: 1024px) 40vw, 360px"
-                            className="object-contain drop-shadow-2xl"
-                            priority={i === 0}
-                          />
-                        )}
+                      <h1
+                        className="hero-title max-w-[520px] text-[34px] sm:text-[44px] font-extrabold leading-[1.1] text-white tracking-[-1.5px]"
+                      >
+                        {leadingTitle}{" "}
+                        {lastWord && <span className="text-[#F97316] sf-text-glow">{lastWord}</span>}
+                      </h1>
+
+                      <p className="hero-subtitle mt-3 max-w-[440px] text-[15px] leading-[1.6] text-[#999999]">
+                        {s.subTitle}
+                      </p>
+
+                      <div className="hero-price mt-4 flex items-center gap-3 flex-wrap">
+                        <span className="text-[34px] font-bold text-white">Fresh Deal</span>
+                        <span className="text-base text-[#555555] line-through">Regular Price</span>
+                        <span className="sf-badge sf-badge-orange">Save More</span>
+                      </div>
+
+                      <div className="hero-buttons mt-6 flex gap-3 flex-wrap">
+                        <Link
+                          href={s.linkUrl}
+                          className="sf-btn-primary"
+                        >
+                          {s.ctaText || "Shop Now"} <FiArrowRight size={15} />
+                        </Link>
+                        <Link
+                          href={s.linkUrl}
+                          className="sf-btn-ghost"
+                        >
+                          Learn More
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -326,7 +339,7 @@ function HeroSideCard({
       href={href}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className={cn("sf-card-3d relative min-h-[132px] rounded-[16px] p-5 overflow-hidden group", bg)}
+      className={cn("side-card sf-card-3d relative min-h-[132px] rounded-[16px] p-5 overflow-hidden group", bg)}
     >
       <span className="sf-badge sf-badge-orange absolute right-4 top-4">Limited</span>
       <div className="flex items-center gap-4 pr-16">
@@ -367,7 +380,7 @@ function FlashCountdownCard() {
   return (
     <Link
       href="/store/category/all"
-      className="min-h-[132px] rounded-[16px] border border-[rgba(249,115,22,0.2)] bg-[#141414] p-5 flex flex-col justify-center shadow-[0_0_30px_rgba(249,115,22,0.08)]"
+      className="side-card min-h-[132px] rounded-[16px] border border-[rgba(249,115,22,0.2)] bg-[#141414] p-5 flex flex-col justify-center shadow-[0_0_30px_rgba(249,115,22,0.08)]"
     >
       <span className="w-11 h-11 rounded-full bg-linear-to-br from-[#F97316] to-[#EA580C] text-white flex items-center justify-center shrink-0 shadow-[var(--shadow-orange-glow)]">
         <FiZap size={22} />
