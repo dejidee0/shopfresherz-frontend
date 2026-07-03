@@ -75,7 +75,7 @@ export function BillingStep({
       }
     >
       <StepIndicator step={1} />
-      <h2 className="text-lg font-bold text-[#111111] mb-5">
+      <h2 className="text-lg font-bold text-white mb-5">
         Billing Information
       </h2>
 
@@ -83,7 +83,7 @@ export function BillingStep({
         {/* Full name + company */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="sm:col-span-1">
-            <p className="text-sm font-medium text-[#374151] mb-1">Full Name</p>
+            <p className="text-sm font-medium text-[#A0A0A0] mb-1">Full Name</p>
             <div className="grid grid-cols-2 gap-2">
               <Field
                 placeholder="First name"
@@ -194,9 +194,9 @@ export function BillingStep({
             type="checkbox"
             checked={form.saveAddress}
             onChange={(e) => set("saveAddress", e.target.checked)}
-            className="w-4 h-4 accent-[#F5820A]"
+            className="w-4 h-4 accent-[#F97316]"
           />
-          <span className="text-sm text-[#374151]">Save this address</span>
+          <span className="text-sm text-[#A0A0A0]">Save this address</span>
         </label>
 
         {/* CTA */}
@@ -204,7 +204,7 @@ export function BillingStep({
           onClick={() => {
             if (validate()) onContinue();
           }}
-          className="w-full h-12 rounded bg-[#F5820A] text-white font-semibold flex items-center justify-center gap-2 hover:bg-[#E06B00] transition-colors mt-2"
+          className="w-full h-12 rounded sf-btn-primary text-white font-semibold flex items-center justify-center gap-2 mt-2"
         >
           CONTINUE TO DELIVERY <FiArrowRight size={16} />
         </button>

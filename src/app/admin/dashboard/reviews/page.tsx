@@ -69,7 +69,7 @@
 //     fullText: "Stopped charging after two weeks. Customer service was unhelpful when I tried to get a replacement. Very disappointed given the price point. Would not recommend.",
 //     author: "Ngozi Obi",
 //     initials: "NO",
-//     avatarColor: "bg-purple-500",
+//     avatarColor: "bg-orange-500",
 //     timeAgo: "2d ago",
 //     status: "Rejected",
 //   },
@@ -433,7 +433,7 @@ function getInitials(name: string): string {
 
 const AVATAR_COLORS = [
   "bg-orange-400", "bg-teal-500", "bg-blue-500",
-  "bg-purple-500", "bg-pink-500", "bg-indigo-500",
+  "bg-orange-500", "bg-pink-500", "bg-indigo-500",
 ];
 
 function avatarColor(userId: string): string {

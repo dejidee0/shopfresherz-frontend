@@ -31,7 +31,7 @@ const LINE_ITEM_COLUMNS: ColumnDef<OrderLineItem>[] = [
           />
         </div>
         <div className="min-w-0">
-          <p className="text-[10px] font-bold uppercase text-[#F5820A] tracking-wide mb-0.5">
+          <p className="text-[10px] font-bold uppercase text-[#F97316] tracking-wide mb-0.5">
             {row.categoryName}
           </p>
           <p className="text-sm text-[#111111] line-clamp-2 leading-snug max-w-xs">
@@ -95,7 +95,7 @@ export default function OrderDetailPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/account/orders"
-              className="w-8 h-8 rounded-full border border-[#E5E7EB] flex items-center justify-center text-[#6B7280] hover:border-[#F5820A] hover:text-[#F5820A] transition-colors"
+              className="w-8 h-8 rounded-full border border-[#E5E7EB] flex items-center justify-center text-[#6B7280] hover:border-[#F97316] hover:text-[#F97316] transition-colors"
               aria-label="Back to orders"
             >
               <FiArrowLeft size={15} />
@@ -104,7 +104,7 @@ export default function OrderDetailPage() {
               Order Details
             </h2>
           </div>
-          <button className="flex items-center gap-1.5 text-sm text-[#F5820A] font-medium hover:underline">
+          <button className="flex items-center gap-1.5 text-sm text-[#F97316] font-medium hover:underline">
             Leave a Rating <FiPlus size={13} />
           </button>
         </div>
@@ -116,7 +116,7 @@ export default function OrderDetailPage() {
         {!isLoading && !order && (
           <div className="p-10 text-center">
             <p className="text-sm text-[#6B7280]">Order not found.</p>
-            <Link href="/account/orders" className="text-sm text-[#F5820A] hover:underline mt-2 inline-block">
+            <Link href="/account/orders" className="text-sm text-[#F97316] hover:underline mt-2 inline-block">
               Back to Order History
             </Link>
           </div>
@@ -137,7 +137,7 @@ export default function OrderDetailPage() {
                   })}
                 </p>
               </div>
-              <p className="text-2xl font-extrabold text-[#F5820A]">
+              <p className="text-2xl font-extrabold text-[#F97316]">
                 {formatPrice(order.total)}
               </p>
             </div>

@@ -43,18 +43,18 @@ export function ProductTabs({ product }: ProductTabsProps) {
   const [activeTab, setActiveTab] = useState<TabKey>('description')
 
   return (
-    <div className="mt-10 border border-[#E5E7EB] rounded-card overflow-hidden">
+    <div className="mt-10">
       {/* Tab bar */}
-      <div className="flex border-b border-[#E5E7EB] overflow-x-auto scrollbar-hide">
+      <div className="flex gap-1 rounded-[10px] bg-[#141414] p-1 overflow-x-auto scrollbar-hide">
         {TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={cn(
-              'shrink-0 px-6 py-4 text-sm font-semibold border-b-2 transition-all duration-150 whitespace-nowrap',
+              'shrink-0 px-5 py-2.5 text-[14px] rounded-[8px] transition-colors duration-150 whitespace-nowrap',
               activeTab === tab.key
-                ? 'border-[#F5820A] text-[#F5820A]'
-                : 'border-transparent text-[#6B7280] hover:text-[#111111]'
+                ? 'bg-[#242424] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
+                : 'text-[#666666] hover:text-white'
             )}
           >
             {tab.label}
@@ -63,7 +63,7 @@ export function ProductTabs({ product }: ProductTabsProps) {
       </div>
 
       {/* Tab content */}
-      <div className="p-6">
+      <div className="py-6 text-[#888888] leading-[1.8]">
         {activeTab === 'description' && (
           <DescriptionTab product={product} />
         )}
@@ -88,20 +88,20 @@ function DescriptionTab({ product }: { product: Product }) {
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
       {/* Left: main description copy */}
       <div className="md:col-span-1">
-        <h4 className="text-sm font-bold text-[#111111] mb-3">Description</h4>
+        <h4 className="text-sm font-bold text-white mb-3">Description</h4>
         <div
-          className="text-sm text-[#6B7280] leading-relaxed space-y-3 prose prose-sm max-w-none"
+          className="text-sm text-[#888888] leading-relaxed space-y-3 prose prose-sm max-w-none prose-invert"
           dangerouslySetInnerHTML={{ __html: product.description }}
         />
       </div>
 
       {/* Middle: features list */}
       <div className="md:col-span-1">
-        <h4 className="text-sm font-bold text-[#111111] mb-3">Feature</h4>
+        <h4 className="text-sm font-bold text-white mb-3">Feature</h4>
         <ul className="space-y-3">
           {FEATURES.map(({ icon: Icon, text }) => (
-            <li key={text} className="flex items-center gap-2.5 text-sm text-[#6B7280]">
-              <Icon size={15} className="text-[#F5820A] shrink-0" />
+            <li key={text} className="flex items-center gap-2.5 text-sm text-[#888888]">
+              <Icon size={15} className="text-[#F97316] shrink-0" />
               {text}
             </li>
           ))}
@@ -110,12 +110,12 @@ function DescriptionTab({ product }: { product: Product }) {
 
       {/* Right: shipping info */}
       <div className="md:col-span-1">
-        <h4 className="text-sm font-bold text-[#111111] mb-3">Shipping Information</h4>
+        <h4 className="text-sm font-bold text-white mb-3">Shipping Information</h4>
         <ul className="space-y-2">
           {SHIPPING_INFO.map(({ label, value }) => (
             <li key={label} className="text-sm">
-              <span className="font-semibold text-[#111111]">{label}</span>{' '}
-              <span className="text-[#6B7280]">{value}</span>
+              <span className="font-semibold text-white">{label}</span>{' '}
+              <span className="text-[#888888]">{value}</span>
             </li>
           ))}
         </ul>
@@ -133,16 +133,16 @@ function AdditionalTab({ product }: { product: Product }) {
         <tbody>
           {product.attributes &&
             Object.entries(product.attributes).map(([key, value]) => (
-              <tr key={key} className="border-b border-[#F5F5F5]">
-                <td className="py-2.5 pr-6 font-semibold text-[#111111] w-40 capitalize">
+              <tr key={key} className="border-b border-white/[0.05]">
+                <td className="py-2.5 pr-6 font-semibold text-white w-40 capitalize">
                   {key.replace(/_/g, ' ')}
                 </td>
-                <td className="py-2.5 text-[#6B7280]">{value}</td>
+                <td className="py-2.5 text-[#888888]">{value}</td>
               </tr>
             ))}
           {(!product.attributes || Object.keys(product.attributes).length === 0) && (
             <tr>
-              <td colSpan={2} className="py-4 text-[#6B7280] text-sm">
+              <td colSpan={2} className="py-4 text-[#888888] text-sm">
                 No additional information available.
               </td>
             </tr>
@@ -160,31 +160,31 @@ function SpecificationTab({ product }: { product: Product }) {
     <div className="max-w-xl">
       <table className="w-full text-sm border-collapse">
         <tbody>
-          <tr className="border-b border-[#F5F5F5]">
-            <td className="py-2.5 pr-6 font-semibold text-[#111111] w-40">Brand</td>
-            <td className="py-2.5 text-[#6B7280]">{product.brandName}</td>
+          <tr className="border-b border-white/[0.05]">
+            <td className="py-2.5 pr-6 font-semibold text-white w-40">Brand</td>
+            <td className="py-2.5 text-[#888888]">{product.brandName}</td>
           </tr>
-          <tr className="border-b border-[#F5F5F5]">
-            <td className="py-2.5 pr-6 font-semibold text-[#111111]">SKU</td>
-            <td className="py-2.5 text-[#6B7280]">{product.sku}</td>
+          <tr className="border-b border-white/[0.05]">
+            <td className="py-2.5 pr-6 font-semibold text-white">SKU</td>
+            <td className="py-2.5 text-[#888888]">{product.sku}</td>
           </tr>
-          <tr className="border-b border-[#F5F5F5]">
-            <td className="py-2.5 pr-6 font-semibold text-[#111111]">Category</td>
-            <td className="py-2.5 text-[#6B7280]">{product.categoryName}</td>
+          <tr className="border-b border-white/[0.05]">
+            <td className="py-2.5 pr-6 font-semibold text-white">Category</td>
+            <td className="py-2.5 text-[#888888]">{product.categoryName}</td>
           </tr>
           {product.tags && product.tags.length > 0 && (
-            <tr className="border-b border-[#F5F5F5]">
-              <td className="py-2.5 pr-6 font-semibold text-[#111111]">Tags</td>
-              <td className="py-2.5 text-[#6B7280]">{product.tags.join(', ')}</td>
+            <tr className="border-b border-white/[0.05]">
+              <td className="py-2.5 pr-6 font-semibold text-white">Tags</td>
+              <td className="py-2.5 text-[#888888]">{product.tags.join(', ')}</td>
             </tr>
           )}
           {product.attributes &&
             Object.entries(product.attributes).map(([key, value]) => (
-              <tr key={key} className="border-b border-[#F5F5F5]">
-                <td className="py-2.5 pr-6 font-semibold text-[#111111] capitalize">
+              <tr key={key} className="border-b border-white/[0.05]">
+                <td className="py-2.5 pr-6 font-semibold text-white capitalize">
                   {key.replace(/_/g, ' ')}
                 </td>
-                <td className="py-2.5 text-[#6B7280]">{value}</td>
+                <td className="py-2.5 text-[#888888]">{value}</td>
               </tr>
             ))}
         </tbody>
@@ -198,13 +198,13 @@ function SpecificationTab({ product }: { product: Product }) {
 function ReviewsTab({ product }: { product: Product }) {
   return (
     <div className="text-center py-10">
-      <p className="text-4xl font-extrabold text-[#111111]">
+      <p className="text-4xl font-extrabold text-white">
         {product.averageRating.toFixed(1)}
       </p>
-      <p className="text-sm text-[#6B7280] mt-1">
+      <p className="text-sm text-[#888888] mt-1">
         Based on {product.reviewCount.toLocaleString()} reviews
       </p>
-      <p className="mt-6 text-sm text-[#6B7280]">
+      <p className="mt-6 text-sm text-[#888888]">
         Reviews are loaded from the API. Integration coming soon.
       </p>
     </div>

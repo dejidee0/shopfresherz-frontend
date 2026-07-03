@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { cn } from "@/lib/utils/format";
 import type { CategoryWithImage } from "@/lib/types/product";
 import { productsApi } from "@/lib/api/products";
@@ -67,16 +66,6 @@ interface CategoryGridProps {
 export function CategoryGrid({
   categories = DEFAULT_CATEGORIES,
 }: CategoryGridProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  function scroll(dir: "left" | "right") {
-    if (!scrollRef.current) return;
-    scrollRef.current.scrollBy({
-      left: dir === "right" ? 260 : -260,
-      behavior: "smooth",
-    });
-  }
-
   const [loadedCategories, setLoadedCategories] = useState<CategoryWithImage[]>(
     [],
   );
@@ -100,80 +89,71 @@ export function CategoryGrid({
     fetchCategories();
   }, []);
 
+  const displayCategories = (loadedCategories.length ? loadedCategories : categories).slice(0, 7);
+
   return (
-    <section className="py-10" aria-label="Shop by category">
-      <div className="max-w-content mx-auto px-10">
-        {/* Section header */}
-        <div className="flex items-center gap-2 mb-6">
-          <div className="w-1 h-7 bg-[#F5820A] rounded-full shrink-0" />
-          <h2 className="text-xl font-bold text-[#111111]">
-            Shop with Categories
-          </h2>
-        </div>
-
-        {/* Scrollable row */}
-        <div className="relative">
-          {/* Left arrow */}
-          <button
-            onClick={() => scroll("left")}
-            className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white border border-[#E5E7EB] shadow-sm flex items-center justify-center text-[#111111] hover:border-[#F5820A] hover:text-[#F5820A] transition-colors"
-            aria-label="Scroll categories left"
-          >
-            <FiChevronLeft size={16} />
-          </button>
-
-          <div
-            ref={scrollRef}
-            className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
-          >
-            {loadedCategories.map((cat) => (
-              <CategoryItem key={cat.id} category={cat} />
-            ))}
+    <section className="py-8" aria-label="Shop by category">
+      <div className="max-w-content mx-auto px-3 sm:px-6 lg:px-10">
+        <div className="sf-card-3d rounded-[16px] p-6">
+          <div className="flex items-center justify-between gap-4 mb-5">
+            <h2 className="text-xl font-bold text-white">
+              Shop by Category
+            </h2>
+            <Link
+              href="/store/category/all"
+              className="text-[13px] font-medium text-[#F97316] hover:text-[#EA580C]"
+            >
+              See all →
+            </Link>
           </div>
 
-          {/* Right arrow */}
-          <button
-            onClick={() => scroll("right")}
-            className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white border border-[#E5E7EB] shadow-sm flex items-center justify-center text-[#111111] hover:border-[#F5820A] hover:text-[#F5820A] transition-colors"
-            aria-label="Scroll categories right"
-          >
-            <FiChevronRight size={16} />
-          </button>
+          <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+            {displayCategories.map((cat, index) => (
+              <CategoryItem key={cat.id} category={cat} index={index} />
+            ))}
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-function CategoryItem({ category }: { category: CategoryWithImage }) {
+const TILE_COLORS = [
+  "bg-[#F97316]/15 border-[#F97316]/25",
+  "bg-[#1F2937]/70 border-white/[0.08]",
+  "bg-[#10B981]/10 border-[#10B981]/20",
+  "bg-[#27272A] border-white/[0.08]",
+  "bg-[#F59E0B]/10 border-[#F59E0B]/20",
+  "bg-[#F97316]/15 border-[#F97316]/25",
+  "bg-[#10B981]/10 border-[#10B981]/20",
+];
+
+function CategoryItem({ category, index }: { category: CategoryWithImage; index: number }) {
   return (
     <Link
       href={`/store/category/${category.slug}`}
       className={cn(
-        "group shrink-0 flex flex-col items-center gap-3",
-        "w-30 md:w-35",
+        "group flex flex-col items-center gap-2 cursor-pointer",
       )}
     >
-      {/* Icon circle */}
-      <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-[#F5F5F5] border-2 border-transparent group-hover:border-[#F5820A] transition-all duration-200 overflow-hidden flex items-center justify-center">
+      <div className={cn(
+        "w-14 h-14 rounded-[14px] overflow-hidden flex items-center justify-center border transition-transform duration-150 group-hover:-translate-y-0.5 group-hover:shadow-[0_10px_24px_rgba(249,115,22,0.18)]",
+        TILE_COLORS[index % TILE_COLORS.length],
+      )}>
         {category.imageUrl ? (
           <Image
             src={category.imageUrl}
             alt={category.name}
-            width={100}
-            height={100}
-            className="w-full h-full rounded-full "
+            width={56}
+            height={56}
+            className="w-full h-full object-contain p-2"
           />
         ) : (
-          <div className="h-full w-full rounded-full flex items-center justify-center bg-linear-to-r from-[#F5820A] to-[#E06B00] p-2 text-white text-center text-xs font-bold drop-shadow-2xl">
-            {/* {category.name.slice(0, 1).toUpperCase()} */}
-            {category.name}
-          </div>
+          <span className="text-2xl">📱</span>
         )}
       </div>
 
-      {/* Label */}
-      <span className="text-xs font-medium text-[#111111] text-center leading-tight group-hover:text-[#F5820A] transition-colors">
+      <span className="text-[11px] font-medium text-[#CFCFCF] text-center leading-tight group-hover:text-[#F97316] transition-colors">
         {category.name}
       </span>
     </Link>

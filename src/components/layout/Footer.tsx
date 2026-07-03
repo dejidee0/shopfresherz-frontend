@@ -1,105 +1,69 @@
 import Link from 'next/link'
-import Image from 'next/image'
-import { FiPhone, FiMail, FiMapPin } from 'react-icons/fi'
-import { RiInstagramLine, RiFacebookLine, RiTwitterXLine, RiWhatsappLine } from 'react-icons/ri'
-
-const SHOP_LINKS = [
-  { label: 'New Arrivals', href: '/store/category/all' },
-  { label: 'Best Sellers', href: '/store/category/all' },
-  { label: 'Flash Deals', href: '/store/category/all' },
-  { label: 'Mobile Phones', href: '/store/category/all' },
-  { label: 'Laptops & Computers', href: '/store/category/all' },
-  { label: 'Gaming & Consoles', href: '/store/category/all' },
-  { label: 'Accessories', href: '/store/category/all' },
-  { label: 'Browse All Products', href: '/store/category/all', highlight: true },
-]
-
-const TOP_CATEGORIES = [
-  { label: 'Computer & Laptop', href: '/store/category/all' },
-  { label: 'SmartPhone', href: '/store/category/all' },
-  { label: 'Electronics', href: '/store/category/all' },
-  { label: 'Accessories', href: '/store/category/all' },
-  { label: 'Camera & Photo', href: '/store/category/all' },
-  { label: 'Gaming & Consoles', href: '/store/category/all' },
-  { label: 'Romoss', href: '/store/category/all' },
-  { label: 'Browse All Products', href: '/store/category/all', highlight: true },
-]
+import { RiInstagramLine, RiTwitterXLine, RiWhatsappLine } from 'react-icons/ri'
 
 const QUICK_LINKS = [
-  // { label: 'About Us', href: '/about' },
-  // { label: 'Blog Posts', href: '/blog' },
-  // { label: 'Shopping Cart', href: '/cart' },
-  { label: 'Wishlist', href: '/store/wishlist' },
-  { label: 'Customer Help', href: '/store/need-help' },
-  { label: 'Track Order', href: '/account/track' },
+  { label: 'Track your order', href: '/account/track' },
+  { label: 'Return policy', href: '/store/need-help' },
+  { label: 'Warranty info', href: '/store/need-help' },
+  { label: 'Contact support', href: '/store/support' },
+]
+
+const CATEGORY_LINKS = [
+  { label: 'Smartphones', href: '/store/category/all' },
+  { label: 'Laptops', href: '/store/category/all' },
+  { label: 'Gaming', href: '/store/category/all' },
+  { label: 'Accessories', href: '/store/category/all' },
 ]
 
 const SOCIAL_LINKS = [
-  { label: 'Facebook', href: '#', icon: RiFacebookLine },
-  { label: 'Twitter / X', href: '#', icon: RiTwitterXLine },
   { label: 'Instagram', href: 'https://www.instagram.com/shopfresherz?igsh=MXRhMHNrM3JnbWtteQ==', icon: RiInstagramLine },
+  { label: 'Twitter / X', href: '#', icon: RiTwitterXLine },
   { label: 'WhatsApp', href: 'https://wa.me/2349075308722', icon: RiWhatsappLine },
 ]
 
-const POPULAR_TAGS = [
-  'Home', 'Laptop', 'Phone', 'Game Camera',
-  'Macbook', 'TV', 'Power Bank', 'Smart TV',
-  'Tablet', 'Microwave', 'Samsung',
-]
+const PAYMENT_OPTIONS = ['Flutterwave', 'Kuda Bank', 'Transfer']
+
+function FooterHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h4 className="relative mb-5 text-[12px] font-semibold uppercase tracking-[0.8px] text-white after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-5 after:bg-[#F97316]">
+      {children}
+    </h4>
+  )
+}
 
 export function Footer() {
-  const getCurrentYear = () => {
-    const currentYear = new Date().getFullYear()
-    return currentYear
-  }
-
   return (
-    <footer className="bg-[#0D0D0D] text-white">
-      {/* Main footer content */}
-      <div className="max-w-content mx-auto px-10 py-16">
-        <div className="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-5 gap-10">
-
-          {/* Col 1 — Brand + contact */}
-          <div className="lg:col-span-1">
-            <Link href="/" className="block mb-5">
-              <Image
-                src="/icons/ShopFreshersV2LogoOrange.png"
-                alt="ShopFresherz"
-                width={140}
-                height={36}
-                className="h-9 w-auto"
-                style={{ width: "auto", height: "auto" }} // ensures aspect ratio
-              />
+    <footer className="border-t border-white/[0.04] bg-[#080808] text-white">
+      <div className="px-4 pt-14 md:px-8">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] lg:gap-12">
+          <div>
+            <Link href="/" className="mb-4 inline-flex items-center gap-2">
+              <span className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-linear-to-br from-[#F97316] to-[#EA580C] text-sm font-bold leading-none text-white shadow-[0_4px_12px_rgba(249,115,22,0.35)]">
+                SF
+              </span>
+              <span className="flex flex-col leading-none">
+                <span className="text-base font-bold text-white">ShopFresherz</span>
+                <span className="mt-1 text-[11px] text-[#444444]">Gadget Store</span>
+              </span>
             </Link>
-            <p className="text-[#6B7280] text-sm leading-relaxed mb-5">
-              Nigeria&apos;s most trusted destination for tech enthusiasts — fresh gadgets at
-              competitive prices.
+
+            <p className="mb-6 mt-4 max-w-[260px] text-[13px] leading-[1.9] text-[#444444]">
+              Nigeria&apos;s most trusted destination for premium gadgets and electronics.
+              Fresh tech, every time.
             </p>
 
-            {/* Contact */}
-            <div className="space-y-2.5">
-              <a
-                href="tel:+2349075308722"
-                className="flex items-center gap-2.5 text-sm text-[#6B7280] hover:text-[#F5820A] transition-colors"
-              >
-                <FiPhone size={14} className="text-[#F5820A] shrink-0" />
-                (620) 555-0129
-              </a>
-              <a
-                href="mailto:support@shopfresherz.com"
-                className="flex items-center gap-2.5 text-sm text-[#6B7280] hover:text-[#F5820A] transition-colors"
-              >
-                <FiMail size={14} className="text-[#F5820A] shrink-0" />
-                support@shopfresher.z.com
-              </a>
-              <p className="flex items-start gap-2.5 text-sm text-[#6B7280]">
-                <FiMapPin size={14} className="text-[#F5820A] shrink-0 mt-0.5" />
-                Lagos, Nigeria
-              </p>
+            <div className="flex max-w-sm">
+              <input
+                type="email"
+                placeholder="Email address"
+                className="sf-input h-11 rounded-r-none"
+              />
+              <button className="sf-btn-primary h-11 rounded-l-none px-4 text-xs">
+                Subscribe
+              </button>
             </div>
 
-            {/* Social links */}
-            <div className="flex items-center gap-3 mt-6">
+            <div className="mt-5 flex items-center gap-3">
               {SOCIAL_LINKS.map(({ label, href, icon: Icon }) => (
                 <a
                   key={label}
@@ -107,49 +71,20 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="w-8 h-8 rounded-full border border-[#333] flex items-center justify-center text-[#6B7280] hover:border-[#F5820A] hover:text-[#F5820A] transition-colors"
+                  className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-white/[0.06] bg-[#141414] text-[#555555] transition-all hover:bg-[rgba(249,115,22,0.08)] hover:text-[#F97316] hover:shadow-[0_4px_12px_rgba(249,115,22,0.2)]"
                 >
-                  <Icon size={15} />
+                  <Icon size={16} />
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Col 2 — Top Categories */}
           <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4">
-              Top Category
-            </h4>
-            <ul className="space-y-2.5">
-              {TOP_CATEGORIES.map(({ label, href, highlight }) => (
-                <li key={label}>
-                  <Link
-                    href={href}
-                    className={
-                      highlight
-                        ? 'text-sm text-[#F5820A] hover:underline font-medium'
-                        : 'text-sm text-[#6B7280] hover:text-[#F5820A] transition-colors'
-                    }
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Col 3 — Quick Links */}
-          <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4">
-              Quick Links
-            </h4>
-            <ul className="space-y-2.5">
+            <FooterHeading>Quick Links</FooterHeading>
+            <ul className="space-y-3">
               {QUICK_LINKS.map(({ label, href }) => (
                 <li key={label}>
-                  <Link
-                    href={href}
-                    className="text-sm text-[#6B7280] hover:text-[#F5820A] transition-colors"
-                  >
+                  <Link href={href} className="text-[13px] text-[#555555] transition-colors hover:text-[#888888]">
                     {label}
                   </Link>
                 </li>
@@ -157,71 +92,44 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Col 4 — Socials (repeated as per Figma) */}
           <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4">
-              Socials
-            </h4>
-            <ul className="space-y-2.5">
-              {SOCIAL_LINKS.map(({ label, href, icon: Icon }) => (
+            <FooterHeading>Categories</FooterHeading>
+            <ul className="space-y-3">
+              {CATEGORY_LINKS.map(({ label, href }) => (
                 <li key={label}>
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-[#6B7280] hover:text-[#F5820A] transition-colors"
-                  >
-                    <Icon size={14} />
+                  <Link href={href} className="text-[13px] text-[#555555] transition-colors hover:text-[#888888]">
                     {label}
-                  </a>
+                  </Link>
                 </li>
               ))}
-              <li>
-                <a
-                  href="https://www.instagram.com/shopfresherz?igsh=MXRhMHNrM3JnbWtteQ=="
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm text-[#6B7280] hover:text-[#F5820A] transition-colors"
-                >
-                  <RiInstagramLine size={14} />
-                  Instagram
-                </a>
-              </li>
             </ul>
           </div>
 
-          {/* Col 5 — Popular Tags */}
           <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4">
-              Popular Tag
-            </h4>
+            <FooterHeading>We Accept</FooterHeading>
             <div className="flex flex-wrap gap-2">
-              {POPULAR_TAGS.map((tag) => (
-                <Link
-                  key={tag}
-                  href={`/store/search?q=${encodeURIComponent(tag)}`}
-                  className="px-3 py-1 text-xs text-[#6B7280] border border-[#333] rounded hover:border-[#F5820A] hover:text-[#F5820A] transition-colors"
+              {PAYMENT_OPTIONS.map((label) => (
+                <span
+                  key={label}
+                  className="rounded-[6px] border border-white/[0.05] bg-[#141414] px-2.5 py-1.5 text-[11px] text-[#444444]"
                 >
-                  {tag}
-                </Link>
+                  {label}
+                </span>
               ))}
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Bottom bar */}
-      <div className="border-t border-[#1A1A1A]">
-        <div className="max-w-content mx-auto px-10 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#6B7280]">
-          <p>© {getCurrentYear()} shopfresherz.com. All rights reserved.</p>
-          <div className="flex items-center gap-4">
-            <Link href="#" className="hover:text-[#F5820A] transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="#" className="hover:text-[#F5820A] transition-colors">
-              Terms of Service
-            </Link>
+        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/[0.04] py-5 sm:flex-row">
+          <p className="text-[12px] text-[#333333]">© 2026 ShopFresherz</p>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {PAYMENT_OPTIONS.map((label) => (
+              <span key={label} className="rounded-[6px] border border-white/[0.05] bg-[#141414] px-2.5 py-1.5 text-[11px] text-[#444444]">
+                {label}
+              </span>
+            ))}
           </div>
+          <p className="text-[12px] text-[#333333]">Made with heart in Nigeria</p>
         </div>
       </div>
     </footer>

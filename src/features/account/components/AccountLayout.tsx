@@ -71,7 +71,7 @@ export function AccountLayout({
         {/* Hamburger — visible only on mobile */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className="lg:hidden flex items-center gap-1.5 text-sm font-medium text-[#111111] border border-gray-200 rounded px-3 py-1.5 hover:border-[#F5820A] hover:text-[#F5820A] transition-colors shrink-0"
+          className="lg:hidden flex items-center gap-1.5 text-sm font-medium text-[#111111] border border-gray-200 rounded px-3 py-1.5 hover:border-[#F97316] hover:text-[#F97316] transition-colors shrink-0"
           aria-label="Open account menu"
         >
           <FiMenu size={16} />
@@ -103,7 +103,7 @@ export function AccountLayout({
                 <p className="text-sm font-semibold text-[#111111]">My Account</p>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="text-gray-400 hover:text-[#F5820A] transition-colors p-1"
+                  className="text-gray-400 hover:text-[#F97316] transition-colors p-1"
                   aria-label="Close menu"
                 >
                   <FiX size={20} />

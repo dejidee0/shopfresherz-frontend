@@ -1,41 +1,21 @@
-import { FiPhone } from 'react-icons/fi'
-import { RiInstagramLine } from 'react-icons/ri'
-import { FaTruck } from 'react-icons/fa'
-
 export function TopBar() {
   return (
-    <div className="w-full bg-[#0D0D0D] text-white text-xs h-9 flex items-center">
-      <div className="max-w-content mx-auto w-full px-4 md:px-10 flex items-center justify-center md:justify-between">
-        {/* Left: Free shipping */}
-        <div className="hidden md:flex items-center gap-2">
-          <FaTruck className="text-[#F5820A]" size={14} />
-          <span>Free Shipping on orders over ₦100,000</span>
+    <div className="flex h-9 w-full items-center bg-black">
+      <div className="grid w-full grid-cols-1 items-center gap-2 px-4 md:grid-cols-3 md:px-8">
+        <div className="hidden text-[11px] text-[#666666] md:block">
+          Free shipping on orders over ₦100,000
         </div>
 
-        {/* Center: Promo */}
-        <div className="hidden md:block text-center">
-          Up to{' '}
-          <span className="text-[#F5820A] font-bold text-base">59%</span>{' '}
-          OFF
+        <div className="text-center text-[11px] font-semibold text-[#F97316]">
+          Up to 59% OFF - Flash Sale Today
         </div>
 
-        {/* Right: Contact */}
-        <div className="flex items-center gap-4">
+        <div className="hidden items-center justify-end md:flex">
           <a
             href="tel:+2349075308722"
-            className="flex items-center gap-1.5 hover:text-[#F5820A] transition-colors"
+            className="text-[11px] text-[#666666] transition-colors hover:text-[#F97316]"
           >
-            <FiPhone size={12} />
-            <span>+234 907 530 8722</span>
-          </a>
-          <a
-            href="https://www.instagram.com/shopfresherz?igsh=MXRhMHNrM3JnbWtteQ=="
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 hover:text-[#F5820A] transition-colors"
-          >
-            <RiInstagramLine size={13} />
-            <span>shopfresherz</span>
+            +234 907 530 8722 · @shopfresherz
           </a>
         </div>
       </div>

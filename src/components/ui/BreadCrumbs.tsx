@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { FiChevronRight, FiHome, FiMoreHorizontal } from 'react-icons/fi'
+import { FiHome, FiMoreHorizontal } from 'react-icons/fi'
 import { cn } from '@/lib/utils/format'
 
 // Collapse threshold — if there are more than this many items (excluding home),
@@ -17,7 +17,7 @@ interface BreadcrumbProps {
 }
 
 function Separator() {
-  return <FiChevronRight size={13} className="text-[#D1D5DB] shrink-0" />
+  return <span className="text-[#CFCFCF] shrink-0">/</span>
 }
 
 function Crumb({
@@ -27,25 +27,29 @@ function Crumb({
   item: BreadcrumbItem
   isLast: boolean
 }) {
+  const label = isLast && item.label.length > 20
+    ? `${item.label.slice(0, 20)}...`
+    : item.label
+
   if (isLast || !item.href) {
     return (
       <span
         className={cn(
           'truncate max-w-35 sm:max-w-50',
-          isLast ? 'text-[#F5820A] font-medium' : 'text-[#6B7280]'
+          isLast ? 'text-[#F97316] font-medium' : 'text-[#888888]'
         )}
         aria-current={isLast ? 'page' : undefined}
       >
-        {item.label}
+        {label}
       </span>
     )
   }
   return (
     <Link
       href={item.href}
-      className="text-[#6B7280] hover:text-[#F5820A] transition-colors truncate max-w-35 sm:max-w-50"
+      className="text-[#888888] hover:text-[#F97316] transition-colors truncate max-w-35 sm:max-w-50"
     >
-      {item.label}
+      {label}
     </Link>
   )
 }
@@ -58,12 +62,12 @@ export function Breadcrumb({ items, className }: BreadcrumbProps) {
   return (
     <nav
       aria-label="Breadcrumb"
-      className={cn('flex items-center gap-1.5 text-sm py-3 min-w-0', className)}
+      className={cn('flex items-center gap-1.5 text-[12px] py-3 min-w-0', className)}
     >
       {/* Home icon — always visible */}
       <Link
         href="/"
-        className="text-[#6B7280] hover:text-[#F5820A] transition-colors shrink-0"
+        className="text-[#888888] hover:text-[#F97316] transition-colors shrink-0"
         aria-label="Home"
       >
         <FiHome size={14} />
@@ -78,7 +82,7 @@ export function Breadcrumb({ items, className }: BreadcrumbProps) {
             {/* The peer checkbox trick — toggles the hidden middle items */}
             <label
               htmlFor="breadcrumb-expand"
-              className="flex items-center justify-center w-5 h-5 rounded text-[#6B7280] hover:text-[#F5820A] hover:bg-orange-50 cursor-pointer transition-colors shrink-0"
+              className="flex items-center justify-center w-5 h-5 rounded text-[#888888] hover:text-[#F97316] hover:bg-orange-50 cursor-pointer transition-colors shrink-0"
               aria-label="Show full path"
             >
               <FiMoreHorizontal size={14} />

@@ -59,7 +59,7 @@ export function LaptopPromoSection() {
           </span>
 
           {/* Product Title */}
-          <h2 className="text-4xl sm:text-4xl font-bold text-[#111111] tracking-tight">
+          <h2 className="text-4xl sm:text-4xl font-bold text-white tracking-tight">
             {promo?.title}
           </h2>
 

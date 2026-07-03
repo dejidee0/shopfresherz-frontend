@@ -33,15 +33,14 @@ const FALLBACK_2: PromoBanner = {
 };
 
 export function StorePromoSection() {
-  const [promo, setPromo] = useState<PromoBanner>();
-  const [promo2, setPromo2] = useState<PromoBanner>();
+  const [promo, setPromo] = useState<PromoBanner>(FALLBACK);
+  const [promo2, setPromo2] = useState<PromoBanner>(FALLBACK_2);
 
   useEffect(() => {
     productsApi
       .getPromoBanner()
       .then((data) => {
         if (data) {
-          // Card 1 — primary fields
           setPromo({
             title: data.title,
             subtitle: data.subtitle,
@@ -50,9 +49,6 @@ export function StorePromoSection() {
             imageAlt: data.imageAlt || data.title,
             badge: data.badge,
           });
-          // Card 2 — same API data, dark card treatment
-          // Uses the same image/title but with the dark card's static fallback
-          // for subtitle/badge since the API only returns one set of copy
           setPromo2({
             title: data.title,
             subtitle: data.subtitle,
@@ -66,95 +62,67 @@ export function StorePromoSection() {
       })
       .catch((err) => {
         console.error("[StorePromo] ❌ Failed to load promo banner:", err);
-        // fallbacks already in state
       });
   }, []);
 
   return (
     <section className="py-8">
-      <div className="max-w-content mx-auto px-2 sm:px-4 lg:px-10">
-        {/* Two cards side by side — stacks on mobile only */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          {/* ── Card 1: Light Card ── */}
-          <article className="relative flex-1 overflow-hidden rounded-xl bg-[#F5F5F5] px-6 py-7 sm:px-7 sm:py-8">
-            <div className="grid grid-cols-[1fr_auto] items-center gap-4">
-              {/* Text column */}
-              <div className="flex flex-col gap-3">
-                <span className="inline-flex w-fit rounded-sm bg-[#F5820A] px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.22em] text-white">
-                  {promo?.badge}
-                </span>
-                <h2 className="text-lg font-extrabold leading-snug text-[#111111] sm:text-xl lg:text-2xl xl:text-3xl whitespace-pre-line">
-                  {promo?.title}
-                </h2>
-                <p className="text-xs leading-5 text-[#6B7280] sm:text-sm sm:leading-6">
-                  {promo?.subtitle}
-                </p>
-                <Link
-                  href="/store/category/all"
-                  className="mt-1 inline-flex w-fit items-center gap-1.5 rounded-full bg-[#F5820A] px-5 py-2.5 text-[11px] font-bold uppercase tracking-widest text-white transition-colors hover:bg-[#dc7605]"
-                >
-                  {promo?.ctaText} →
-                </Link>
-              </div>
-
-              {/* Image column */}
-              <div className="w-[80px] sm:w-[80px] lg:w-[150px] xl:w-[180px] shrink-0">
-                {promo?.imageUrl && (
-                  <Image
-                    src={promo?.imageUrl}
-                    alt={promo?.imageAlt}
-                    width={180}
-                    height={180}
-                    className="h-auto w-full object-contain"
-                    priority
-                    unoptimized
-                  />
-                )}
-              </div>
+      <div className="max-w-content mx-auto px-3 sm:px-6 lg:px-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <article className="relative overflow-hidden rounded-[16px] bg-linear-to-br from-[#F97316] to-[#EA580C] p-7 min-h-[190px]">
+            <div className="relative z-10 max-w-[70%]">
+              <span className="text-[11px] uppercase text-white/70 tracking-[0.12em]">
+                Flash Sale
+              </span>
+              <h2 className="mt-2 text-[22px] font-bold leading-tight text-white">
+                Up to 40% Off Top Brands
+              </h2>
+              <p className="mt-2 text-xs leading-5 text-white/80">
+                {promo.subtitle}
+              </p>
+              <Link
+                href="/store/category/all"
+                className="mt-5 inline-flex rounded-[8px] bg-[#F97316] px-4 py-2.5 text-xs font-medium text-white transition-colors hover:bg-[#EA580C]"
+              >
+                {promo.ctaText} &rarr;
+              </Link>
+            </div>
+            <div className="absolute right-7 top-1/2 -translate-y-1/2 text-[64px] text-white/80">
+              &#9889;
             </div>
           </article>
 
-          {/* ── Card 2: Dark Card ── */}
-          <article className="relative flex-1 overflow-hidden rounded-xl bg-[#181818] px-6 py-7 sm:px-7 sm:py-8">
-            {/* Purple price badge — kept as design element */}
-            <div className="absolute right-3 top-3 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-[#7C3AED] text-xs font-extrabold leading-tight text-white shadow-lg sm:h-14 sm:w-14 sm:text-sm">
-              $590
+          <article className="relative overflow-hidden rounded-[16px] bg-linear-to-br from-[#1a1a2e] to-[#2d3561] p-7 min-h-[190px]">
+            <div className="relative z-10 max-w-[66%]">
+              <span className="text-[11px] uppercase text-white/70 tracking-[0.12em]">
+                Laptop Promo
+              </span>
+              <h2 className="mt-2 text-[22px] font-bold leading-tight text-white whitespace-pre-line">
+                {promo2.title}
+              </h2>
+              <p className="mt-2 text-xs leading-5 text-white/80">
+                {promo2.subtitle}
+              </p>
+              <Link
+                href="/store/category/all"
+                className="mt-5 inline-flex rounded-[8px] bg-[#F97316] px-4 py-2.5 text-xs font-medium text-white transition-colors hover:bg-[#EA580C]"
+              >
+                {promo2.ctaText} &rarr;
+              </Link>
             </div>
 
-            <div className="grid grid-cols-[1fr_auto] items-center gap-4">
-              {/* Text column */}
-              <div className="flex flex-col gap-3">
-                <span className="inline-flex w-fit rounded-sm bg-[#F5820A] px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.22em] text-white">
-                  {promo2?.badge}
-                </span>
-                <h2 className="text-lg font-extrabold leading-snug text-white sm:text-xl lg:text-2xl xl:text-3xl whitespace-pre-line">
-                  {promo2?.title}
-                </h2>
-                <p className="text-xs leading-5 text-[#9CA3AF] sm:text-sm sm:leading-6">
-                  {promo2?.subtitle}
-                </p>
-                <Link
-                  href="/store/category/all"
-                  className="mt-1 inline-flex w-fit items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-[11px] font-bold uppercase tracking-widest text-[#111111] transition-colors hover:bg-[#F0F0F0]"
-                >
-                  {promo2?.ctaText} →
-                </Link>
-              </div>
-
-              {/* Image column */}
-              <div className="w-[80px] sm:w-[100px] lg:w-[130px] xl:w-[160px] shrink-0">
-                {promo2?.imageUrl && (
-                  <Image
-                    src={promo2?.imageUrl}
-                    alt={promo2?.imageAlt}
-                    width={160}
-                    height={220}
-                    className="h-auto w-full object-contain"
-                    priority
-                    unoptimized
-                  />
-                )}
-              </div>
+            <div className="absolute right-5 bottom-0 w-[120px] sm:w-[150px]">
+              {promo2.imageUrl && (
+                <Image
+                  src={promo2.imageUrl}
+                  alt={promo2.imageAlt}
+                  width={160}
+                  height={160}
+                  className="h-auto w-full object-contain"
+                  priority
+                  unoptimized
+                />
+              )}
             </div>
           </article>
         </div>

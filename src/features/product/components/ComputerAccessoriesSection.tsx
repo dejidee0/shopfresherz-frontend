@@ -43,7 +43,7 @@ function StarRating({ rating }: { rating: number }) {
         >
           <polygon
             points="5,0.5 6.12,3.38 9.26,3.62 7,5.64 7.72,8.69 5,7.1 2.28,8.69 3,5.64 0.74,3.62 3.88,3.38"
-            fill={i < Math.round(rating) ? "#F5820A" : "#D1D5DB"}
+            fill={i < Math.round(rating) ? "#F97316" : "#D1D5DB"}
           />
         </svg>
       ))}
@@ -56,7 +56,7 @@ function StarRating({ rating }: { rating: number }) {
 const BADGE_CONFIG: Record<BadgeType, { bg: string; label?: string }> = {
   "best-deals": { bg: "bg-[#22C55E]", label: "BEST DEALS" },
   hot:          { bg: "bg-[#EF4444]", label: "HOT" },
-  sale:         { bg: "bg-[#F5820A]", label: "SALE" },
+  sale:         { bg: "bg-[#F97316]", label: "SALE" },
   discount:     { bg: "bg-[#22C55E]" },
 };
 
@@ -79,7 +79,7 @@ function ProductCard({ product }: { product: AccessoriesProduct }) {
 
   return (
     <div
-      className="group relative rounded-[8px] block overflow-hidden border border-[#E5E7EB] bg-white transition-shadow duration-200 hover:shadow-md"
+      className="group relative rounded-[8px] block overflow-hidden border border-white/[0.08] bg-[#141414] transition-all duration-200 hover:border-[#F97316]/60 hover:shadow-[0_16px_36px_rgba(249,115,22,0.14)]"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -101,10 +101,10 @@ function ProductCard({ product }: { product: AccessoriesProduct }) {
           }}
           disabled={isLoading(product.id)}
           aria-label={isFavorited(product.id) ? "Added to favorites" : "Add to favorites"}
-          className={`w-7 h-7 bg-white rounded-full shadow flex items-center justify-center transition-colors
+          className={`w-7 h-7 bg-[#1F1F1F] border border-white/[0.08] rounded-full shadow flex items-center justify-center transition-colors
             ${isFavorited(product.id)
-              ? "text-[#F5820A]"
-              : "text-[#6B7280] hover:text-[#F5820A]"}
+              ? "text-[#F97316]"
+              : "text-[#6B7280] hover:text-[#F97316]"}
             ${isLoading(product.id) ? "opacity-50 cursor-wait" : ""}
           `}
         >
@@ -128,7 +128,7 @@ function ProductCard({ product }: { product: AccessoriesProduct }) {
               unoptimized
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center rounded bg-[#F3F4F6] text-[11px] text-[#9CA3AF]">
+            <div className="flex h-full w-full items-center justify-center rounded bg-[#1F1F1F] text-[11px] text-[#9CA3AF]">
               No image available
             </div>
           )}
@@ -147,13 +147,13 @@ function ProductCard({ product }: { product: AccessoriesProduct }) {
           </div>
 
           {/* Name */}
-          <p className="line-clamp-2 text-[12px] font-semibold leading-snug text-[#111111]">
+          <p className="line-clamp-2 text-[12px] font-semibold leading-snug text-[#D7D7D7] group-hover:text-[#F97316] transition-colors">
             {product.name}
           </p>
 
           {/* Price row */}
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[13px] font-bold text-[#F5820A]">
+            <span className="text-[13px] font-bold text-[#F97316]">
               ₦{product.price.toLocaleString()}
             </span>
             {product.compareAtPrice ? (
@@ -308,7 +308,7 @@ export function ComputerAccessoriesSection() {
             {/* ── Header row ── */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
-              <h2 className="shrink-0 text-xl font-bold text-[#111111] sm:text-2xl">
+              <h2 className="shrink-0 text-xl font-bold text-white sm:text-2xl">
                 Computer Accessories
               </h2>
 
@@ -324,8 +324,8 @@ export function ComputerAccessoriesSection() {
                   onClick={() => setActiveCategoryId(null)}
                   className={`shrink-0 pb-0.5 transition-colors ${
                     activeCategoryId === null
-                      ? "border-b-2 border-[#F5820A] text-[#F5820A]"
-                      : "text-[#6B7280] hover:text-[#F5820A]"
+                      ? "border-b-2 border-[#F97316] text-[#F97316]"
+                       : "text-[#A0A0A0] hover:text-[#F97316]"
                   }`}
                 >
                   All Product
@@ -339,8 +339,8 @@ export function ComputerAccessoriesSection() {
                     onClick={() => setActiveCategoryId(cat.id)}
                     className={`shrink-0 pb-0.5 transition-colors ${
                       activeCategoryId === cat.id
-                        ? "border-b-2 border-[#F5820A] text-[#F5820A]"
-                        : "text-[#6B7280] hover:text-[#F5820A]"
+                        ? "border-b-2 border-[#F97316] text-[#F97316]"
+                        : "text-[#A0A0A0] hover:text-[#F97316]"
                     }`}
                   >
                     {cat.name}
@@ -349,7 +349,7 @@ export function ComputerAccessoriesSection() {
 
                 <Link
                   href="/store/category/all"
-                  className="shrink-0 text-[#F5820A] hover:text-[#D97706]"
+                  className="shrink-0 text-[#F97316] hover:text-[#D97706]"
                 >
                   Browse All Product →
                 </Link>
@@ -365,7 +365,7 @@ export function ComputerAccessoriesSection() {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-[14px] md:grid-cols-4">
               {loading
                 ? Array.from({ length: 8 }).map((_, i) => (
-                    <div key={i} className="h-56 animate-pulse rounded bg-[#F3F4F6]" />
+                    <div key={i} className="h-56 animate-pulse rounded bg-[#1F1F1F]" />
                   ))
                 : products.map((p) => <ProductCard key={p.id} product={p} />)}
             </div>
@@ -418,7 +418,7 @@ export function ComputerAccessoriesSection() {
                     <span className="text-[#FFFFFF] text-[11px] tracking-wide">
                       Only for:
                     </span>
-                    <span className="text-black p-2 rounded-[3px] ml-2 bg-white font-extrabold text-[clamp(14px,4vw,16px)]">
+                    <span className="text-white p-2 rounded-[3px] ml-2 bg-[#0A0A0A]/25 border border-white/20 font-extrabold text-[clamp(14px,4vw,16px)]">
                       {accessoriesPromo?.price}
                     </span>
                   </div>
@@ -428,7 +428,7 @@ export function ComputerAccessoriesSection() {
                 <div className="flex justify-center">
                   <Link
                     href={`/store/product/${accessoriesPromo?.slug}`}
-                    className="mt-1 flex gap-[10px] items-center rounded-lg bg-white px-4 py-3 text-[13px] font-bold text-black tracking-wider hover:bg-gray-100 transition-colors"
+                    className="mt-1 flex gap-[10px] items-center rounded-lg bg-[#0A0A0A] px-4 py-3 text-[13px] font-bold text-white tracking-wider hover:bg-[#1A1A1A] transition-colors"
                   >
                     <span>{accessoriesPromo?.ctaText}</span>
                     <span>→</span>
@@ -456,14 +456,14 @@ export function ComputerAccessoriesSection() {
     {/* Subtext with orange keyword */}
     <p className="text-[11px] uppercase tracking-wide text-white/60">
       Only for{" "}
-      <span className="font-semibold text-[#F5820A]">SMARTPHONE</span>{" "}
+      <span className="font-semibold text-[#F97316]">SMARTPHONE</span>{" "}
       product.
     </p>
 
     {/* Purple Shop Now button */}
     <Link
       href="/store/category/all"
-      className="mt-2 flex w-full items-center justify-between rounded-md bg-[#7C3AED] px-4 py-2.5 text-[11px] font-bold uppercase tracking-widest text-white transition-colors hover:bg-[#6D28D9]"
+      className="mt-2 flex w-full items-center justify-between rounded-md bg-[#F97316] px-4 py-2.5 text-[11px] font-bold uppercase tracking-widest text-white transition-colors hover:bg-[#EA580C]"
     >
       <span>SHOP NOW</span>
       <span className="text-sm">→</span>

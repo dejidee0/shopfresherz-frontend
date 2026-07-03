@@ -6,8 +6,11 @@ import {
   FiMinus,
   FiPlus,
   FiShoppingCart,
-  FiShare2,
   FiCopy,
+  FiCheck,
+  FiTruck,
+  FiRefreshCw,
+  FiLock,
 } from 'react-icons/fi'
 import {
   RiFacebookFill,
@@ -17,9 +20,8 @@ import {
 import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa'
 import { useCartStore } from '@/store/cart'
 import { ColorSwatches, VariantDropdown } from './VariantSelector'
-import { Badge } from '@/components/ui/Badge'
 import { cn, formatPrice, clampQty } from '@/lib/utils/format'
-import type { Product, ProductVariant } from '@/lib/types/product'
+import type { Product } from '@/lib/types/product'
 import { getDiscountPercent, getStockStatus } from '@/lib/utils/productService'
 
 interface PDPActionsProps {
@@ -91,58 +93,51 @@ export function PDPActions({ product }: PDPActionsProps) {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
 
       {/* ── Rating ── */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <StarRating rating={product.averageRating ?? 0} />
-        <span className="text-sm text-[#6B7280]">
-          {(product.averageRating ?? 0).toFixed(1)} Star Rating
+        <span className="text-[13px] text-[#888888]">
+          ({(product.reviewCount ?? 0).toLocaleString()} reviews)
         </span>
-        <span className="text-sm text-[#6B7280]">
-          ({(product.reviewCount ?? 0).toLocaleString()} User feedback)
+        <span className={cn('badge', isOutOfStock ? 'badge-red' : 'badge-green')}>
+          {isOutOfStock ? 'Out of Stock' : 'In Stock'}
         </span>
       </div>
 
       {/* ── Title ── */}
-      <h1 className="text-xl font-bold text-[#111111] leading-snug">
+      <h1 className="text-[32px] font-bold text-white leading-[1.2] tracking-[-0.8px] mt-1 mb-1">
         {product.name}
       </h1>
 
       {/* ── Meta row ── */}
-      <div className="grid grid-cols-2 gap-x-8 gap-y-1.5 text-sm">
-        <MetaRow label="Sku:" value={product.sku ?? ''} />
-        <MetaRow
-          label="Availability:"
-          value={
-            stockStatus === 'in_stock' || stockStatus === 'low_stock'
-              ? 'In Stock'
-              : 'Out of Stock'
-          }
-          valueClass={
-            isOutOfStock ? 'text-[#EF4444]' : 'text-[#22C55E] font-semibold'
-          }
-        />
-        <MetaRow label="Brand:" value={product.brandName ?? product.brand?.name ?? ''} />
-        <MetaRow label="Category:" value={product.categoryName ?? product.category?.name ?? ''} />
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-[#555555]">
+        <span>SKU: {product.sku || 'N/A'}</span>
+        <span className="text-[#D1D5DB]">|</span>
+        <span>Brand: {product.brandName ?? product.brand?.name ?? 'ShopFresherz'}</span>
+        <span className="text-[#D1D5DB]">|</span>
+        <span>Category: {product.categoryName ?? product.category?.name ?? 'Gadgets'}</span>
       </div>
 
+      <div className="h-px bg-white/[0.05]" />
+
       {/* ── Price ── */}
-      <div className="flex items-baseline gap-3 flex-wrap">
-        <span className="text-2xl font-extrabold text-[#F5820A]">
+      <div className="flex items-center gap-3 flex-wrap">
+        <span className="text-[36px] font-bold text-white">
           {formatPrice(product.price)}
         </span>
         {product.compareAtPrice && (
-          <span className="text-base text-[#6B7280] line-through">
+          <span className="text-[18px] text-[#444444] line-through">
             {formatPrice(product.compareAtPrice)}
           </span>
         )}
         {discountPercent && (
-          <Badge variant="sale" discountPercent={discountPercent} />
+          <span className="badge badge-orange">-{discountPercent}% OFF</span>
         )}
       </div>
 
-      <div className="h-px bg-[#F5F5F5]" />
+      <div className="h-px bg-white/[0.05]" />
 
       {/* ── Variants ── */}
 
@@ -185,30 +180,30 @@ export function PDPActions({ product }: PDPActionsProps) {
         </div>
       )}
 
-      <div className="h-px bg-[#F5F5F5]" />
+      <div className="h-px bg-white/[0.05]" />
 
       {/* ── Qty + CTA row ── */}
       <div className="flex flex-wrap items-center gap-3">
         {/* Qty stepper */}
-        <div className="flex items-center border border-[#E5E7EB] rounded-sm overflow-hidden shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => setQty((q) => clampQty(q - 1, availableStock))}
             disabled={qty <= 1}
-            className="w-6 h-8 md:w-10 md:h-11 flex items-center justify-center text-[#6B7280] hover:bg-[#F5F5F5] disabled:opacity-40 transition-colors"
+            className="w-10 h-10 rounded-[8px] border border-white/[0.1] bg-[#141414] flex items-center justify-center text-white hover:border-[#F97316] disabled:opacity-40 transition-colors"
             aria-label="Decrease quantity"
           >
-            <FiMinus size={14} />
+            <FiMinus size={18} />
           </button>
-          <span className="w-6 md:w-10 text-center text-sm font-bold text-[#111111]">
+          <span className="w-12 h-10 border-y border-white/[0.1] bg-[#1A1A1A] flex items-center justify-center text-sm font-medium text-white">
             {qty}
           </span>
           <button
             onClick={() => setQty((q) => clampQty(q + 1, availableStock))}
             disabled={qty >= Math.min(availableStock, 10)}
-            className="w-6 h-8 md:w-10 md:h-11 flex items-center justify-center text-[#6B7280] hover:bg-[#F5F5F5] disabled:opacity-40 transition-colors"
+            className="w-10 h-10 rounded-[8px] border border-white/[0.1] bg-[#141414] flex items-center justify-center text-white hover:border-[#F97316] disabled:opacity-40 transition-colors"
             aria-label="Increase quantity"
           >
-            <FiPlus size={14} />
+            <FiPlus size={18} />
           </button>
         </div>
 
@@ -217,13 +212,13 @@ export function PDPActions({ product }: PDPActionsProps) {
           onClick={handleAddToCart}
           disabled={isOutOfStock}
           className={cn(
-            'flex-1 h-11 flex items-center justify-center gap-2 px-2 md:px-0 rounded-sm text-xs md:text-sm font-semibold transition-all',
+            'flex-1 min-w-[180px] h-12 flex items-center justify-center gap-2 px-4 rounded-[10px] text-[15px] font-semibold transition-colors',
             isOutOfStock
-              ? 'bg-[#F5F5F5] text-[#6B7280] cursor-not-allowed'
-              : 'bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white hover:shadow-lg hover:shadow-orange-200 active:scale-[0.98]'
+              ? 'bg-[#1A1A1A] text-[#444444] cursor-not-allowed'
+              : 'sf-btn-primary text-white'
           )}
         >
-          <FiShoppingCart size={15} className='hidden md:block' />
+          <FiShoppingCart size={17} />
           ADD TO CART
         </button>
 
@@ -231,19 +226,19 @@ export function PDPActions({ product }: PDPActionsProps) {
         <button
           onClick={handleBuyNow}
           disabled={isOutOfStock}
-          className="shrink-0 h-11 px-5 border border-[#E5E7EB] text-[#111111] font-semibold rounded-sm text-sm hover:border-[#F5820A] hover:text-[#F5820A] transition-colors disabled:opacity-40"
+          className="shrink-0 w-[140px] h-12 bg-white/[0.08] text-white border border-white/[0.12] font-bold rounded-[10px] text-[15px] hover:border-[#F97316] hover:text-[#F97316] hover:shadow-[0_4px_20px_rgba(249,115,22,0.15)] transition-all disabled:opacity-40"
         >
           BUY NOW
         </button>
       </div>
 
       {/* ── Wishlist + Share ── */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex items-center justify-between flex-wrap gap-3 mt-1">
         <button
           onClick={() => setIsWishlisted((v) => !v)}
           className={cn(
-            'flex items-center gap-2 text-sm font-medium transition-colors',
-            isWishlisted ? 'text-[#F5820A]' : 'text-[#6B7280] hover:text-[#F5820A]'
+            'flex items-center gap-2 text-[13px] transition-colors',
+            isWishlisted ? 'text-[#F97316]' : 'text-[#888888] hover:text-[#F97316]'
           )}
         >
           <FiHeart
@@ -254,7 +249,7 @@ export function PDPActions({ product }: PDPActionsProps) {
         </button>
 
         {/* Share row */}
-        <div className="flex items-center gap-2 text-sm text-[#6B7280]">
+        <div className="flex items-center gap-2 text-sm text-[#666666]">
           <span className="shrink-0">Share product:</span>
           <button
             onClick={handleCopyLink}
@@ -263,7 +258,7 @@ export function PDPActions({ product }: PDPActionsProps) {
               'w-7 h-7 rounded-full flex items-center justify-center border transition-colors',
               copyDone
                 ? 'border-[#22C55E] text-[#22C55E]'
-                : 'border-[#E5E7EB] hover:border-[#F5820A] hover:text-[#F5820A]'
+                : 'border-white/[0.1] hover:border-[#F97316] hover:text-[#F97316]'
             )}
           >
             <FiCopy size={12} />
@@ -272,7 +267,7 @@ export function PDPActions({ product }: PDPActionsProps) {
             href={`https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-7 h-7 rounded-full flex items-center justify-center border border-[#E5E7EB] hover:border-[#1877F2] hover:text-[#1877F2] transition-colors"
+            className="w-7 h-7 rounded-full flex items-center justify-center border border-white/[0.1] hover:border-[#1877F2] hover:text-[#1877F2] transition-colors"
           >
             <RiFacebookFill size={12} />
           </a>
@@ -280,7 +275,7 @@ export function PDPActions({ product }: PDPActionsProps) {
             href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}&text=${encodeURIComponent(product.name)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-7 h-7 rounded-full flex items-center justify-center border border-[#E5E7EB] hover:border-black hover:text-black transition-colors"
+            className="w-7 h-7 rounded-full flex items-center justify-center border border-white/[0.1] hover:border-white hover:text-white transition-colors"
           >
             <RiTwitterXFill size={12} />
           </a>
@@ -288,34 +283,31 @@ export function PDPActions({ product }: PDPActionsProps) {
             href={`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}&description=${encodeURIComponent(product.name)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-7 h-7 rounded-full flex items-center justify-center border border-[#E5E7EB] hover:border-[#E60023] hover:text-[#E60023] transition-colors"
+            className="w-7 h-7 rounded-full flex items-center justify-center border border-white/[0.1] hover:border-[#E60023] hover:text-[#E60023] transition-colors"
           >
             <RiPinterestFill size={12} />
           </a>
         </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 pt-1">
+        {[
+          { icon: FiCheck, text: 'Genuine Product' },
+          { icon: FiTruck, text: 'Fast Delivery' },
+          { icon: FiRefreshCw, text: 'Easy Returns' },
+          { icon: FiLock, text: 'Secure Payment' },
+        ].map(({ icon: Icon, text }) => (
+          <span key={text} className="inline-flex items-center gap-1 text-[11px] text-[#555555]">
+            <Icon size={12} className="text-[#F97316]" />
+            {text}
+          </span>
+        ))}
       </div>
     </div>
   )
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function MetaRow({
-  label,
-  value,
-  valueClass,
-}: {
-  label: string
-  value: string
-  valueClass?: string
-}) {
-  return (
-    <p className="text-sm">
-      <span className="text-[#6B7280]">{label} </span>
-      <span className={cn('font-semibold text-[#111111]', valueClass)}>{value}</span>
-    </p>
-  )
-}
 
 function StarRating({ rating }: { rating: number }) {
   return (

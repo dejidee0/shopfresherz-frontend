@@ -10,7 +10,7 @@ import {
   type WheelEvent,
 } from 'react'
 import Image from 'next/image'
-import { FiMaximize2, FiX, FiZoomIn, FiZoomOut, FiRefreshCw, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import { FiCamera, FiMaximize2, FiX, FiZoomIn, FiZoomOut, FiRefreshCw, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { cn } from '@/lib/utils/format'
 
 interface ZoomImage {
@@ -40,6 +40,7 @@ const FALLBACK_IMAGE = '/images/device-placeholder.jpg'
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function ProductImageZoom({ images, productName, isOutOfStock = false }: ProductImageZoomProps) {
+  const hasProvidedImages = images.length > 0
   const productImages = images.length > 0
     ? images
     : [{
@@ -303,9 +304,9 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
           <div
             ref={mainRef}
             className={cn(
-              'relative rounded-card overflow-hidden bg-[#F5F5F5] shrink-0',
-              'w-full max-w-135 aspect-square',
-              isOutOfStock ? 'grayscale cursor-default' : 'cursor-crosshair'
+              'relative rounded-[20px] overflow-hidden bg-[#141414] border border-white/[0.06] shrink-0 shadow-[0_20px_60px_rgba(0,0,0,0.5)]',
+              'w-full h-[360px] sm:h-[440px] p-8',
+              isOutOfStock || !hasProvidedImages ? 'grayscale cursor-default' : 'cursor-crosshair'
             )}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -319,14 +320,15 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
           >
             {/* Out of stock overlay */}
             {isOutOfStock && (
-              <div className="absolute inset-0 bg-white/50 backdrop-blur-[2px] z-10 flex items-center justify-center rounded-card">
-                <span className="bg-[#6B7280] text-white text-sm font-bold px-4 py-2 rounded-badge uppercase tracking-wide">
+              <div className="absolute inset-0 bg-[#0A0A0A]/60 backdrop-blur-[2px] z-10 flex items-center justify-center rounded-card">
+                <span className="bg-[#242424] text-white text-sm font-bold px-4 py-2 rounded-[20px] uppercase tracking-wide">
                   Out of Stock
                 </span>
               </div>
             )}
 
             {/* Main image with scroll/mobile zoom */}
+            {hasProvidedImages ? (
             <Image
               src={
                 (scrollZoom > 1 || mobileZoom > 1) && zoomImageLoaded[activeIndex]
@@ -336,7 +338,7 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
               alt={`${productName} — image ${activeIndex + 1}`}
               fill
               sizes="540px"
-              className="object-contain p-4 transition-transform duration-200 select-none"
+              className="object-contain p-8 transition-transform duration-300 select-none hover:scale-[1.04]"
               style={{
                 transform: `scale(${Math.max(scrollZoom, mobileZoom)}) translate(${
                   scrollZoom > 1
@@ -348,11 +350,17 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
               priority
               draggable={false}
             />
+            ) : (
+              <div className="absolute inset-6 rounded-[10px] bg-[#1F1F1F] flex flex-col items-center justify-center gap-2 text-[#555555]">
+                <FiCamera size={28} />
+                <span className="text-[12px]">No image available</span>
+              </div>
+            )}
 
             {/* Hover lens overlay */}
             {isHovering && !isOutOfStock && scrollZoom === 1 && (
               <div
-                className="absolute pointer-events-none border-2 border-[#F5820A] bg-[#F5820A]/10 transition-opacity duration-150"
+                className="absolute pointer-events-none border-2 border-[#F97316] bg-[#F97316]/10 transition-opacity duration-150"
                 style={{
                   width: LENS_SIZE,
                   height: LENS_SIZE,
@@ -366,8 +374,8 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
             {!isOutOfStock && (
               <button
                 className={cn(
-                  'absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 shadow flex items-center justify-center',
-                  'text-[#6B7280] hover:text-[#F5820A] transition-all duration-200',
+                  'absolute top-3 right-3 w-8 h-8 rounded-full bg-[#1A1A1A]/90 shadow flex items-center justify-center',
+                  'text-[#777777] hover:text-[#F97316] transition-all duration-200',
                   isHovering ? 'opacity-100' : 'opacity-0'
                 )}
                 onClick={(e) => { e.stopPropagation(); openLightbox() }}
@@ -380,7 +388,7 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
             {/* Mobile zoom reset button */}
             {mobileZoom > 1 && (
               <button
-                className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white shadow flex items-center justify-center text-[#F5820A] text-xs font-bold z-10"
+                className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-[#F97316] shadow flex items-center justify-center text-white text-xs font-bold z-10"
                 onClick={(e) => {
                   e.stopPropagation()
                   setMobileZoom(1)
@@ -396,7 +404,7 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
           {/* ── Zoom preview panel (desktop, right of image) ── */}
           {isHovering && !isOutOfStock && zoomImageLoaded[activeIndex] && scrollZoom === 1 && (
             <div
-              className="hidden lg:block shrink-0 rounded-card overflow-hidden border border-[#E5E7EB] shadow-lg"
+              className="hidden lg:block shrink-0 rounded-card overflow-hidden border border-white/[0.08] shadow-lg shadow-black/30"
               style={{ width: PREVIEW_SIZE, height: PREVIEW_SIZE }}
               aria-hidden="true"
             >
@@ -430,10 +438,10 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
                 setMobilePan({ x: 0, y: 0 })
               }}
               className={cn(
-                'relative shrink-0 w-16 h-16 rounded border-2 overflow-hidden bg-[#F5F5F5] transition-all duration-150',
+                'relative shrink-0 w-[72px] h-[72px] rounded-[10px] border overflow-hidden bg-[#1F1F1F] transition-all duration-150',
                 i === activeIndex
-                  ? 'border-[#F5820A] shadow-sm'
-                  : 'border-[#E5E7EB] hover:border-[#F5820A]/50'
+                  ? 'border-2 border-[#F97316] shadow-[0_0_16px_rgba(249,115,22,0.3)]'
+                  : 'border border-white/[0.06] hover:border-white/[0.2]'
               )}
             >
               <Image
@@ -446,6 +454,10 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
             </button>
           ))}
         </div>
+        <p className="flex items-center gap-1 text-[11px] text-[#888888]">
+          <FiZoomIn size={12} />
+          Hover to zoom
+        </p>
       </div>
 
       {/* ── Lightbox modal ── */}
@@ -461,28 +473,28 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
           <div className="flex items-center justify-end gap-2 p-4 shrink-0">
             <button
               onClick={lightboxZoomIn}
-              className="w-9 h-9 rounded-full bg-white/10 text-white hover:bg-[#F5820A] flex items-center justify-center transition-colors"
+              className="w-9 h-9 rounded-full bg-white/10 text-white hover:bg-[#F97316] flex items-center justify-center transition-colors"
               aria-label="Zoom in"
             >
               <FiZoomIn size={16} />
             </button>
             <button
               onClick={lightboxZoomOut}
-              className="w-9 h-9 rounded-full bg-white/10 text-white hover:bg-[#F5820A] flex items-center justify-center transition-colors"
+              className="w-9 h-9 rounded-full bg-white/10 text-white hover:bg-[#F97316] flex items-center justify-center transition-colors"
               aria-label="Zoom out"
             >
               <FiZoomOut size={16} />
             </button>
             <button
               onClick={() => { setLightboxZoom(1); setLightboxPan({ x: 0, y: 0 }) }}
-              className="w-9 h-9 rounded-full bg-white/10 text-white hover:bg-[#F5820A] flex items-center justify-center transition-colors"
+              className="w-9 h-9 rounded-full bg-white/10 text-white hover:bg-[#F97316] flex items-center justify-center transition-colors"
               aria-label="Reset zoom"
             >
               <FiRefreshCw size={14} />
             </button>
             <button
               onClick={closeLightbox}
-              className="w-9 h-9 rounded-full bg-white/10 text-white hover:bg-[#F5820A] flex items-center justify-center transition-colors"
+              className="w-9 h-9 rounded-full bg-white/10 text-white hover:bg-[#F97316] flex items-center justify-center transition-colors"
               aria-label="Close"
             >
               <FiX size={16} />
@@ -524,14 +536,14 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
             <>
               <button
                 onClick={() => setActiveIndex((i) => (i - 1 + productImages.length) % productImages.length)}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 text-white hover:bg-[#F5820A] flex items-center justify-center transition-colors"
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 text-white hover:bg-[#F97316] flex items-center justify-center transition-colors"
                 aria-label="Previous image"
               >
                 <FiChevronLeft size={20} />
               </button>
               <button
                 onClick={() => setActiveIndex((i) => (i + 1) % productImages.length)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 text-white hover:bg-[#F5820A] flex items-center justify-center transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 text-white hover:bg-[#F97316] flex items-center justify-center transition-colors"
                 aria-label="Next image"
               >
                 <FiChevronRight size={20} />
@@ -548,7 +560,7 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
                 aria-label={`Image ${i + 1}`}
                 className={cn(
                   'relative w-12 h-12 rounded overflow-hidden bg-white/10 border-2 transition-all',
-                  i === activeIndex ? 'border-[#F5820A]' : 'border-transparent hover:border-white/40'
+                  i === activeIndex ? 'border-[#F97316]' : 'border-transparent hover:border-white/40'
                 )}
               >
                 <Image

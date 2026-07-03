@@ -1,53 +1,55 @@
-import { FaShippingFast } from "react-icons/fa";
-import { LiaAwardSolid } from "react-icons/lia";
-import { MdOutlinePayment } from "react-icons/md";
-import { BiSupport } from "react-icons/bi";
+import { FiHeadphones, FiRefreshCw, FiShield, FiTruck } from "react-icons/fi";
 
 const TRUST_SIGNALS = [
   {
-    icon: FaShippingFast,
-    title: "FASTER DELIVERY",
-    subtitle: "Delivery in 24/H",
+    icon: FiTruck,
+    iconBg: "bg-[rgba(249,115,22,0.12)] shadow-[0_4px_12px_rgba(249,115,22,0.1)]",
+    iconColor: "text-[#F97316]",
+    title: "Fast Delivery",
+    subtitle: "Within Lagos 24hrs",
   },
   {
-    icon: LiaAwardSolid,
-    title: "24 HOURS RETURN",
-    subtitle: "100% money-back guarantee",
+    icon: FiShield,
+    iconBg: "bg-[rgba(34,197,94,0.12)] shadow-[0_4px_12px_rgba(34,197,94,0.08)]",
+    iconColor: "text-[#22C55E]",
+    title: "Secure Payment",
+    subtitle: "Flutterwave protected",
   },
   {
-    icon: MdOutlinePayment,
-    title: "SECURE PAYMENT",
-    subtitle: "Your money is safe",
+    icon: FiRefreshCw,
+    iconBg: "bg-[rgba(96,165,250,0.12)] shadow-[0_4px_12px_rgba(96,165,250,0.08)]",
+    iconColor: "text-[#60A5FA]",
+    title: "Easy Returns",
+    subtitle: "24-hour money back",
   },
   {
-    icon: BiSupport,
-    title: "SUPPORT 24/7",
-    subtitle: "Live contact/message",
+    icon: FiHeadphones,
+    iconBg: "bg-[rgba(251,191,36,0.12)] shadow-[0_4px_12px_rgba(251,191,36,0.08)]",
+    iconColor: "text-[#FBBF24]",
+    title: "24/7 Support",
+    subtitle: "Live chat + WhatsApp",
   },
 ];
 
 export function TrustSignals() {
   return (
-    <div className="w-full border border-[#E5E7EB] rounded-[8px]">
-      <div className="max-w-content mx-auto md:px-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 md:divide-x md:divide-[#E5E7EB]">
-          {TRUST_SIGNALS.map(({ icon: Icon, title, subtitle }) => (
-            <div
-              key={title}
-              className="flex flex-col md:flex-row items-center md:gap-3 p-2 md:py-5 md:px-6"
-            >
-              <Icon className="text-[#111111] shrink-0" size={28} />
-              <div className="flex flex-col">
-                <p className="text-sm text-center md:text-start font-bold text-[#111111] leading-tight">
-                  {title}
-                </p>
-                <p className="text-xs text-center md:text-start text-[#6B7280] mt-0.5">
-                  {subtitle}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+    <div className="w-full bg-[#0F0F0F] border-y border-white/[0.05]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-white/[0.04]">
+        {TRUST_SIGNALS.map(({ icon: Icon, iconBg, iconColor, title, subtitle }) => (
+          <div key={title} className="flex items-center gap-3.5 px-6 py-5">
+            <span className={`w-11 h-11 rounded-[12px] flex items-center justify-center shrink-0 ${iconBg}`}>
+              <Icon className={iconColor} size={20} />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[13px] font-semibold text-white leading-tight">
+                {title}
+              </span>
+              <span className="block mt-1 text-[11px] text-[#555555] leading-tight">
+                {subtitle}
+              </span>
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );

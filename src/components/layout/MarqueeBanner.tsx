@@ -8,7 +8,7 @@ const SEGMENTS = [
 
 export function MarqueeBanner() {
   return (
-    <div className="w-full bg-[#F5820A] overflow-hidden">
+    <div className="w-full bg-[#F97316] overflow-hidden">
       <div
         className="flex w-max animate-[marquee_15s_linear_infinite] [@keyframes_marquee]{0%{transform:translateX(0%)}100%{transform:translateX(-100%)}} hover:[animation-play-state:paused]"
         aria-label="ShopFresherz tagline"

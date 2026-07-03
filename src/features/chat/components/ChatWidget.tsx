@@ -54,7 +54,7 @@ function BotBubble({ message }: { message: Message }) {
 function UserBubble({ message }: { message: Message }) {
   return (
     <div className="flex flex-col items-end gap-1">
-      <div className="max-w-[82%] bg-[#F5820A] rounded-2xl rounded-tr-sm px-4 py-3 text-sm text-white leading-relaxed">
+      <div className="max-w-[82%] bg-[#F97316] rounded-2xl rounded-tr-sm px-4 py-3 text-sm text-white leading-relaxed">
         {message.text}
       </div>
       <span className="text-[10px] text-[#9CA3AF] mr-1">
@@ -193,7 +193,7 @@ export function ChatWidget() {
       {!isOpen && (
         <button
           onClick={open}
-          className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-[#F5820A] text-white shadow-lg hover:shadow-orange-300 hover:scale-105 transition-all duration-200 flex items-center justify-center"
+          className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-[#F97316] text-white shadow-lg hover:shadow-orange-300 hover:scale-105 transition-all duration-200 flex items-center justify-center"
           aria-label="Open chat with Fresherz"
         >
           <FiMessageCircle size={22} />
@@ -229,7 +229,7 @@ export function ChatWidget() {
             <div className="flex items-center gap-3 px-4 py-3 bg-white border-b border-[#F5F5F5] shrink-0">
               <div className="relative shrink-0">
                 <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-                  <RiRobot2Line size={20} className="text-[#F5820A]" />
+                  <RiRobot2Line size={20} className="text-[#F97316]" />
                 </div>
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#22C55E] rounded-full border-2 border-white" />
               </div>
@@ -286,7 +286,7 @@ export function ChatWidget() {
                         key={reply}
                         type="button"
                         onClick={() => sendMessage(reply)}
-                        className="shrink-0 rounded-full border border-[#F5820A]/30 bg-[#FFF7ED] px-3 py-2 text-xs font-semibold text-[#B45309] hover:border-[#F5820A] hover:bg-[#FFEDD5] transition-colors"
+                        className="shrink-0 rounded-full border border-[#F97316]/30 bg-[#FFF7ED] px-3 py-2 text-xs font-semibold text-[#B45309] hover:border-[#F97316] hover:bg-[#FFEDD5] transition-colors"
                       >
                         {reply}
                       </button>
@@ -310,7 +310,7 @@ export function ChatWidget() {
                   <button
                     onClick={() => sendMessage()}
                     disabled={!input.trim() || isLoading}
-                    className="w-10 h-10 rounded-full bg-[#F5820A] text-white shrink-0 flex items-center justify-center shadow-sm hover:shadow-md hover:scale-105 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100"
+                    className="w-10 h-10 rounded-full bg-[#F97316] text-white shrink-0 flex items-center justify-center shadow-sm hover:shadow-md hover:scale-105 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100"
                     aria-label="Send message"
                   >
                     <FiSend size={16} className="-translate-x-px" />

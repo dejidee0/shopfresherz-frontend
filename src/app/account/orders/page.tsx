@@ -50,7 +50,7 @@ const COLUMNS: ColumnDef<Order>[] = [
     render: (row) => (
       <Link
         href={`/account/order-detail/${row.orderNumber}`}
-        className="text-sm text-[#F5820A] font-medium hover:underline whitespace-nowrap"
+        className="text-sm text-[#F97316] font-medium hover:underline whitespace-nowrap"
       >
         View Details →
       </Link>

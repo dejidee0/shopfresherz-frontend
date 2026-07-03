@@ -50,10 +50,10 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
   return (
     <Link
       href={`/store/product/${product.slug}`}
-      className="flex items-center gap-4 p-4 border border-gray-100 rounded-sm bg-white hover:shadow-sm hover:border-[#F5820A] transition-all duration-200 h-[75px] group"
+      className="flex items-center gap-4 p-4 border border-white/[0.08] rounded-[10px] bg-[#141414] hover:border-[#F97316]/60 hover:shadow-[0_14px_34px_rgba(249,115,22,0.14)] transition-all duration-200 h-[75px] group"
     >
       {/* Aspect-ratio safe image container */}
-      <div className="relative w-16 h-16 shrink-0 rounded bg-[#F5F5F5] overflow-hidden">
+      <div className="relative w-16 h-16 shrink-0 rounded bg-[#1F1F1F] overflow-hidden">
         {product.imageUrl ? (
           <Image
             src={product.imageUrl}
@@ -63,13 +63,13 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
             className="h-full w-full object-contain transition-transform duration-200 group-hover:scale-105"
           />
         ) : (
-          <div className="h-full w-full rounded bg-[#E5E7EB]" />
+          <div className="h-full w-full rounded bg-white/[0.08]" />
         )}
       </div>
 
       {/* Content details side */}
       <div className="flex flex-col flex-1 min-w-0">
-        <h3 className="text-xs font-normal text-gray-800 line-clamp-2 leading-tight mb-1.5 group-hover:text-[#F5820A] transition-colors">
+        <h3 className="text-xs font-normal text-[#D7D7D7] line-clamp-2 leading-tight mb-1.5 group-hover:text-[#F97316] transition-colors">
           {product.title}
         </h3>
         <span className="text-sm font-semibold text-orange-500">
@@ -145,13 +145,13 @@ export function TopHighlightsSection() {
   }, []);
 
   return (
-    <section className="w-full max-w-6xl mx-auto px-4 py-8 bg-white">
+    <section className="w-full max-w-6xl mx-auto px-4 py-8">
       {/* Clean responsive grid boundaries */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8">
         {highlightsData.map((category) => (
           <div key={category.id} className="flex flex-col gap-4">
             {/* Structural Category Header */}
-            <h2 className="text-xs font-bold tracking-wider text-gray-900 uppercase">
+            <h2 className="text-xs font-bold tracking-wider text-white uppercase">
               {category.title}
             </h2>
 

@@ -9,7 +9,6 @@ import {
   FiTruck,
   FiCreditCard,
   FiPlus,
-  FiAlertCircle,
 } from "react-icons/fi";
 import { OrderSummary, CheckoutLayout } from "./CheckoutShared";
 import type {
@@ -61,18 +60,22 @@ function SummarySection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 sm:p-5">
+    <div className="bg-[#141414] border border-white/[0.08] rounded-[12px] p-5 mb-4 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <FiCheckCircle size={15} className="text-[#F5820A] shrink-0" />
-          <p className="text-xs font-bold uppercase tracking-wider text-[#6B7280]">
+          {title.toLowerCase().includes("delivery") ? (
+            <FiTruck size={15} className="text-[#F97316] shrink-0" />
+          ) : (
+            <FiCheckCircle size={15} className="text-[#F97316] shrink-0" />
+          )}
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-[#888888]">
             {title}
           </p>
         </div>
         {onEdit && (
           <button
             onClick={onEdit}
-            className="text-xs text-[#F5820A] font-medium hover:underline flex items-center gap-0.5"
+            className="text-xs text-[#F97316] font-medium hover:underline flex items-center gap-0.5"
           >
             Change <FiChevronRight size={12} />
           </button>
@@ -197,12 +200,12 @@ export function RegisteredCheckout({
       >
         <div className="flex flex-col gap-4">
           {/* ── Delivery Address ─────────────────────────────────────────────── */}
-          <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 sm:p-5">
+          <div className="bg-[#141414] border border-white/[0.08] rounded-[12px] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <FiMapPin size={15} className="text-[#F5820A] shrink-0" />
-                <p className="text-xs font-bold uppercase tracking-wider text-[#6B7280]">
-                  Delivery Address
+                <FiMapPin size={15} className="text-[#F97316] shrink-0" />
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-[#888888]">
+                  DELIVERY ADDRESS
                 </p>
               </div>
             </div>
@@ -215,28 +218,28 @@ export function RegisteredCheckout({
                   <button
                     key={addr.id}
                     onClick={() => onSelectAddress(addr.id)}
-                    className={`w-full text-left flex items-start gap-3 p-3 rounded-lg border transition-all duration-150 ${
+                    className={`w-full text-left flex items-start gap-3 p-3 rounded-[8px] border transition-all duration-150 ${
                       isSelected
-                        ? "border-[#F5820A] bg-[#FFF7F0]"
-                        : "border-[#E5E7EB] bg-white hover:border-[#F5820A]/40 hover:bg-[#FFFAF5]"
+                        ? "border-[#F97316] bg-[#F97316]/10 shadow-[0_0_26px_rgba(249,115,22,0.16)]"
+                        : "border-white/[0.08] bg-[#101010] hover:border-[#F97316]/40 hover:bg-[#181818]"
                     }`}
                   >
                     <span
                       className={`mt-0.5 shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${
-                        isSelected ? "border-[#F5820A]" : "border-[#D1D5DB]"
+                        isSelected ? "border-[#F97316]" : "border-white/25"
                       }`}
                     >
                       {isSelected && (
-                        <span className="w-2 h-2 rounded-full bg-[#F5820A]" />
+                        <span className="w-2 h-2 rounded-full bg-[#F97316]" />
                       )}
                     </span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <p className="text-sm font-semibold text-[#111111]">
+                        <p className="text-sm font-semibold text-white">
                           {user?.firstName} {user?.lastName}
                         </p>
                         {addr.label && (
-                          <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-[#F3F4F6] text-[#6B7280]">
+                          <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-white/[0.08] text-[#A0A0A0]">
                             {addr.label}
                           </span>
                         )}
@@ -246,7 +249,7 @@ export function RegisteredCheckout({
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-[#6B7280] mt-0.5 leading-relaxed">
+                      <p className="text-xs text-[#A0A0A0] mt-0.5 leading-relaxed">
                         {addr.line1}
                         {addr.line2 ? `, ${addr.line2}` : ""}
                         <br />
@@ -261,7 +264,7 @@ export function RegisteredCheckout({
               {addresses.length > 2 && (
                 <button
                   onClick={() => setShowAllAddresses((v) => !v)}
-                  className="text-xs text-[#F5820A] font-medium hover:underline self-start ml-1 mt-1"
+                  className="text-xs text-[#F97316] font-medium hover:underline self-start ml-1 mt-1"
                 >
                   {showAllAddresses
                     ? "Show less"
@@ -271,7 +274,7 @@ export function RegisteredCheckout({
 
               <button
                 onClick={() => setIsAddressModalOpen(true)}
-                className="mt-1 flex items-center gap-2 text-xs text-[#6B7280] font-medium hover:text-[#F5820A] transition-colors self-start"
+                className="mt-1 flex w-full items-center justify-center gap-2 rounded-[8px] border border-dashed border-white/[0.14] px-4 py-3 text-[13px] text-[#888888] font-medium hover:border-[#F97316] hover:text-[#F97316] transition-colors"
               >
                 <span className="w-4 h-4 rounded-full border border-dashed border-current flex items-center justify-center">
                   <FiPlus size={10} />
@@ -284,12 +287,12 @@ export function RegisteredCheckout({
           {/* ── Delivery Details ─────────────────────────────────────────────── */}
           <SummarySection title="Delivery Details" onEdit={onEditDelivery}>
             <div className="flex items-center gap-2">
-              <FiTruck size={14} className="text-[#6B7280] shrink-0" />
-              <p className="text-sm font-semibold text-[#111111]">
+              <FiTruck size={14} className="text-[#888888] shrink-0" />
+              <p className="text-[14px] font-medium text-white">
                 {DELIVERY_LABELS[delivery] ?? "Standard Delivery"}
               </p>
             </div>
-            <p className="text-xs text-[#6B7280] mt-0.5 ml-5">
+            <p className="text-[13px] text-[#888888] mt-0.5 ml-5">
               {delivery === "pickup"
                 ? "You will pick up your order from our store."
                 : deliveryFee === 0
@@ -298,15 +301,95 @@ export function RegisteredCheckout({
             </p>
           </SummarySection>
 
+          <div className="bg-[#141414] border border-white/[0.08] rounded-[12px] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <FiCreditCard size={15} className="text-[#F97316] shrink-0" />
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-[#888888]">
+                  PAYMENT METHOD
+                </p>
+              </div>
+              <button
+                onClick={onEditPayment}
+                className="text-xs text-[#F97316] font-medium hover:underline flex items-center gap-0.5"
+              >
+                Change <FiChevronRight size={12} />
+              </button>
+            </div>
+
+            <div className="grid gap-2">
+              {savedCards.length > 0 ? (
+                savedCards.map((card) => {
+                  const isSelected = selectedPayment === "card" && selectedCardId === card.id;
+                  return (
+                    <button
+                      key={card.id}
+                      onClick={() => onSelectCard(card.id)}
+                      className={`w-full flex items-center gap-3 rounded-[8px] border px-4 py-3 text-left transition-colors ${
+                        isSelected
+                          ? "border-[1.5px] border-[#F97316] bg-[#F97316]/10"
+                          : "border-white/[0.08] bg-[#101010] hover:border-[#F97316]/40 hover:bg-[#181818]"
+                      }`}
+                    >
+                       <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${isSelected ? "border-[#F97316]" : "border-white/25"}`}>
+                        {isSelected && <span className="w-2 h-2 rounded-full bg-[#F97316]" />}
+                      </span>
+                      <FiCreditCard size={16} className="text-[#F97316]" />
+                      <span className="flex flex-col">
+                         <span className="text-sm font-medium text-white">{cardBrandLabel(card)}</span>
+                        <span className="text-xs text-[#888888]">{maskNumber(card.cardNumber?.slice(-4))}</span>
+                      </span>
+                    </button>
+                  );
+                })
+              ) : (
+                <button
+                  onClick={() => onSelectPayment("card")}
+                  className={`w-full flex items-center gap-3 rounded-[8px] border px-4 py-3 text-left transition-colors ${
+                    selectedPayment === "card"
+                      ? "border-[1.5px] border-[#F97316] bg-[#F97316]/10"
+                      : "border-white/[0.08] bg-[#101010] hover:border-[#F97316]/40 hover:bg-[#181818]"
+                  }`}
+                >
+                  <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedPayment === "card" ? "border-[#F97316]" : "border-white/25"}`}>
+                    {selectedPayment === "card" && <span className="w-2 h-2 rounded-full bg-[#F97316]" />}
+                  </span>
+                  <FiCreditCard size={16} className="text-[#F97316]" />
+                  <span className="text-sm font-medium text-white">Card</span>
+                </button>
+              )}
+
+              {(["bank_transfer", "pay_on_delivery"] as PaymentMethod[]).map((method) => (
+                <button
+                  key={method}
+                  onClick={() => onSelectPayment(method)}
+                  className={`w-full flex items-center gap-3 rounded-[8px] border px-4 py-3 text-left transition-colors ${
+                    selectedPayment === method
+                      ? "border-[1.5px] border-[#F97316] bg-[#F97316]/10"
+                      : "border-white/[0.08] bg-[#101010] hover:border-[#F97316]/40 hover:bg-[#181818]"
+                  }`}
+                >
+                  <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedPayment === method ? "border-[#F97316]" : "border-white/25"}`}>
+                    {selectedPayment === method && <span className="w-2 h-2 rounded-full bg-[#F97316]" />}
+                  </span>
+                  <FiCreditCard size={16} className="text-[#F97316]" />
+                  <span className="text-sm font-medium text-white">
+                    {PAYMENT_METHOD_LABELS[method]}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           
           {/* ── Place Order ──────────────────────────────────────────────────── */}
           <button
             onClick={onPlaceOrder}
             disabled={!paymentReady}
-            className={`w-full h-12 rounded font-bold flex items-center justify-center gap-2 transition-colors ${
+            className={`w-full h-[52px] rounded-[10px] text-[16px] font-semibold flex items-center justify-center gap-2 transition-colors ${
               paymentReady
-                ? "bg-[#F5820A] text-white hover:bg-[#E06B00] cursor-pointer"
-                : "bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed"
+                ? "sf-btn-primary text-white cursor-pointer"
+                : "bg-[#252525] text-[#888888] cursor-not-allowed"
             }`}
           >
             PLACE ORDER — {formatPrice(total)} <FiArrowRight size={16} />

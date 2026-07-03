@@ -34,10 +34,10 @@ export function DataTable<T>({
   footer,
 }: DataTableProps<T>) {
   return (
-    <div className={cn('bg-white rounded-card border border-[#E5E7EB]', className)}>
+    <div className={cn('bg-[#141414] rounded-[12px] border-[0.5px] border-white/[0.08] transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(0,0,0,0.35)]', className)}>
       {title && (
-        <div className="px-6 py-4 border-b border-[#E5E7EB]">
-          <h3 className="text-sm font-bold text-[#111111] uppercase tracking-wide">
+        <div className="px-6 py-4 border-b border-white/[0.08]">
+          <h3 className="text-sm font-bold text-white uppercase tracking-wide">
             {title}
           </h3>
         </div>
@@ -46,7 +46,7 @@ export function DataTable<T>({
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#E5E7EB]">
+            <tr className="border-b border-white/[0.08]">
               {columns.map((col) => (
                 <th
                   key={String(col.key)}
@@ -75,13 +75,13 @@ export function DataTable<T>({
               data.map((row) => (
                 <tr
                   key={String(row[rowKey])}
-                  className="hover:bg-[#FAFAFA] transition-colors"
+                  className="hover:bg-white/[0.04] transition-colors"
                 >
                   {columns.map((col) => (
                     <td
                       key={String(col.key)}
                       className={cn(
-                        'px-6 py-4 text-[#111111] whitespace-nowrap',
+                        'px-6 py-4 text-white whitespace-nowrap',
                         alignClass[col.align ?? 'left']
                       )}
                     >
@@ -98,7 +98,7 @@ export function DataTable<T>({
       </div>
 
       {footer && (
-        <div className="px-6 py-4 border-t border-[#E5E7EB]">{footer}</div>
+        <div className="px-6 py-4 border-t border-white/[0.08]">{footer}</div>
       )}
     </div>
   )

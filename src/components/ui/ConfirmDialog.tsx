@@ -32,9 +32,9 @@ const VARIANT_CONFIG: Record<
   info: {
     icon: FiInfo,
     iconBg: 'bg-orange-50',
-    iconColor: 'text-[#F5820A]',
+    iconColor: 'text-[#F97316]',
     confirmBtn:
-      'bg-gradient-to-r from-[#F5820A] to-[#E06B00] text-white hover:shadow-md active:scale-[0.98]',
+      'bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white hover:shadow-md active:scale-[0.98]',
   },
 }
 
@@ -82,7 +82,7 @@ export function ConfirmDialog() {
         aria-describedby={options.message ? 'confirm-message' : undefined}
         className="fixed inset-0 z-9991 flex items-center justify-center p-4 pointer-events-none"
       >
-        <div className="pointer-events-auto bg-white rounded-modal shadow-2xl w-full max-w-100 p-6 animate-in zoom-in-95 duration-200">
+        <div className="pointer-events-auto bg-[#141414] border border-white/[0.08] rounded-modal shadow-2xl shadow-black/40 w-full max-w-100 p-6 animate-in zoom-in-95 duration-200">
 
           {/* Icon */}
           <div className={cn('w-12 h-12 rounded-full flex items-center justify-center mb-4', config.iconBg)}>
@@ -92,7 +92,7 @@ export function ConfirmDialog() {
           {/* Title */}
           <h2
             id="confirm-title"
-            className="text-base font-bold text-[#111111] leading-snug"
+            className="text-base font-bold text-white leading-snug"
           >
             {options.title}
           </h2>
@@ -112,7 +112,7 @@ export function ConfirmDialog() {
             {/* Cancel */}
             <button
               onClick={() => _answer(false)}
-              className="flex-1 h-10 border border-[#E5E7EB] rounded-btn text-sm font-semibold text-[#111111] hover:bg-[#F5F5F5] transition-colors"
+              className="flex-1 h-10 border border-white/[0.1] rounded-btn text-sm font-semibold text-white hover:bg-white/[0.06] transition-colors"
               autoFocus
             >
               {options.cancelLabel ?? 'Cancel'}

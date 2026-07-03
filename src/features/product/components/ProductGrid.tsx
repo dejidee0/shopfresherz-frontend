@@ -67,7 +67,7 @@
 //           <div className="flex items-center gap-4 flex-wrap">
 //             {/* Title with orange accent */}
 //             <div className="flex items-center gap-2">
-//               <div className="w-1 h-7 bg-[#F5820A] rounded-full shrink-0" />
+//               <div className="w-1 h-7 bg-[#F97316] rounded-full shrink-0" />
 //               <h2 className="text-xl font-bold text-[#111111]">{title}</h2>
 //             </div>
 
@@ -81,7 +81,7 @@
 //                     className={cn(
 //                       'px-3 py-1 text-xs font-semibold rounded transition-all duration-200',
 //                       activeTab === tab.key
-//                         ? 'bg-[#F5820A] text-white shadow-sm'
+//                         ? 'bg-[#F97316] text-white shadow-sm'
 //                         : 'text-[#6B7280] hover:text-[#111111]'
 //                     )}
 //                   >
@@ -96,7 +96,7 @@
 //           {seeAllHref && (
 //             <Link
 //               href={seeAllHref}
-//               className="text-sm text-[#F5820A] font-medium hover:underline flex items-center gap-1 shrink-0"
+//               className="text-sm text-[#F97316] font-medium hover:underline flex items-center gap-1 shrink-0"
 //             >
 //               Browse All Product →
 //             </Link>
@@ -147,14 +147,14 @@ interface ProductGridSectionProps {
 
 function SkeletonCard() {
   return (
-    <div className="bg-white border border-[#E5E7EB] rounded-card overflow-hidden animate-pulse">
-      <div className="aspect-square bg-[#F5F5F5]" />
+    <div className="bg-[#141414] border border-white/[0.08] rounded-card overflow-hidden animate-pulse">
+      <div className="aspect-square bg-[#1F1F1F]" />
       <div className="p-3 space-y-2">
-        <div className="h-3 bg-[#F5F5F5] rounded w-1/3" />
-        <div className="h-4 bg-[#F5F5F5] rounded w-full" />
-        <div className="h-4 bg-[#F5F5F5] rounded w-4/5" />
-        <div className="h-5 bg-[#F5F5F5] rounded w-1/2" />
-        <div className="h-9 bg-[#F5F5F5] rounded w-full" />
+        <div className="h-3 bg-white/[0.08] rounded w-1/3" />
+        <div className="h-4 bg-white/[0.08] rounded w-full" />
+        <div className="h-4 bg-white/[0.08] rounded w-4/5" />
+        <div className="h-5 bg-white/[0.08] rounded w-1/2" />
+        <div className="h-9 bg-white/[0.08] rounded w-full" />
       </div>
     </div>
   )
@@ -194,11 +194,11 @@ export function ProductGridSection({
         <div className="flex items-cen\ter justify-between mb-5 flex-wrap gap-3">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
-              <div className="w-1 h-7 bg-[#F5820A] rounded-full shrink-0" />
-              <h2 className="text-xl font-bold text-[#111111]">{title}</h2>
+              <div className="w-1 h-7 bg-[#F97316] rounded-full shrink-0" />
+              <h2 className="text-xl font-bold text-white">{title}</h2>
             </div>
             {tabs && tabs.length > 0 && (
-              <div className="flex flex-wrap items-center gap-1 bg-[#F5F5F5] rounded-btn p-1">
+              <div className="flex flex-wrap items-center gap-1 bg-white/[0.06] border border-white/[0.08] rounded-btn p-1">
                 {tabs.map((tab) => (
                   <button
                     key={tab.key}
@@ -206,8 +206,8 @@ export function ProductGridSection({
                     className={cn(
                       'px-3 py-1 text-xs font-semibold rounded transition-all duration-200',
                       activeTab === tab.key
-                        ? 'bg-[#F5820A] text-white shadow-sm'
-                        : 'text-[#6B7280] hover:text-[#111111]'
+                        ? 'bg-[#F97316] text-white shadow-sm shadow-orange-500/20'
+                        : 'text-[#A0A0A0] hover:text-white'
                     )}
                   >
                     {tab.label}
@@ -219,7 +219,7 @@ export function ProductGridSection({
           {seeAllHref && (
             <Link
               href={seeAllHref}
-              className="text-sm text-[#F5820A] font-medium hover:underline flex items-center gap-1 shrink-0"
+              className="text-sm text-[#F97316] font-medium hover:underline flex items-center gap-1 shrink-0"
             >
               Browse All Product →
             </Link>

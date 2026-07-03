@@ -57,7 +57,7 @@ export function OrderStepper({ steps }: OrderStepperProps) {
           const pct = steps.length > 1 ? (lastCompleted / (steps.length - 1)) * 100 : 0
           return (
             <div
-              className="h-full bg-[#F5820A] transition-all duration-500"
+              className="h-full bg-[#F97316] transition-all duration-500"
               style={{ width: `${pct}%` }}
             />
           )
@@ -76,9 +76,9 @@ export function OrderStepper({ steps }: OrderStepperProps) {
               className={cn(
                 'w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all',
                 isCompleted
-                  ? 'bg-[#F5820A] border-[#F5820A] text-white'
+                  ? 'bg-[#F97316] border-[#F97316] text-white'
                   : isActive
-                  ? 'bg-white border-[#F5820A] text-[#F5820A]'
+                  ? 'bg-white border-[#F97316] text-[#F97316]'
                   : 'bg-white border-[#E5E7EB] text-[#D1D5DB]'
               )}
             >
@@ -89,7 +89,7 @@ export function OrderStepper({ steps }: OrderStepperProps) {
             <div
               className={cn(
                 'w-8 h-8 rounded flex items-center justify-center',
-                isCompleted ? 'text-[#F5820A]' : 'text-[#D1D5DB]'
+                isCompleted ? 'text-[#F97316]' : 'text-[#D1D5DB]'
               )}
             >
               <Icon size={20} />

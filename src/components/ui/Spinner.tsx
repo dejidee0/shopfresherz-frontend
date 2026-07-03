@@ -19,13 +19,13 @@ const SIZE: Record<SpinnerSize, string> = {
 }
 
 const TRACK: Record<SpinnerVariant, string> = {
-  primary: 'border-[#F5820A]/25',
+  primary: 'border-[#F97316]/25',
   white:   'border-white/25',
   muted:   'border-[#6B7280]/20',
 }
 
 const FILL: Record<SpinnerVariant, string> = {
-  primary: 'border-t-[#F5820A]',
+  primary: 'border-t-[#F97316]',
   white:   'border-t-white',
   muted:   'border-t-[#6B7280]',
 }
@@ -60,7 +60,7 @@ interface PageSpinnerProps {
 export function PageSpinner({ label = 'Loading…' }: PageSpinnerProps) {
   return (
     <div
-      className="fixed inset-0 z-9998 flex flex-col items-center justify-center bg-white/70 backdrop-blur-sm"
+      className="fixed inset-0 z-9998 flex flex-col items-center justify-center bg-[#0A0A0A]/80 backdrop-blur-sm"
       role="status"
       aria-label={label}
     >

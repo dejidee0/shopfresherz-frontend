@@ -65,7 +65,7 @@ interface FieldProps {
 function Field({ label, id, error, children }: FieldProps) {
   return (
     <div className="flex flex-col gap-1.5 w-full">
-      <label htmlFor={id} className="text-sm font-medium text-[#111111]">
+      <label htmlFor={id} className="text-[12px] font-medium text-[#666666]">
         {label}
       </label>
       {children}
@@ -86,11 +86,11 @@ function Input({ hasError, className, ...props }: InputProps) {
   return (
     <input
       className={cn(
-        'w-full h-10 px-3 rounded-btn border text-sm outline-none transition-all duration-150',
-        'placeholder:text-[#9CA3AF] bg-white',
+        'sf-input h-12 px-4 text-sm',
+        'placeholder:text-[#444444]',
         hasError
           ? 'border-[#EF4444] focus:ring-2 focus:ring-[#EF4444]/20'
-          : 'border-[#E5E7EB] focus:border-[#F5820A] focus:ring-2 focus:ring-[#F5820A]/20',
+          : '',
         className
       )}
       {...props}
@@ -109,7 +109,7 @@ function PasswordInput({
       <button
         type="button"
         onClick={() => setShow((v) => !v)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#111111] transition-colors"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666666] hover:text-white transition-colors"
         aria-label={show ? 'Hide password' : 'Show password'}
         tabIndex={-1}
       >
@@ -135,7 +135,7 @@ function SignInForm() {
   return (
     <form
       onSubmit={handleSubmit((data) => login(data))}
-      className="flex flex-col gap-4 p-6"
+      className="flex flex-col gap-4 px-0 py-6"
       noValidate
     >
       <Field label="Email Address" id="email" error={errors.email?.message}>
@@ -162,7 +162,7 @@ function SignInForm() {
       <div className="flex items-center justify-end">
         <Link
           href="/auth/forget-password"
-          className="text-xs text-[#F5820A] hover:underline font-medium"
+          className="text-xs text-[#F97316] hover:underline font-medium"
         >
           Forgot password?
         </Link>
@@ -205,7 +205,7 @@ function SignUpForm() {
           confirmPassword: data.password
         })
       )}
-      className="flex flex-col gap-4 p-6"
+      className="flex flex-col gap-4 px-0 py-6"
       noValidate
     >
       {/* Name row */}
@@ -268,17 +268,17 @@ function SignUpForm() {
         <input
           type="checkbox"
           id="agreeToTerms"
-          className="mt-0.5 w-4 h-4 accent-[#F5820A] cursor-pointer shrink-0"
+          className="mt-0.5 w-4 h-4 accent-[#F97316] cursor-pointer shrink-0"
           {...register('agreeToTerms')}
         />
         <div>
-          <label htmlFor="agreeToTerms" className="text-xs text-[#6B7280] leading-relaxed cursor-pointer">
+          <label htmlFor="agreeToTerms" className="text-xs text-[#666666] leading-relaxed cursor-pointer">
             I agree to ShopFresherz{' '}
-            <Link href="/terms" className="text-[#7B2FBE] hover:underline font-medium">
+            <Link href="/terms" className="text-[#F97316] hover:underline font-medium">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link href="/privacy" className="text-[#7B2FBE] hover:underline font-medium">
+            <Link href="/privacy" className="text-[#F97316] hover:underline font-medium">
               Privacy Policy
             </Link>
           </label>
@@ -312,17 +312,17 @@ const LoginForm = () => {
   const isSignIn = path.endsWith('login')
 
   return (
-    <div className="bg-white rounded-modal shadow-lg overflow-hidden w-full max-w-110">
+    <div className="w-full max-w-[420px] px-6 py-4">
 
       {/* Tab switcher */}
-      <div className="flex border-b border-[#E5E7EB]">
+      <div className="grid grid-cols-2 gap-2 rounded-[10px] border border-white/[0.08] bg-[#141414] p-1">
         <button
           onClick={() => router.push('/auth/login')}
           className={cn(
-            'flex-1 flex items-center justify-center py-4 text-sm font-semibold transition-colors border-b-2',
+            'flex-1 flex items-center justify-center rounded-[8px] py-3 text-sm font-semibold transition-colors',
             isSignIn
-              ? 'border-[#F5820A] text-[#F5820A]'
-              : 'border-transparent text-[#6B7280] hover:text-[#111111]'
+              ? 'bg-[#242424] text-white'
+              : 'text-[#666666] hover:text-white'
           )}
         >
           Sign In
@@ -330,10 +330,10 @@ const LoginForm = () => {
         <button
           onClick={() => router.push('/auth/register')}
           className={cn(
-            'flex-1 flex items-center justify-center py-4 text-sm font-semibold transition-colors border-b-2',
+            'flex-1 flex items-center justify-center rounded-[8px] py-3 text-sm font-semibold transition-colors',
             !isSignIn
-              ? 'border-[#F5820A] text-[#F5820A]'
-              : 'border-transparent text-[#6B7280] hover:text-[#111111]'
+              ? 'bg-[#242424] text-white'
+              : 'text-[#666666] hover:text-white'
           )}
         >
           Sign Up

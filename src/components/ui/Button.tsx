@@ -14,15 +14,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<Variant, string> = {
-  // primary:
-  //   'bg-gradient-to-r from-[#F5820A] to-[#E06B00] text-white hover:shadow-lg hover:shadow-orange-200 active:scale-[0.98]',
-  primary: 'bg-primary text-white hover:bg-primary-dark active:scale-[0.98]',
+  primary:
+    'bg-[#F97316] text-white border border-transparent rounded-[8px] hover:bg-[#EA580C] active:scale-[0.98]',
   secondary:
-    'border border-[#F5820A] text-[#F5820A] bg-transparent hover:bg-orange-50 active:scale-[0.98]',
+    'border-[1.5px] border-white/[0.18] text-white bg-transparent rounded-[8px] hover:border-[#F97316] hover:text-[#F97316] hover:bg-[#F97316]/10 active:scale-[0.98]',
   ghost:
-    'border border-[#E5E7EB] text-[#111111] bg-transparent hover:bg-gray-50 active:scale-[0.98]',
+    'border-[1.5px] border-white/[0.18] text-white bg-transparent rounded-[8px] hover:border-[#F97316] hover:text-[#F97316] hover:bg-[#F97316]/10 active:scale-[0.98]',
   danger:
-    'bg-[#EF4444] text-white hover:bg-red-600 active:scale-[0.98]',
+    'bg-[#DC2626] text-white border border-transparent rounded-[8px] hover:bg-red-700 active:scale-[0.98]',
 }
 
 const sizeClasses: Record<Size, string> = {
@@ -55,7 +54,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={isDisabled}
         className={cn(
           // Base
-          'inline-flex items-center justify-center font-semibold rounded transition-all duration-200 select-none',
+          'inline-flex items-center justify-center font-medium rounded-[8px] transition-all duration-200 select-none',
           // Variant
           variantClasses[variant],
           // Size

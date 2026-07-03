@@ -20,7 +20,7 @@ export default function OrderSuccessPage() {
 
         {/* Copy */}
         <div className="flex flex-col gap-1.5">
-          <h1 className="text-xl sm:text-2xl font-bold text-[#111111]">
+          <h1 className="text-xl sm:text-2xl font-bold text-white">
             Your order is successfully placed
           </h1>
           <p className="text-sm text-[#6B7280]">
@@ -33,7 +33,7 @@ export default function OrderSuccessPage() {
         {/* CTA */}
         <Link
           href="/"
-          className="inline-flex items-center gap-2 h-11 px-8 rounded bg-[#F5820A] text-white text-sm font-semibold hover:bg-[#E06B00] transition-colors mt-2"
+          className="inline-flex items-center gap-2 h-11 px-8 rounded bg-[#F97316] text-white text-sm font-semibold hover:bg-[#EA580C] transition-colors mt-2"
         >
           HOME PAGE <FiArrowRight size={15} />
         </Link>

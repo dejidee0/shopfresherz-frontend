@@ -2,7 +2,7 @@ import { useAuthStore } from '@/store/auth'
 import { toast } from '@/store/toast'
 import type { RefreshResponse } from './auth'
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'https://fresherz-001-site1.ftempurl.com/api/v1'
 
 type RequestOptions = RequestInit & {
   token?: string
@@ -13,7 +13,12 @@ type RequestOptions = RequestInit & {
 
 /** Build URL with query params */
 function buildUrl(path: string, params?: RequestOptions['params']): string {
-  const url = new URL(`${BASE_URL}${path}`)
+  const base = process.env.NEXT_PUBLIC_API_URL ?? 'https://fresherz-001-site1.ftempurl.com/api/v1'
+  if (!base) {
+    console.error('[ShopFresherz] NEXT_PUBLIC_API_URL is not defined')
+    throw new Error('API base URL is not configured')
+  }
+  const url = new URL(`${base}${path}`)
   if (params) {
     Object.entries(params).forEach(([k, v]) => {
       if (v !== undefined && v !== null && v !== '') {

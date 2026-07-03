@@ -63,8 +63,8 @@ export function AccountSidebar({ onNavigate }: AccountSidebarProps) {
                 className={cn(
                   'flex items-center gap-3 px-4 py-2.5 text-sm transition-colors',
                   isActive
-                    ? 'bg-[#F5820A] text-white font-semibold'
-                    : 'text-[#374151] hover:bg-orange-50 hover:text-[#F5820A]'
+                    ? 'bg-[#F97316] text-white font-semibold'
+                    : 'text-[#374151] hover:bg-orange-50 hover:text-[#F97316]'
                 )}
               >
                 <Icon size={16} className="shrink-0" />

@@ -8,7 +8,7 @@ const STATUS_CONFIG: Record<
   Pending:          { label: 'PENDING',     className: 'text-[#F59E0B]' },
   AwaitingPayment:  { label: 'AWAITING',    className: 'text-[#6B7280]' },
   Paid:             { label: 'PAID',        className: 'text-[#22C55E]' },
-  Processing:       { label: 'IN PROGRESS', className: 'text-[#F5820A]' },
+  Processing:       { label: 'IN PROGRESS', className: 'text-[#F97316]' },
   Shipped:          { label: 'SHIPPED',     className: 'text-[#3B82F6]' },
   Delivered:        { label: 'COMPLETED',   className: 'text-[#22C55E]' },
   Cancelled:        { label: 'CANCELED',    className: 'text-[#EF4444]' },

@@ -97,8 +97,8 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="border-b border-[#F5F5F5] pb-5 mb-5 last:border-none last:mb-0">
-      <h3 className="text-sm font-bold text-[#111111] uppercase tracking-wide mb-3">
+    <div className="border-b border-white/[0.04] pb-5 mb-5 last:border-none last:mb-0">
+      <h3 className="text-[13px] font-semibold text-white uppercase tracking-wide mb-3">
         {title}
       </h3>
       {children}
@@ -149,7 +149,7 @@ export function ShopSidebar({
   }, []);
 
   return (
-    <aside className="w-52 sm:w-56 md:w-60 shrink-0 space-y-0 max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-hide">
+    <aside className="w-52 sm:w-56 md:w-[260px] shrink-0 space-y-0 max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-hide bg-[#0F0F0F] border-r border-white/[0.04] px-5 py-8">
       {/* ── Category ── */}
       <Section title="Category">
         <ul className="space-y-0.5 max-h-64 overflow-y-auto scrollbar-hide flex flex-col">
@@ -161,16 +161,16 @@ export function ShopSidebar({
                 className={cn(
                   "flex items-center gap-2 w-full text-left text-xs sm:text-sm py-1 sm:py-1.5 px-1 rounded transition-colors",
                   filters.categorySlug === cat.slug
-                    ? "text-[#F5820A] font-semibold"
-                    : "text-[#111111] hover:text-[#F5820A]",
+                    ? "text-[#F97316] font-semibold"
+                    : "text-[#A0A0A0] hover:text-white",
                 )}
               >
                 <span
                   className={cn(
                     "w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 shrink-0 transition-colors",
                     filters.categorySlug === cat.slug
-                      ? "border-[#F5820A] bg-[#F5820A]"
-                      : "border-[#D1D5DB]",
+                      ? "border-[#F97316] bg-[#F97316]"
+                      : "border-white/[0.18]",
                   )}
                 />
                 <span className="truncate">{cat.label}</span>
@@ -185,16 +185,16 @@ export function ShopSidebar({
                       className={cn(
                         "flex items-center gap-2 w-full text-left text-xs py-0.5 sm:py-1 px-1 rounded transition-colors",
                         filters.categorySlug === child.slug
-                          ? "text-[#F5820A] font-semibold"
-                          : "text-[#6B7280] hover:text-[#F5820A]",
+                          ? "text-[#F97316] font-semibold"
+                          : "text-[#666666] hover:text-white",
                       )}
                     >
                       <span
                         className={cn(
                           "w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border-2 shrink-0 transition-colors",
                           filters.categorySlug === child.slug
-                            ? "border-[#F5820A] bg-[#F5820A]"
-                            : "border-[#D1D5DB]",
+                            ? "border-[#F97316] bg-[#F97316]"
+                            : "border-white/[0.18]",
                         )}
                       />
                       <span className="truncate">{child.label}</span>
@@ -228,16 +228,16 @@ export function ShopSidebar({
                   className={cn(
                     "flex items-center gap-2 w-full text-left text-xs sm:text-sm py-0.5 transition-colors",
                     isActive
-                      ? "text-[#F5820A] font-medium"
-                      : "text-[#6B7280] hover:text-[#F5820A]",
+                      ? "text-[#F97316] font-medium"
+                      : "text-[#666666] hover:text-white",
                   )}
                 >
                   <span
                     className={cn(
                       "w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border-2 shrink-0",
                       isActive
-                        ? "border-[#F5820A] bg-[#F5820A]"
-                        : "border-[#D1D5DB]",
+                        ? "border-[#F97316] bg-[#F97316]"
+                        : "border-white/[0.18]",
                     )}
                   />
                   <span className="truncate">{label}</span>
@@ -263,8 +263,8 @@ export function ShopSidebar({
                   className={cn(
                     "w-3.5 h-3.5 sm:w-4 sm:h-4 rounded border-2 shrink-0 flex items-center justify-center transition-colors",
                     checked
-                      ? "bg-[#F5820A] border-[#F5820A]"
-                      : "border-[#D1D5DB] group-hover:border-[#F5820A]",
+                      ? "bg-[#F97316] border-[#F97316]"
+                      : "border-white/[0.18] group-hover:border-[#F97316]",
                   )}
                 >
                   {checked && (
@@ -284,8 +284,8 @@ export function ShopSidebar({
                   className={cn(
                     "text-[10px] sm:text-xs transition-colors truncate",
                     checked
-                      ? "text-[#F5820A] font-medium"
-                      : "text-[#6B7280] group-hover:text-[#111111]",
+                      ? "text-[#F97316] font-medium"
+                      : "text-[#666666] group-hover:text-white",
                   )}
                 >
                   {brand.name} {/* ← name for display only */}
@@ -308,8 +308,8 @@ export function ShopSidebar({
                 className={cn(
                   "px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs rounded border transition-all duration-150",
                   active
-                    ? "bg-[#F5820A] border-[#F5820A] text-white"
-                    : "border-[#E5E7EB] text-[#6B7280] hover:border-[#F5820A] hover:text-[#F5820A]",
+                    ? "bg-[#F97316] border-[#F97316] text-white"
+                    : "border-white/[0.08] text-[#666666] hover:border-[#F97316] hover:text-[#F97316]",
                 )}
               >
                 {tag}
@@ -320,9 +320,9 @@ export function ShopSidebar({
       </Section>
 
       {/* ── Promo card ── */}
-      <div className="bg-white border border-[#E5E7EB] rounded-card overflow-hidden hidden sm:block">
+      <div className="sf-card-3d overflow-hidden hidden sm:block">
         {/* Product image */}
-        <div className="bg-[#F5F5F5] aspect-square flex items-center justify-center p-3 sm:p-4">
+        <div className="bg-[#1A1A1A] aspect-square flex items-center justify-center p-3 sm:p-4">
           <Image
             src={PROMO.image}
             alt={PROMO.name}
@@ -334,22 +334,22 @@ export function ShopSidebar({
 
         {/* Text */}
         <div className="p-3 sm:p-4 text-center">
-          <p className="text-[10px] sm:text-xs font-bold text-[#111111] uppercase tracking-wide mb-0.5">
+          <p className="text-[10px] sm:text-xs font-bold text-[#F97316] uppercase tracking-wide mb-0.5">
             {PROMO.tag}
           </p>
-          <p className="text-xs sm:text-base font-extrabold text-[#111111] leading-tight">
+          <p className="text-xs sm:text-base font-extrabold text-white leading-tight">
             {PROMO.name}
           </p>
-          <p className="text-[10px] sm:text-sm font-bold text-[#111111] mt-0.5 sm:mt-1">
+          <p className="text-[10px] sm:text-sm font-bold text-white mt-0.5 sm:mt-1">
             {PROMO.headline}
           </p>
-          <p className="text-[10px] sm:text-sm text-[#6B7280]">
+          <p className="text-[10px] sm:text-sm text-[#666666]">
             {PROMO.subtext}
           </p>
 
-          <div className="mt-2 sm:mt-3 flex items-center justify-center gap-1 text-[10px] sm:text-sm text-[#6B7280]">
+          <div className="mt-2 sm:mt-3 flex items-center justify-center gap-1 text-[10px] sm:text-sm text-[#666666]">
             <span>{PROMO.label}</span>
-            <span className="font-bold text-xs sm:text-base text-[#111111]">
+            <span className="font-bold text-xs sm:text-base text-[#F97316]">
               ₦{PROMO.price.toLocaleString()} {PROMO.currency}
             </span>
           </div>
@@ -357,7 +357,7 @@ export function ShopSidebar({
           <div className="flex flex-col gap-1.5 sm:gap-2 mt-3 sm:mt-4">
             <Link
               href={"/store/category/all"}
-              className="flex items-center justify-center gap-1.5 sm:gap-2 h-8 sm:h-9 bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white text-[10px] sm:text-xs font-semibold rounded-btn hover:shadow-md transition-all"
+              className="sf-btn-primary flex items-center justify-center gap-1.5 sm:gap-2 h-8 sm:h-9 text-[10px] sm:text-xs font-semibold"
             >
               <FiShoppingCart size={11} />
               EXPLORE

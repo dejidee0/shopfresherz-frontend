@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { FiHeart, FiShoppingCart, FiEye } from "react-icons/fi";
+import { FiHeart, FiShoppingCart } from "react-icons/fi";
 import { cn, formatPrice } from "@/lib/utils/format";
 import { Badge } from "@/components/ui/Badge";
 import { useCartStore } from "@/store/cart";
@@ -27,11 +27,11 @@ export function ProductCard({
   className,
   onQuickView,
 }: ProductCardProps) {
-  const [hovered, setHovered] = useState(false);
   const [imgError, setImgError] = useState(false);
 
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartStore((s) => s.openCart);
+  const cartItems = useCartStore((s) => s.items);
   const {
     handleAddToFavorites,
     isLoading: isFavLoading,
@@ -45,6 +45,8 @@ export function ProductCard({
   );
 
   const isOutOfStock = stockStatus === "out_of_stock";
+  const favorited = isWishlisted || isFavorited(product.id);
+  const inCart = cartItems.some((item) => item.productId === product.id);
 
   const isNew = product.createdAt
     ? Date.now() - new Date(product.createdAt).getTime() <
@@ -94,12 +96,11 @@ export function ProductCard({
     <Link
       href={`/store/product/${product.slug}`}
       className={cn(
-        "bg-white border border-[#E5E7EB] rounded overflow-hidden flex flex-col group relative transition-all duration-200 hover:border-[#F5820A]",
+        "sf-product-card flex flex-col group relative",
+        (favorited || inCart) && "border-2 border-[#F97316]",
         isOutOfStock && "opacity-80",
         className,
       )}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
     >
       {/* Badge */}
       {(discountPercent || isNew) && !isOutOfStock && (
@@ -119,90 +120,91 @@ export function ProductCard({
         </div>
       )}
 
-      {/* Action icons */}
-      <div
+      <button
+        onClick={handleWishlist}
+        disabled={isFavLoading(product.id)}
         className={cn(
-          "absolute top-2 right-2 z-10 flex flex-col gap-1.5 transition-all duration-200",
-          // Always visible on mobile
-          "opacity-100 translate-x-0 lg:opacity-0 lg:translate-x-2",
-          // Hover effect only on desktop
-          hovered && "lg:opacity-100 lg:translate-x-0",
+          "absolute top-3 right-3 z-10 w-8 h-8 bg-[#1A1A1A]/95 rounded-full border border-white/[0.08] flex items-center justify-center transition-colors shadow-[0_4px_12px_rgba(0,0,0,0.35)]",
+          favorited ? "text-[#F97316]" : "text-[#666666] hover:text-white",
+          isFavLoading(product.id) && "opacity-50 cursor-wait",
         )}
+        aria-label={favorited ? "Remove from wishlist" : "Add to wishlist"}
       >
-        {/* Wishlist */}
-        <button
-          onClick={handleWishlist}
-          className={cn(
-            "w-7 h-7 bg-white rounded-full shadow flex items-center justify-center transition-colors",
-            isWishlisted
-              ? "text-[#F5820A]"
-              : "text-[#6B7280] hover:text-[#F5820A]",
-          )}
-          aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-        >
-          <FiHeart size={13} className={isWishlisted ? "fill-current" : ""} />
-        </button>
-
-        {/* Add to cart */}
-        <button
-          onClick={handleAddToCart}
-          disabled={isOutOfStock}
-          className={cn(
-            "w-7 h-7 bg-white rounded-full shadow flex items-center justify-center transition-colors",
-            isOutOfStock
-              ? "text-[#D1D5DB] cursor-not-allowed"
-              : "text-[#6B7280] hover:text-[#F5820A]",
-          )}
-          aria-label="Add to cart"
-        >
-          <FiShoppingCart size={13} />
-        </button>
-
-        {/* Quick view */}
-        <button
-          onClick={handleQuickView}
-          className="w-7 h-7 bg-white rounded-full shadow flex items-center justify-center text-[#6B7280] hover:text-[#F5820A] transition-colors"
-          aria-label="Quick view"
-        >
-          <FiEye size={13} />
-        </button>
-      </div>
+        <FiHeart size={14} className={favorited ? "fill-current" : ""} />
+      </button>
 
       {/* Image */}
-      <div className="overflow-hidden bg-white" style={{ height: "160px" }}>
-        <Image
-          src={imageSrc}
-          alt={product.name}
-          width={200}
-          height={200}
-          style={{ mixBlendMode: "multiply" }}
-          className={cn(
-            "w-full h-full object-contain transition-transform duration-300 p-3",
-            !isOutOfStock && "group-hover:scale-105",
-          )}
-          onError={() => setImgError(true)}
-          unoptimized
-        />
+      <div className="overflow-hidden bg-[#1A1A1A] h-[190px] sm:h-[200px] flex items-center justify-center transition-shadow group-hover:shadow-[inset_0_0_30px_rgba(249,115,22,0.05)]">
+        {imageSrc ? (
+          <Image
+            src={imageSrc}
+            alt={product.name}
+            width={200}
+            height={200}
+            className={cn(
+              "w-full h-full object-contain transition-transform duration-300 p-5 drop-shadow-[0_12px_24px_rgba(0,0,0,0.45)]",
+              !isOutOfStock && "group-hover:scale-110",
+            )}
+            onError={() => setImgError(true)}
+            unoptimized
+          />
+        ) : (
+          <div className="w-full h-full bg-[#1F1F1F] flex items-center justify-center text-[#555555] text-[11px]">
+            No image
+          </div>
+        )}
       </div>
 
       {/* Info */}
-      <div className="p-3 flex flex-col gap-1 flex-1">
-        {/* Product name */}
-        <p className="text-[11px] text-[#111111] font-medium leading-snug line-clamp-2 min-h-8">
+      <div className="p-4 flex flex-col gap-2 flex-1">
+        <p className="text-[10px] text-[#555555] uppercase tracking-[0.8px] leading-none">
+          {product.brandName ?? product.brand?.name ?? product.categoryName ?? "ShopFresherz"}
+        </p>
+
+        <p className="text-[13px] text-white font-medium leading-[1.45] line-clamp-2 min-h-[38px] group-hover:text-[#F97316] transition-colors">
           {product.name}
         </p>
 
-        {/* Price */}
-        <div className="flex items-center gap-1.5 mt-0.5">
-          <span className="text-sm text-[#F5820A] font-semibold">
-            {formatPrice(product.price)}
-          </span>
+        <button
+          onClick={handleQuickView}
+          className="sr-only"
+          aria-label="Quick view"
+          tabIndex={-1}
+        />
 
-          {product.compareAtPrice && (
-            <span className="text-[10px] text-[#9CA3AF] line-through">
-              {formatPrice(product.compareAtPrice)}
+        <div className="flex items-center gap-1.5 text-[11px]">
+          <span className="flex text-[#F97316]" aria-hidden="true">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <span key={i}>{i < Math.round(product.averageRating ?? 0) ? "\u2605" : "\u2606"}</span>
+            ))}
+          </span>
+          <span className="text-[#555555]">({product.reviewCount ?? 0})</span>
+        </div>
+
+        <div className="mt-auto flex items-end justify-between gap-2">
+          <div className="flex flex-col">
+            <span className="text-[16px] font-bold text-[#F97316] leading-tight [text-shadow:0_0_12px_rgba(249,115,22,0.3)]">
+              {formatPrice(product.price)}
             </span>
-          )}
+
+            {product.compareAtPrice && (
+              <span className="text-[11px] text-[#555555] line-through">
+                {formatPrice(product.compareAtPrice)}
+              </span>
+            )}
+          </div>
+
+          <button
+            onClick={handleAddToCart}
+            disabled={isOutOfStock}
+            className={cn(
+              "w-9 h-9 rounded-[10px] bg-linear-to-br from-[#F97316] to-[#EA580C] text-white flex items-center justify-center shrink-0 transition-all shadow-[0_4px_12px_rgba(249,115,22,0.3)]",
+              isOutOfStock ? "opacity-50 cursor-not-allowed" : "hover:scale-105 hover:shadow-[0_8px_20px_rgba(249,115,22,0.4)]",
+            )}
+            aria-label="Add to cart"
+          >
+            <FiShoppingCart size={16} />
+          </button>
         </div>
       </div>
     </Link>

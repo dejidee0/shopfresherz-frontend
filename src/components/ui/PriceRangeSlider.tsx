@@ -75,7 +75,7 @@ export function PriceRangeSlider({
       <div ref={trackRef} className="relative h-1.5 bg-[#E5E7EB] rounded-full mx-2 my-5 cursor-pointer">
         {/* Active range fill */}
         <div
-          className="absolute h-full bg-[#F5820A] rounded-full"
+          className="absolute h-full bg-[#F97316] rounded-full"
           style={{ left: `${minPct}%`, right: `${100 - maxPct}%` }}
         />
 
@@ -102,12 +102,12 @@ export function PriceRangeSlider({
 
       {/* Price display */}
       <div className="flex items-center justify-between text-xs text-[#6B7280] mt-1">
-        <div className="border border-[#E5E7EB] rounded px-2 py-1">
-          <span className="font-medium text-[#111111]">{formatPrice(localMin)}</span>
+        <div className="border border-white/[0.1] bg-[#141414] rounded px-2 py-1">
+          <span className="font-medium text-white">{formatPrice(localMin)}</span>
         </div>
         <div className="h-px w-3 bg-[#E5E7EB]" />
-        <div className="border border-[#E5E7EB] rounded px-2 py-1">
-          <span className="font-medium text-[#111111]">{formatPrice(localMax)}</span>
+        <div className="border border-white/[0.1] bg-[#141414] rounded px-2 py-1">
+          <span className="font-medium text-white">{formatPrice(localMax)}</span>
         </div>
       </div>
     </div>
@@ -127,7 +127,7 @@ function Thumb({ percent, onDrag, ...aria }: ThumbProps) {
   return (
     <div
       role="slider"
-      className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-[#F5820A] border-2 border-white shadow-md cursor-grab active:cursor-grabbing focus:outline-none focus:ring-2 focus:ring-[#F5820A]/40 z-10"
+      className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-[#F97316] border-2 border-white shadow-md cursor-grab active:cursor-grabbing focus:outline-none focus:ring-2 focus:ring-[#F97316]/40 z-10"
       style={{ left: `${percent}%` }}
       onMouseDown={onDrag}
       onTouchStart={onDrag}

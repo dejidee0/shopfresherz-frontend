@@ -29,6 +29,10 @@ import {
 import { checkoutApi } from "@/lib/api/checkout";
 import { toast } from "@/store/toast";
 import { FlutterwavePaymentTrigger } from "@/features/payment/components/FlutterwavePaymentTrigger";
+import {
+  CHECKOUT_ADDRESSES_QUERY_KEY,
+  SAVED_CARDS_QUERY_KEY,
+} from "@/features/checkout/queryKeys";
 
 type CheckoutStep = 1 | 2 | 3 | 4;
 
@@ -37,14 +41,6 @@ const COUPONS: Record<string, { type: "percent" | "fixed"; value: number }> = {
   FRESH10: { type: "percent", value: 10 },
   WELCOME5000: { type: "fixed", value: 5000 },
 };
-
-export function SAVED_CARDS_QUERY_KEY(token: string | null | undefined) {
-  return ["checkout-saved-cards", token] as const;
-}
-
-export function CHECKOUT_ADDRESSES_QUERY_KEY(token: string | null | undefined) {
-  return ["checkout-addresses", token] as const;
-}
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -348,14 +344,14 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="max-w-content mx-auto px-4 sm:px-6 lg:px-10 py-16 min-h-[60vh] text-center">
-        <h1 className="text-xl font-bold text-[#111111]">Your cart is empty</h1>
-        <p className="mt-2 text-sm text-[#6B7280]">
+      <div className="bg-[#0A0A0A] px-4 py-16 min-h-screen text-center">
+        <h1 className="text-xl font-bold text-white">Your cart is empty</h1>
+        <p className="mt-2 text-sm text-[#666666]">
           Add products to your cart before checking out.
         </p>
         <button
           onClick={() => router.push("/store")}
-          className="mt-6 h-11 px-6 rounded bg-[#F5820A] text-white text-sm font-semibold hover:bg-[#E06B00] transition-colors"
+          className="sf-btn-primary mt-6 h-11 px-6 text-sm"
         >
           Continue Shopping
         </button>
@@ -364,7 +360,8 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="max-w-content mx-auto px-4 sm:px-6 lg:px-10 py-6 min-h-[60vh]">
+    <div className="bg-[#0A0A0A] px-4 sm:px-6 lg:px-8 py-8 min-h-screen">
+      <div className="max-w-content mx-auto">
       {step === 1 && (
         <RegisteredCheckout
           {...sidebarProps}
@@ -451,6 +448,7 @@ export default function CheckoutPage() {
           }}
         />
       )}
+      </div>
     </div>
   );
 }

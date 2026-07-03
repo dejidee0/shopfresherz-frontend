@@ -67,15 +67,15 @@ export default async function ProductDetailPage({ params }: PDPProps) {
   ];
 
   return (
-    <div className="max-w-content mx-auto px-4 sm:px-6 md:px-10 py-4 sm:py-6">
+    <div className="bg-[#0A0A0A] px-4 sm:px-6 lg:px-8 py-6 min-h-screen">
       {/* Breadcrumb */}
       <Breadcrumb items={breadcrumbs} />
 
       {/* ── Main PDP layout ── */}
-      <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 md:gap-10 mt-3 sm:mt-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,45%)_minmax(0,55%)] gap-8 lg:gap-10 mt-6">
 
         {/* Left: Image zoom */}
-        <div className="w-full lg:w-120 shrink-0">
+        <div className="w-full min-w-0">
           <ProductImageZoom
             images={product.imageUrls.map((url) => {
               // Derive Cloudinary variants by injecting transformation segments.
@@ -98,7 +98,7 @@ export default async function ProductDetailPage({ params }: PDPProps) {
         </div>
 
         {/* Right: Product info + actions */}
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0">
           <PDPActions product={product} />
         </div>
       </div>

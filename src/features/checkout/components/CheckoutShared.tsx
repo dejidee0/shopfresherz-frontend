@@ -33,15 +33,15 @@ export function Field({
 }) {
   return (
     <div className={cn('flex flex-col gap-1', className)}>
-      {label && <label className="text-sm font-medium text-[#374151]">{label}</label>}
+      {label && <label className="mb-1.5 text-[12px] font-medium text-[#666666]">{label}</label>}
       <input
         type={type}
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={cn(
-          'h-10 px-3 rounded border text-sm text-[#111111] outline-none transition-colors placeholder:text-[#9CA3AF]',
-          error ? 'border-red-400 focus:border-red-400' : 'border-[#E5E7EB] focus:border-[#F5820A]'
+          'sf-input h-10 px-3 text-sm',
+          error ? 'border-red-400 focus:border-red-400' : ''
         )}
       />
       {error && <p className="text-xs text-red-500 mt-0.5">{error}</p>}
@@ -68,13 +68,13 @@ export function SelectField({
 }) {
   return (
     <div className={cn('flex flex-col gap-1', className)}>
-      {label && <label className="text-sm font-medium text-[#374151]">{label}</label>}
+      {label && <label className="mb-1.5 text-[12px] font-medium text-[#666666]">{label}</label>}
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={cn(
-          'h-10 px-3 rounded border text-sm text-[#111111] bg-white outline-none transition-colors',
-          error ? 'border-red-400 focus:border-red-400' : 'border-[#E5E7EB] focus:border-[#F5820A]'
+          'h-10 px-3 rounded-[8px] border border-white/[0.08] text-sm text-white bg-[#141414] outline-none transition-colors focus:border-[#F97316]',
+          error ? 'border-red-400 focus:border-red-400' : ''
         )}
       >
         <option value="">{placeholder}</option>
@@ -106,28 +106,28 @@ export function RadioOption({
     <button
       onClick={onSelect}
       className={cn(
-        'w-full flex items-center justify-between p-4 rounded-lg border text-left transition-colors',
-        selected ? 'border-[#F5820A] bg-orange-50/40' : 'border-[#E5E7EB] bg-white hover:border-[#F5820A]/40'
+        'w-full flex items-center justify-between p-3 sm:p-4 rounded-[10px] border text-left transition-all',
+        selected ? 'border-[#F97316] bg-[rgba(249,115,22,0.05)] shadow-[0_0_0_1px_rgba(249,115,22,0.2),0_4px_12px_rgba(249,115,22,0.1)]' : 'border-white/[0.06] bg-[#141414] hover:border-[#F97316]/40'
       )}
     >
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-[#111111]">{label}</p>
-        <p className="text-xs text-[#6B7280] mt-0.5">{subtitle}</p>
+        <p className="text-sm font-semibold text-white">{label}</p>
+        <p className="text-xs text-[#666666] mt-0.5">{subtitle}</p>
       </div>
 
       <div className="flex items-center gap-3 shrink-0 ml-4">
         {price !== undefined && (
-          <span className={cn('text-sm font-semibold', price === null || price === 'Free' ? 'text-green-500' : 'text-[#111111]')}>
+          <span className={cn('text-sm font-semibold', price === null || price === 'Free' ? 'text-green-500' : 'text-white')}>
             {price === null ? 'Free' : price}
           </span>
         )}
         <div
           className={cn(
             'w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors',
-            selected ? 'border-green-500' : 'border-[#D1D5DB]'
+            selected ? 'border-[#F97316]' : 'border-[#D1D5DB]'
           )}
         >
-          {selected && <div className="w-2.5 h-2.5 rounded-full bg-green-500" />}
+          {selected && <div className="w-2.5 h-2.5 rounded-full bg-[#F97316]" />}
         </div>
       </div>
     </button>
@@ -153,7 +153,7 @@ export function StepIndicator({ step }: { step: CheckoutStep }) {
               <div
                 className={cn(
                   'w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
-                  done ? 'bg-green-500 text-white' : active ? 'bg-[#F5820A] text-white' : 'bg-[#E5E7EB] text-[#6B7280]'
+                  done ? 'bg-green-500 text-white' : active ? 'bg-[#F97316] text-white' : 'bg-[#242424] text-[#666666]'
                 )}
               >
                 {done ? <FiCheckCircle size={13} /> : n}
@@ -161,7 +161,7 @@ export function StepIndicator({ step }: { step: CheckoutStep }) {
               <span
                 className={cn(
                   'text-xs font-medium hidden sm:block whitespace-nowrap transition-colors',
-                  active ? 'text-[#F5820A]' : done ? 'text-green-600' : 'text-[#6B7280]'
+                  active ? 'text-[#F97316]' : done ? 'text-green-600' : 'text-[#6B7280]'
                 )}
               >
                 {label}
@@ -190,13 +190,13 @@ export function StepNavButtons({
     <div className="flex gap-3 mt-6">
       <button
         onClick={onBack}
-        className="flex-1 sm:flex-none h-12 md:px-6 rounded border border-[#E5E7EB] text-sm font-semibold text-[#374151] flex items-center justify-center gap-2 hover:border-[#F5820A] hover:text-[#F5820A] transition-colors"
+        className="flex-1 sm:flex-none h-12 md:px-6 rounded-[8px] border border-white/[0.08] text-sm font-semibold text-[#777777] flex items-center justify-center gap-2 hover:border-[#F97316] hover:text-[#F97316] transition-colors"
       >
         <FiArrowLeft size={15} /> BACK
       </button>
       <button
         onClick={onContinue}
-        className="flex-1 h-12 text-xs md:text-base rounded bg-[#F5820A] text-white font-semibold flex items-center justify-center gap-2 hover:bg-[#E06B00] transition-colors"
+        className="sf-btn-primary flex-1 h-12 text-xs md:text-base rounded-[10px] font-semibold"
       >
         {continueLabel} <FiArrowRight size={15} />
       </button>
@@ -226,17 +226,17 @@ export function OrderSummary({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 sm:p-5">
-        <p className="text-sm font-bold text-[#111111] mb-4">Order Summary</p>
+      <div className="bg-[#141414] border border-white/[0.06] rounded-[14px] p-5 shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
+        <p className="text-[16px] font-semibold text-white mb-4">Order Summary</p>
 
-        <div className="flex flex-col gap-4 mb-4">
+        <div className="flex flex-col mb-4">
           {items.length === 0 && (
-            <p className="text-sm text-[#6B7280]">Your cart is empty.</p>
+            <p className="text-sm text-[#666666]">Your cart is empty.</p>
           )}
 
           {items.map((item) => (
-            <div key={item.id} className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded bg-[#F5F5F5] shrink-0 overflow-hidden">
+            <div key={item.id} className="flex items-center gap-3 py-3 border-b border-white/[0.04] last:border-b-0">
+              <div className="w-12 h-12 rounded-[8px] bg-[#1F1F1F] shrink-0 overflow-hidden">
                 <Image
                   src={item.image || '/images/device-placeholder.jpg'}
                   alt={item.name}
@@ -246,17 +246,19 @@ export function OrderSummary({
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-[#111111] truncate">{item.name}</p>
-                <p className="text-xs text-[#6B7280] mt-0.5">
-                  {item.quantity} x{' '}
-                  <span className="text-[#F5820A] font-semibold">{formatPrice(item.price)}</span>
+                <p className="text-[13px] text-white truncate">{item.name}</p>
+                <p className="text-[12px] text-[#666666] mt-0.5">
+                  {item.quantity} {item.quantity === 1 ? 'item' : 'items'}
                 </p>
               </div>
+              <span className="text-[13px] font-semibold text-[#F97316]">
+                {formatPrice(item.price * item.quantity)}
+              </span>
             </div>
           ))}
         </div>
 
-        <div className="border-t border-[#F5F5F5] pt-3 space-y-2">
+        <div className="pt-1 space-y-2">
           {[
             { label: 'Sub-total', value: formatPrice(subtotal) },
             { label: 'Shipping', value: deliveryFee === 0 ? 'Free' : formatPrice(deliveryFee) },
@@ -267,23 +269,23 @@ export function OrderSummary({
             },
             { label: 'VAT (7.5%)', value: formatPrice(tax) },
           ].map(({ label, value, accent }) => (
-            <div key={label} className="flex justify-between text-sm">
-              <span className="text-[#6B7280]">{label}</span>
-              <span className={cn('font-medium text-[#111111]', accent)}>{value}</span>
+            <div key={label} className="flex justify-between text-[14px]">
+              <span className="text-[#777777]">{label}</span>
+              <span className={cn('font-medium text-white', accent)}>{value}</span>
             </div>
           ))}
 
-          <div className="flex justify-between text-sm font-bold pt-2 border-t border-[#F5F5F5]">
-            <span className="text-[#111111]">Total</span>
-            <span className="text-[#111111]">{formatPrice(total)}</span>
+          <div className="flex justify-between text-[18px] font-bold pt-3 mt-2 border-t border-white/[0.08]">
+            <span className="text-white">Total</span>
+            <span className="text-white">{formatPrice(total)}</span>
           </div>
         </div>
       </div>
 
-      <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 sm:p-5">
+      <div className="bg-[#141414] border border-white/[0.06] rounded-[14px] p-5 shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
         <div className="flex items-center gap-2 mb-3">
-          <FiTag size={14} className="text-[#F5820A]" />
-          <p className="text-sm font-bold text-[#111111]">Coupon Code</p>
+          <FiTag size={14} className="text-[#F97316]" />
+          <p className="text-[14px] font-medium text-white">Coupon Code</p>
         </div>
         {coupon.applied ? (
           <div className="flex items-center justify-between gap-3">
@@ -294,7 +296,7 @@ export function OrderSummary({
             {onRemoveCoupon && (
               <button
                 onClick={onRemoveCoupon}
-                className="text-xs font-semibold text-[#F5820A] hover:underline"
+                className="text-xs font-semibold text-[#F97316] hover:underline"
               >
                 Remove
               </button>
@@ -307,12 +309,12 @@ export function OrderSummary({
               placeholder="Enter coupon code"
               value={coupon.code}
               onChange={(e) => onCouponChange(e.target.value)}
-              className="h-10 px-3 rounded border border-[#E5E7EB] text-sm outline-none focus:border-[#F5820A] transition-colors placeholder:text-[#9CA3AF]"
+              className="sf-input h-10 px-3 text-[14px]"
             />
             <button
               onClick={onApplyCoupon}
               disabled={!coupon.code.trim()}
-              className="h-10 rounded bg-[#6B21A8] text-white text-sm font-semibold hover:bg-[#581C87] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="sf-btn-primary h-11 rounded-[8px] text-[13px] font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
             >
               APPLY COUPON
             </button>
@@ -332,9 +334,9 @@ export function CheckoutLayout({
   sidebar: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col lg:flex-row gap-6">
+    <div className="flex flex-col lg:flex-row gap-6 items-start">
       <div className="flex-1 min-w-0">{children}</div>
-      <div className="w-full lg:w-[280px] xl:w-[300px] shrink-0">{sidebar}</div>
+      <div className="w-full lg:w-[400px] shrink-0 lg:sticky lg:top-6">{sidebar}</div>
     </div>
   )
 }

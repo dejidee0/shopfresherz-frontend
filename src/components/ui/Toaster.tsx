@@ -30,29 +30,29 @@ const TYPE_CONFIG: Record<
     icon: FiCheckCircle,
     bar: "bg-[#22C55E]",
     iconClass: "text-[#22C55E]",
-    bg: "bg-white",
+    bg: "bg-[#141414]",
     border: "border-[#22C55E]/20",
   },
   error: {
     icon: FiXCircle,
     bar: "bg-[#EF4444]",
     iconClass: "text-[#EF4444]",
-    bg: "bg-white",
+    bg: "bg-[#141414]",
     border: "border-[#EF4444]/20",
   },
   warning: {
     icon: FiAlertTriangle,
     bar: "bg-[#F59E0B]",
     iconClass: "text-[#F59E0B]",
-    bg: "bg-white",
+    bg: "bg-[#141414]",
     border: "border-[#F59E0B]/20",
   },
   info: {
     icon: FiInfo,
-    bar: "bg-[#F5820A]",
-    iconClass: "text-[#F5820A]",
-    bg: "bg-white",
-    border: "border-[#F5820A]/20",
+    bar: "bg-[#F97316]",
+    iconClass: "text-[#F97316]",
+    bg: "bg-[#141414]",
+    border: "border-[#F97316]/20",
   },
 };
 
@@ -100,7 +100,7 @@ function ToastItem({ toast }: { toast: Toast }) {
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-[#111111] leading-snug">
+        <p className="text-sm font-semibold text-white leading-snug">
           {toast.title}
         </p>
         {toast.message && (
@@ -113,7 +113,7 @@ function ToastItem({ toast }: { toast: Toast }) {
       {/* Dismiss button */}
       <button
         onClick={() => dismiss(toast.id)}
-        className="shrink-0 w-5 h-5 flex items-center justify-center text-[#9CA3AF] hover:text-[#111111] transition-colors mt-0.5"
+        className="shrink-0 w-5 h-5 flex items-center justify-center text-[#9CA3AF] hover:text-white transition-colors mt-0.5"
         aria-label="Dismiss"
       >
         <FiX size={13} />

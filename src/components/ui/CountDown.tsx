@@ -52,7 +52,7 @@ function TimeBlock({ value, label, isDark }: { value: string; label: string; isD
     <div
       className={cn(
         'flex flex-col items-center justify-center rounded px-2 py-0.5 min-w-9',
-        isDark ? 'bg-[#F5820A]' : 'bg-orange-50 border border-orange-200'
+        isDark ? 'bg-[#F97316]' : 'bg-orange-50 border border-orange-200'
       )}
     >
       <span className="text-white font-bold text-sm leading-none tabular-nums">{value}</span>
@@ -63,7 +63,7 @@ function TimeBlock({ value, label, isDark }: { value: string; label: string; isD
 
 function Colon({ isDark }: { isDark: boolean }) {
   return (
-    <span className={cn('font-bold text-sm', isDark ? 'text-[#F5820A]' : 'text-[#F5820A]')}>
+    <span className={cn('font-bold text-sm', isDark ? 'text-[#F97316]' : 'text-[#F97316]')}>
       :
     </span>
   )

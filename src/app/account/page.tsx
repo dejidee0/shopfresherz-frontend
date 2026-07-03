@@ -63,7 +63,7 @@ const ORDER_COLUMNS: ColumnDef<AccountOrder>[] = [
     render: () => (
       <Link
         href="/account/orders"
-        className="text-sm text-[#F5820A] font-medium hover:underline whitespace-nowrap"
+        className="text-sm text-[#F97316] font-medium hover:underline whitespace-nowrap"
       >
         View
       </Link>
@@ -83,7 +83,7 @@ function StatCard({
   return (
     <div className="bg-white border border-[#E5E7EB] p-2 md:p-4 flex flex-col md:flex-row items-center gap-3">
       <div className="w-9 h-9 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
-        <Icon size={17} className="text-[#F5820A]" />
+        <Icon size={17} className="text-[#F97316]" />
       </div>
       <div className="flex flex-col gap-2 items-center md:items-start">
         <p className="md:text-xl font-extrabold text-[#111111] leading-none">
@@ -210,19 +210,19 @@ export default function AccountDashboardPage() {
         </h1>
         <p className="text-sm text-[#6B7280] mt-1 leading-relaxed">
           From your account dashboard you can check your{" "}
-          <Link href="/account/orders" className="text-[#F5820A] hover:underline">
+          <Link href="/account/orders" className="text-[#F97316] hover:underline">
             Recent Orders
           </Link>
           , manage your{" "}
-          <Link href="/account/addresses" className="text-[#F5820A] hover:underline">
+          <Link href="/account/addresses" className="text-[#F97316] hover:underline">
             Shipping and Billing Addresses
           </Link>{" "}
           and edit your{" "}
-          <Link href="/account/profile" className="text-[#F5820A] hover:underline">
+          <Link href="/account/profile" className="text-[#F97316] hover:underline">
             Password
           </Link>{" "}
           and{" "}
-          <Link href="/account/profile" className="text-[#F5820A] hover:underline">
+          <Link href="/account/profile" className="text-[#F97316] hover:underline">
             Account Details
           </Link>
           .
@@ -279,7 +279,7 @@ export default function AccountDashboardPage() {
           </div>
           <Link
             href="/account/profile"
-            className="inline-flex mt-4 text-xs font-semibold border border-[#E5E7EB] rounded-btn px-4 py-1.5 text-[#111111] hover:border-[#F5820A] hover:text-[#F5820A] transition-colors"
+            className="inline-flex mt-4 text-xs font-semibold border border-[#E5E7EB] rounded-btn px-4 py-1.5 text-[#111111] hover:border-[#F97316] hover:text-[#F97316] transition-colors"
           >
             EDIT ACCOUNT
           </Link>
@@ -311,7 +311,7 @@ export default function AccountDashboardPage() {
           </div>
           <Link
             href="/account/addresses"
-            className="inline-flex mt-4 text-xs font-semibold border border-[#E5E7EB] rounded-btn px-4 py-1.5 text-[#111111] hover:border-[#F5820A] hover:text-[#F5820A] transition-colors"
+            className="inline-flex mt-4 text-xs font-semibold border border-[#E5E7EB] rounded-btn px-4 py-1.5 text-[#111111] hover:border-[#F97316] hover:text-[#F97316] transition-colors"
           >
             EDIT ADDRESS
           </Link>
@@ -335,7 +335,7 @@ export default function AccountDashboardPage() {
           </p>
           <Link
             href="/account/payment-methods"
-            className="flex items-center gap-1 text-xs text-[#F5820A] font-medium hover:underline"
+            className="flex items-center gap-1 text-xs text-[#F97316] font-medium hover:underline"
           >
             Manage <FiPlus size={12} />
           </Link>
@@ -367,7 +367,7 @@ export default function AccountDashboardPage() {
         footer={
           <Link
             href="/account/orders"
-            className="text-xs text-[#F5820A] font-medium hover:underline"
+            className="text-xs text-[#F97316] font-medium hover:underline"
           >
             View All
           </Link>

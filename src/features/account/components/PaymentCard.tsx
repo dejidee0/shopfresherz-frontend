@@ -17,7 +17,7 @@ type CardType = 'visa' | 'mastercard' | 'verve'
 const CARD_THEMES: Record<CardType, string> = {
   visa:       'bg-gradient-to-br from-[#1A1A2E] to-[#16213E]',
   mastercard: 'bg-gradient-to-br from-[#1B4332] to-[#2D6A4F]',
-  verve:      'bg-gradient-to-br from-[#6B2737] to-[#8B2FC9]',
+  verve:      'bg-gradient-to-br from-[#6B2737] to-[#EA580C]',
 }
 
 const CARD_LOGO: Record<CardType, React.ReactNode> = {
@@ -99,7 +99,7 @@ export function PaymentCard({ card, onDelete, onEdit }: PaymentCardProps) {
             <div className="absolute right-0 top-8 bg-white rounded-card shadow-lg border border-[#E5E7EB] z-20 py-1 min-w-32">
               <button
                 onClick={() => { onEdit(card.id); setMenuOpen(false) }}
-                className="flex items-center gap-2.5 w-full px-4 py-2 text-sm text-[#111111] hover:bg-orange-50 hover:text-[#F5820A] transition-colors"
+                className="flex items-center gap-2.5 w-full px-4 py-2 text-sm text-[#111111] hover:bg-orange-50 hover:text-[#F97316] transition-colors"
               >
                 <FiEdit2 size={13} /> Edit Card
               </button>

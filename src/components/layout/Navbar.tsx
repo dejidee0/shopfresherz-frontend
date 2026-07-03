@@ -116,22 +116,24 @@ export function Navbar() {
     setIsMobileCatsOpen(false)
   }
 
+  const navCategories = allCategories.slice(0, 5)
+
   const SuggestionsDropdown = () =>
     isSuggestionsOpen && suggestions ? (
-      <div className="absolute top-full left-0 right-0 bg-white shadow-xl rounded-b-lg border border-t-0 border-[#E5E7EB] z-50 overflow-hidden">
+      <div className="absolute top-full left-0 right-0 bg-[#141414] shadow-2xl rounded-b-[12px] border border-t-0 border-white/[0.08] z-50 overflow-hidden">
         {suggestions.categories.length > 0 && (
-          <div className="px-3 py-2 border-b border-[#F5F5F5]">
-            <p className="text-[10px] font-bold uppercase text-[#6B7280] mb-1 tracking-wide">
+          <div className="px-3 py-2 border-b border-white/[0.06]">
+            <p className="text-[10px] font-bold uppercase text-[#888888] mb-1 tracking-wide">
               Categories
             </p>
             {suggestions.categories.map((cat) => (
               <Link
                 key={cat.id}
-                href={`/store/category/${cat.slug}`} 
+                href={`/store/category/${cat.slug}`}
                 onClick={() => setIsSuggestionsOpen(false)}
-                className="flex items-center gap-2 px-1 py-1.5 text-sm text-[#111111] hover:text-[#F5820A] transition-colors"
+                className="flex items-center gap-2 px-1 py-1.5 text-sm text-white hover:text-[#F97316] transition-colors"
               >
-                <FiSearch size={12} className="text-[#6B7280]" />
+                <FiSearch size={12} className="text-[#888888]" />
                 {cat.name}
               </Link>
             ))}
@@ -139,7 +141,7 @@ export function Navbar() {
         )}
         {suggestions.products.length > 0 && (
           <div className="p-3">
-            <p className="text-[10px] font-bold uppercase text-[#6B7280] mb-2 tracking-wide">
+            <p className="text-[10px] font-bold uppercase text-[#888888] mb-2 tracking-wide">
               Products
             </p>
             {suggestions.products.map((product) => (
@@ -147,9 +149,9 @@ export function Navbar() {
                 key={product.id}
                 href={`/store/product/${product.slug}`}
                 onClick={() => setIsSuggestionsOpen(false)}
-                className="flex items-center gap-3 p-1.5 rounded hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-3 p-1.5 rounded-[8px] hover:bg-white/[0.04] transition-colors"
               >
-                <div className="w-10 h-10 bg-gray-100 rounded shrink-0 overflow-hidden">
+                <div className="w-10 h-10 bg-[#1F1F1F] rounded-[8px] shrink-0 overflow-hidden">
                   <Image
                     src={product.imageUrls?.[0] ?? '/images/device-placeholder.jpg'}
                     alt={product.name}
@@ -159,15 +161,15 @@ export function Navbar() {
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-[#111111] truncate">{product.name}</p>
-                  <p className="text-sm font-bold text-[#F5820A]">{formatPrice(product.price)}</p>
+                  <p className="text-xs text-white truncate">{product.name}</p>
+                  <p className="text-sm font-bold text-[#F97316]">{formatPrice(product.price)}</p>
                 </div>
               </Link>
             ))}
           </div>
         )}
         {suggestions.products.length === 0 && suggestions.categories.length === 0 && (
-          <div className="p-4 text-center text-sm text-[#6B7280]">
+          <div className="p-4 text-center text-sm text-[#666666]">
             No results for &quot;{query}&quot;
           </div>
         )}
@@ -175,86 +177,83 @@ export function Navbar() {
     ) : null
 
   return (
-    <div className="sticky top-0 z-30 w-full shadow-sm">
-
-      {/* ── Desktop header ── */}
-      <header className="bg-[#F5820A] w-full">
-        <div className="max-w-content mx-auto px-4 sm:px-6 lg:px-10 h-16 lg:h-18 flex items-center gap-3 lg:gap-6">
-
-          <Link href="/store" className="shrink-0">
-            <Image
-              src="/icons/ShopFreshersV2LogoWhite.png"
-              alt="ShopFresherz"
-              width={160}
-              height={40}
-              className="h-8 lg:h-10 w-auto"
-              priority
-            />
+    <div className="sticky top-0 z-30 w-full bg-[#0A0A0A]">
+      <header className="bg-[#0A0A0A] border-b border-white/[0.06]">
+        <div className="px-4 md:px-8 py-3.5 flex items-center gap-4 lg:gap-6">
+          <Link href="/store" className="shrink-0 flex items-center gap-2.5">
+            <span className="w-[38px] h-[38px] rounded-[10px] bg-linear-to-br from-[#F97316] to-[#EA580C] text-white flex items-center justify-center text-base font-bold leading-none shadow-[0_4px_12px_rgba(249,115,22,0.4)]">
+              SF
+            </span>
+            <span className="flex flex-col leading-none">
+              <span className="text-[17px] font-bold text-white tracking-[-0.3px]">ShopFresherz</span>
+              <span className="mt-1 text-[9px] text-[#555555] uppercase tracking-[2px]">
+                Gadget Store
+              </span>
+            </span>
           </Link>
 
-          {/* Search — md+ only */}
-          <div ref={searchRef} className="hidden md:flex flex-1 relative">
+          <div ref={searchRef} className="hidden md:flex flex-1 relative max-w-2xl mx-auto">
             <form onSubmit={handleSearch} className="w-full">
-              <div className="flex">
+              <div className="relative">
+                <button
+                  type="submit"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555555] hover:text-[#F97316] transition-colors"
+                  aria-label="Search"
+                >
+                  <FiSearch size={16} />
+                </button>
                 <input
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search for anything..."
-                  className="flex-1 h-11 px-4 text-sm text-[#111111] bg-white border-none outline-none rounded-l-md placeholder:text-[#9CA3AF]"
+                  placeholder="Search phones, laptops, gaming..."
+                  className="sf-glass w-full rounded-[12px] py-[11px] pl-11 pr-4 text-[13px] text-white outline-none placeholder:text-[#444444] transition-all focus:border-[rgba(249,115,22,0.5)] focus:shadow-[0_0_20px_rgba(249,115,22,0.1)]"
                   aria-label="Search products"
                   aria-autocomplete="list"
                   aria-expanded={isSuggestionsOpen}
                 />
-                <button
-                  type="submit"
-                  className="h-11 px-4 bg-white border-l border-[#E5E7EB] rounded-r-md text-[#6B7280] hover:text-[#F5820A] transition-colors"
-                  aria-label="Search"
-                >
-                  <FiSearch size={18} />
-                </button>
               </div>
             </form>
             <SuggestionsDropdown />
           </div>
 
-          <div className="flex items-center gap-3 lg:gap-4 shrink-0 ml-auto md:ml-0">
+          <div className="flex items-center gap-5 shrink-0 ml-auto md:ml-0">
             <button
               onClick={() => setIsMobileSearchOpen((v) => !v)}
-              className="md:hidden text-white hover:text-white/80 transition-colors"
+              className="md:hidden text-white hover:text-[#F97316] transition-colors"
               aria-label="Search"
             >
-              <FiSearch size={21} />
+              <FiSearch size={22} />
             </button>
 
             <button
               onClick={openCart}
-              className="relative text-white hover:text-white/80 transition-colors"
+              className="relative text-white hover:text-[#F97316] transition-colors"
               aria-label={`Cart, ${mounted ? totalItems : 0} items`}
             >
-              <FiShoppingCart size={21} />
+              <FiShoppingCart size={22} />
               {mounted && totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-[#0D0D0D] text-white text-[10px] font-bold min-w-4.5 h-4.5 rounded-full flex items-center justify-center leading-none px-1">
+                <span className="absolute -top-1.5 -right-2 w-4 h-4 rounded-full bg-[#F97316] text-white text-[9px] font-bold flex items-center justify-center leading-none shadow-[0_2px_8px_rgba(249,115,22,0.5)]">
                   {totalItems > 99 ? '99+' : totalItems}
                 </span>
               )}
             </button>
 
-            <Link href="/store/wishlist" className="hidden sm:block text-white hover:text-white/80 transition-colors" aria-label="Wishlist">
-              <FiHeart size={21} />
+            <Link href="/store/wishlist" className="hidden sm:block text-[#666666] hover:text-white transition-colors" aria-label="Wishlist">
+              <FiHeart size={22} />
             </Link>
 
             <Link
               href={isAuthenticated ? '/account' : '/auth/login'}
-              className="hidden sm:block text-white hover:text-white/80 transition-colors"
+              className="hidden sm:block text-[#666666] hover:text-white transition-colors"
               aria-label={isAuthenticated ? `Account: ${user?.firstName}` : 'Sign in'}
             >
-              <FiUser size={21} />
+              <FiUser size={22} />
             </Link>
 
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="md:hidden text-white hover:text-white/80 transition-colors"
+              className="md:hidden text-white hover:text-[#F97316] transition-colors"
               aria-label="Open menu"
             >
               <FiMenu size={22} />
@@ -262,27 +261,26 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Mobile search bar */}
         {isMobileSearchOpen && (
-          <div ref={mobileSearchRef} className="md:hidden bg-[#E06B00] px-4 pb-3 relative">
+          <div ref={mobileSearchRef} className="md:hidden bg-[#0A0A0A] px-4 pb-3 relative">
             <form onSubmit={handleSearch}>
-              <div className="flex">
+              <div className="relative">
+                <button
+                  type="submit"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#888888]"
+                  aria-label="Search"
+                >
+                  <FiSearch size={16} />
+                </button>
                 <input
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search for anything..."
                   autoFocus
-                  className="flex-1 h-10 px-4 text-sm text-[#111111] bg-white border-none outline-none rounded-l-md placeholder:text-[#9CA3AF]"
+                  className="sf-glass w-full rounded-[12px] py-2.5 pl-10 pr-3.5 text-sm text-white outline-none placeholder:text-[13px] placeholder:text-[#444444]"
                   aria-label="Search products"
                 />
-                <button
-                  type="submit"
-                  className="h-10 px-4 bg-white border-l border-[#E5E7EB] rounded-r-md text-[#6B7280] hover:text-[#F5820A] transition-colors"
-                  aria-label="Search"
-                >
-                  <FiSearch size={17} />
-                </button>
               </div>
             </form>
             <SuggestionsDropdown />
@@ -290,40 +288,48 @@ export function Navbar() {
         )}
       </header>
 
-      {/* ── Sub-nav (desktop) ── */}
-      <nav className="hidden md:block bg-white border-b border-[#E5E7EB] relative">
-        <div className="max-w-content mx-auto px-4 sm:px-6 lg:px-10 h-11 flex items-center gap-6">
+      <nav className="hidden md:block bg-[rgba(10,10,10,0.95)] backdrop-blur-xl border-b border-white/[0.05] relative">
+        <div className="px-8 py-2.5 flex items-center gap-6">
           <div className="relative">
             <button
               onClick={() => setIsMegaOpen((v) => !v)}
-              className="flex items-center gap-2 h-11 px-4 text-sm font-semibold bg-[#F5820A] text-white hover:bg-[#E06B00] transition-colors"
+              className="flex items-center gap-2 rounded-[8px] bg-linear-to-br from-[#F97316] to-[#EA580C] text-white px-4 py-2.5 text-[13px] font-semibold shadow-[0_4px_12px_rgba(249,115,22,0.3)] transition-transform hover:scale-[1.02]"
               aria-expanded={isMegaOpen}
               aria-haspopup="true"
             >
-              <span>All Category</span>
+              <FiGrid size={14} />
+              <span>All Categories</span>
               <FiChevronDown size={14} className={cn('transition-transform duration-200', isMegaOpen && 'rotate-180')} />
             </button>
             <MegaMenu isOpen={isMegaOpen} onClose={() => setIsMegaOpen(false)} />
           </div>
 
-          <div className="flex items-center gap-5 text-sm text-[#111111]">
-            <Link href="/store/support" className="flex items-center gap-1.5 hover:text-[#F5820A] transition-colors">
-              <FiHeadphones size={15} /> Customer Support
-            </Link>
-            <Link href="/store/need-help" className="flex items-center gap-1.5 hover:text-[#F5820A] transition-colors">
-              <FiHelpCircle size={15} /> Need Help
+          <div className="flex items-center gap-6 text-[13px] text-[#777777]">
+            {navCategories.map((cat) => (
+              <Link
+                key={cat.id}
+                href={`/store/category/${cat.slug}`}
+                className="hover:text-white transition-colors"
+              >
+                {cat.name}
+              </Link>
+            ))}
+            <Link href="/store/category/all" className="relative pl-3 text-[#F97316] font-semibold transition-colors before:absolute before:left-0 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full before:bg-[#F97316] before:animate-pulse">
+              Flash Sale
             </Link>
           </div>
 
-          <div className="ml-auto">
-            <Link href="/account/orders" className="flex items-center gap-1.5 text-sm text-[#111111] hover:text-[#F5820A] transition-colors">
-              <FiMapPin size={15} /> Track Order
+          <div className="ml-auto flex items-center gap-4 text-[13px] text-[#666666]">
+            <Link href="/account/orders" className="hover:text-white transition-colors">
+              Track Order
+            </Link>
+            <Link href="/store/support" className="hover:text-white transition-colors">
+              Support
             </Link>
           </div>
         </div>
       </nav>
 
-      {/* ── Mobile drawer ── */}
       {isMobileMenuOpen && (
         <>
           <div
@@ -332,57 +338,55 @@ export function Navbar() {
             aria-hidden="true"
           />
 
-          <div className="fixed inset-y-0 right-0 z-50 w-72 bg-white shadow-2xl md:hidden flex flex-col">
-
-            {/* Drawer header */}
-            <div className="flex items-center justify-between px-5 py-4 bg-[#F5820A]">
-              <Image
-                src="/icons/shopfresherz_logo_white_transparent.svg"
-                alt="ShopFresherz"
-                width={120}
-                height={30}
-                className="h-7 w-auto"
-              />
-              <button onClick={closeMenu} className="text-white hover:text-white/70 transition-colors" aria-label="Close menu">
+          <div className="fixed inset-y-0 right-0 z-50 w-72 bg-[#0D0D0D] shadow-2xl md:hidden flex flex-col border-l border-white/[0.08]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
+              <Link href="/store" onClick={closeMenu} className="flex items-center gap-2.5">
+                <span className="w-8 h-8 rounded-[8px] bg-[#F97316] text-white flex items-center justify-center text-sm font-bold">
+                  SF
+                </span>
+                <span className="flex flex-col leading-none">
+                  <span className="text-sm font-bold text-white">ShopFresherz</span>
+                  <span className="mt-1 text-[9px] text-[#555555] uppercase tracking-[1.5px]">
+                    Gadget Store
+                  </span>
+                </span>
+              </Link>
+              <button onClick={closeMenu} className="text-[#777777] hover:text-white transition-colors" aria-label="Close menu">
                 <FiX size={22} />
               </button>
             </div>
 
-            {/* Drawer body */}
             <div className="flex-1 overflow-y-auto">
-
-              {/* Auth row */}
-              <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
-                <div className="w-9 h-9 rounded-full bg-[#F5820A]/10 flex items-center justify-center">
-                  <FiUser size={18} className="text-[#F5820A]" />
+              <div className="flex items-center gap-3 px-5 py-4 border-b border-white/[0.05]">
+                <div className="w-9 h-9 rounded-[8px] bg-[rgba(249,115,22,0.12)] flex items-center justify-center">
+                  <FiUser size={18} className="text-[#F97316]" />
                 </div>
                 {isAuthenticated ? (
                   <div>
-                    <p className="text-sm font-semibold text-[#111111]">{user?.firstName}</p>
-                    <Link href="/account" onClick={closeMenu} className="text-xs text-[#F5820A]">
+                    <p className="text-sm font-medium text-white">{user?.firstName}</p>
+                    <Link href="/account" onClick={closeMenu} className="text-xs text-[#F97316]">
                       View Account →
                     </Link>
                   </div>
                 ) : (
                   <div>
-                    <Link href="/auth/login" onClick={closeMenu} className="text-sm font-semibold text-[#111111] hover:text-[#F5820A] transition-colors">
+                    <Link href="/auth/login" onClick={closeMenu} className="text-sm font-medium text-white hover:text-[#F97316] transition-colors">
                       Sign In
                     </Link>
-                    <p className="text-xs text-[#6B7280]">
+                    <p className="text-xs text-[#888888]">
                       or{' '}
-                      <Link href="/auth/register" onClick={closeMenu} className="text-[#F5820A]">
+                      <Link href="/auth/register" onClick={closeMenu} className="text-[#F97316]">
                         Create account
                       </Link>
                     </p>
                   </div>
                 )}
-                <Link href="/account/wishlist" onClick={closeMenu} className="ml-auto text-[#6B7280] hover:text-[#F5820A] transition-colors" aria-label="Wishlist">
+                <Link href="/account/wishlist" onClick={closeMenu} className="ml-auto text-[#444444] hover:text-[#F97316] transition-colors" aria-label="Wishlist">
                   <FiHeart size={20} />
                 </Link>
               </div>
 
-              {/* Static nav links */}
-              <nav className="py-2 border-b border-gray-100">
+              <nav className="py-2 border-b border-white/[0.05]">
                 {[
                   { id: 1, href: '/store',          icon: FiHome,       label: 'Home'             },
                   { id: 2, href: '/store/support',   icon: FiHeadphones, label: 'Customer Support' },
@@ -393,52 +397,50 @@ export function Navbar() {
                     key={id}
                     href={href}
                     onClick={closeMenu}
-                    className="flex items-center gap-3 px-5 py-3 text-sm text-[#111111] hover:bg-orange-50 hover:text-[#F5820A] transition-colors"
+                    className="flex items-center gap-3 px-5 py-3 text-sm text-[#A0A0A0] hover:bg-white/[0.04] hover:text-white transition-colors"
                   >
-                    <Icon size={16} className="text-[#6B7280]" />
+                    <Icon size={16} className="text-[#888888]" />
                     {label}
                   </Link>
                 ))}
               </nav>
 
-              {/* Categories accordion */}
               <div className="py-2">
                 <button
                   onClick={() => setIsMobileCatsOpen((v) => !v)}
-                  className="flex items-center justify-between w-full px-5 py-3 text-sm font-semibold text-[#111111] hover:bg-orange-50 hover:text-[#F5820A] transition-colors"
+                  className="flex items-center justify-between w-full px-5 py-3 text-sm font-medium text-white hover:bg-white/[0.04] hover:text-[#F97316] transition-colors"
                 >
                   <span className="flex items-center gap-3">
-                    <FiGrid size={16} className="text-[#6B7280]" />
+                    <FiGrid size={16} className="text-[#888888]" />
                     All Categories
                   </span>
                   <FiChevronRight
                     size={15}
-                    className={cn('text-[#6B7280] transition-transform duration-200', isMobileCatsOpen && 'rotate-90')}
+                    className={cn('text-[#888888] transition-transform duration-200', isMobileCatsOpen && 'rotate-90')}
                   />
                 </button>
 
                 {isMobileCatsOpen && (
-                  <div className="bg-[#FAFAFA] border-t border-gray-100">
-                    {/* "All products" shortcut */}
+                  <div className="bg-[#141414] border-t border-white/[0.05]">
                     <Link
                       href="/store/category/all"
                       onClick={closeMenu}
-                      className="flex items-center gap-2 px-8 py-2.5 text-sm text-[#F5820A] font-medium hover:bg-orange-50 transition-colors"
+                      className="flex items-center gap-2 px-8 py-2.5 text-sm text-[#F97316] font-medium hover:bg-[#FFF0E6] transition-colors"
                     >
                       All Products
                     </Link>
 
                     {allCategories.length === 0 ? (
-                      <p className="px-8 py-3 text-xs text-[#6B7280]">Loading…</p>
+                      <p className="px-8 py-3 text-xs text-[#888888]">Loading…</p>
                     ) : (
                       allCategories.map((cat) => (
                         <Link
                           key={cat.id}
                           href={`/store/category/${cat.slug}`}
                           onClick={closeMenu}
-                          className="flex items-center gap-2 px-8 py-2.5 text-sm text-[#111111] hover:bg-orange-50 hover:text-[#F5820A] transition-colors"
+                          className="flex items-center gap-2 px-8 py-2.5 text-sm text-[#A0A0A0] hover:bg-white/[0.04] hover:text-[#F97316] transition-colors"
                         >
-                          <span className="w-1 h-1 rounded-full bg-[#D1D5DB] shrink-0" />
+                          <span className="w-1 h-1 rounded-full bg-[#AAAAAA] shrink-0" />
                           {cat.name}
                         </Link>
                       ))
@@ -448,16 +450,15 @@ export function Navbar() {
               </div>
             </div>
 
-            {/* Drawer footer */}
-            <div className="border-t border-gray-100 p-4">
+            <div className="border-t border-white/[0.06] p-4">
               <button
                 onClick={() => { openCart(); closeMenu() }}
-                className="w-full flex items-center justify-center gap-2 bg-[#F5820A] text-white text-sm font-semibold py-2.5 rounded hover:bg-[#E06B00] transition-colors"
+                className="w-full flex items-center justify-center gap-2 bg-[#F97316] text-white text-sm font-medium py-2.5 rounded-[8px] hover:bg-[#EA580C] transition-colors"
               >
                 <FiShoppingCart size={16} />
                 View Cart
                 {mounted && totalItems > 0 && (
-                  <span className="bg-white text-[#F5820A] text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+                  <span className="bg-white text-[#F97316] text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
                     {totalItems}
                   </span>
                 )}

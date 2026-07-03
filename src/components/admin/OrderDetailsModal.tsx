@@ -70,7 +70,7 @@ const STATUS_OPTIONS: OrderStatus[] = [
 const statusStyles: Record<OrderStatus, string> = {
   Pending: "bg-yellow-50 text-yellow-600 border border-yellow-200",
   Processing: "bg-blue-50 text-blue-600 border border-blue-200",
-  Shipped: "bg-purple-50 text-purple-600 border border-purple-200",
+  Shipped: "bg-orange-50 text-orange-600 border border-orange-200",
   Delivered: "bg-green-50 text-green-600 border border-green-200",
   Cancelled: "bg-red-50 text-red-500 border border-red-200",
 };

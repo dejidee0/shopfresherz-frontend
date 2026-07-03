@@ -110,44 +110,44 @@
 //   const Icon = section.icon
 
 //   return (
-//     <div id={section.id} className="bg-white border border-[#E5E7EB] rounded-xl overflow-hidden">
+//     <div id={section.id} className="bg-[#141414] border border-white/[0.08] rounded-xl overflow-hidden">
 //       <button
 //         onClick={() => setOpen((v) => !v)}
-//         className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-orange-50 transition-colors"
+//         className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[#F97316]/10 transition-colors"
 //         aria-expanded={open}
 //       >
 //         <div className="flex items-center gap-3">
 //           <div className="w-9 h-9 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
-//             <Icon size={17} className="text-[#F5820A]" />
+//             <Icon size={17} className="text-[#F97316]" />
 //           </div>
 //           <div>
-//             <p className="font-bold text-sm text-[#111111]">{section.title}</p>
+//             <p className="font-bold text-sm text-white">{section.title}</p>
 //             <p className="text-xs text-[#6B7280] mt-0.5 hidden sm:block">{section.intro}</p>
 //           </div>
 //         </div>
 //         {open
-//           ? <FiChevronUp size={16} className="text-[#F5820A] shrink-0 ml-3" />
+//           ? <FiChevronUp size={16} className="text-[#F97316] shrink-0 ml-3" />
 //           : <FiChevronDown size={16} className="text-[#6B7280] shrink-0 ml-3" />}
 //       </button>
 
 //       {open && (
-//         <div className="px-5 pb-5 border-t border-[#E5E7EB] pt-4">
+//         <div className="px-5 pb-5 border-t border-white/[0.08] pt-4">
 //           <p className="text-sm text-[#6B7280] mb-4 leading-relaxed">{section.intro}</p>
 
 //           <ol className="space-y-3">
 //             {section.steps.map(({ step, text }) => (
 //               <li key={step} className="flex items-start gap-3">
-//                 <span className="w-6 h-6 rounded-full bg-[#F5820A] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+//                 <span className="w-6 h-6 rounded-full bg-[#F97316] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
 //                   {step}
 //                 </span>
-//                 <p className="text-sm text-[#111111] leading-relaxed">{text}</p>
+//                 <p className="text-sm text-white leading-relaxed">{text}</p>
 //               </li>
 //             ))}
 //           </ol>
 
 //           {section.note && (
 //             <div className="mt-4 flex items-start gap-2 bg-orange-50 border border-orange-100 rounded-lg px-4 py-3">
-//               <FiAlertCircle size={15} className="text-[#F5820A] shrink-0 mt-0.5" />
+//               <FiAlertCircle size={15} className="text-[#F97316] shrink-0 mt-0.5" />
 //               <p className="text-xs text-[#6B7280] leading-relaxed">{section.note}</p>
 //             </div>
 //           )}
@@ -166,7 +166,7 @@
 //       <section className="bg-[#0D0D0D] text-white py-14 px-4">
 //         <div className="max-w-3xl mx-auto text-center">
 //           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-white/10 mb-4">
-//             <FiHelpCircle size={28} className="text-[#F5820A]" />
+//             <FiHelpCircle size={28} className="text-[#F97316]" />
 //           </div>
 //           <h1 className="text-2xl sm:text-3xl font-extrabold mb-3">
 //             Help Centre
@@ -182,7 +182,7 @@
 
 //         {/* Help sections */}
 //         <section>
-//           <h2 className="text-base font-bold text-[#111111] mb-4 uppercase tracking-wide">
+//           <h2 className="text-base font-bold text-white mb-4 uppercase tracking-wide">
 //             How can we help?
 //           </h2>
 //           <div className="space-y-3">
@@ -194,7 +194,7 @@
 
 //         {/* Quick links */}
 //         <section>
-//           <h2 className="text-base font-bold text-[#111111] mb-4 uppercase tracking-wide">
+//           <h2 className="text-base font-bold text-white mb-4 uppercase tracking-wide">
 //             Quick Links
 //           </h2>
 //           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -202,7 +202,7 @@
 //               <Link
 //                 key={label}
 //                 href={href}
-//                 className="bg-white border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm font-medium text-[#111111] hover:border-[#F5820A] hover:text-[#F5820A] transition-colors text-center"
+//                 className="bg-[#141414] border border-white/[0.08] rounded-xl px-4 py-3 text-sm font-medium text-white hover:border-[#F97316] hover:text-[#F97316] transition-colors text-center"
 //               >
 //                 {label}
 //               </Link>
@@ -211,7 +211,7 @@
 //         </section>
 
 //         {/* Still need help CTA */}
-//         <section className="bg-[#F5820A] rounded-2xl p-6 sm:p-8 text-white text-center">
+//         <section className="bg-[#F97316] rounded-2xl p-6 sm:p-8 text-white text-center">
 //           <FiMessageCircle size={32} className="mx-auto mb-3 opacity-90" />
 //           <h2 className="text-lg font-extrabold mb-2">Still need help?</h2>
 //           <p className="text-white/85 text-sm leading-relaxed max-w-md mx-auto mb-6">
@@ -223,7 +223,7 @@
 //               href="https://wa.me/2349075308722"
 //               target="_blank"
 //               rel="noopener noreferrer"
-//               className="inline-flex items-center gap-2 bg-white text-[#F5820A] font-bold text-sm px-6 py-2.5 rounded-lg hover:bg-orange-50 transition-colors"
+//               className="inline-flex items-center gap-2 bg-white text-[#F97316] font-bold text-sm px-6 py-2.5 rounded-lg hover:bg-[#F97316]/10 transition-colors"
 //             >
 //               <RiWhatsappLine size={18} /> WhatsApp Us
 //             </a>
@@ -330,8 +330,8 @@ const SECTIONS: Section[] = [
       { step: 4, text: 'Warranty claims typically take 7–14 business days to resolve.' },
     ],
     note: 'Warranty does not cover physical damage, water damage, or faults caused by unauthorised repairs.',
-    accent: 'bg-purple-50',
-    accentText: 'text-purple-700',
+    accent: 'bg-orange-50',
+    accentText: 'text-[#C2410C]',
   },
   {
     id: 'orders',
@@ -367,15 +367,15 @@ function SectionBlock({ section }: { section: Section }) {
   return (
     <div
       id={section.id}
-      className={`bg-white border rounded-xl overflow-hidden transition-colors duration-150 ${
-        open ? 'border-[#F5820A]/40' : 'border-[#E5E7EB]'
+      className={`bg-[#141414] border rounded-xl overflow-hidden transition-colors duration-150 ${
+        open ? 'border-[#F97316]/40' : 'border-white/[0.08]'
       }`}
     >
       {/* Header button */}
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-orange-50/50 transition-colors gap-3"
+        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[#F97316]/10/50 transition-colors gap-3"
       >
         <div className="flex items-center gap-3 min-w-0">
           <div
@@ -384,7 +384,7 @@ function SectionBlock({ section }: { section: Section }) {
             <Icon size={16} className={section.accentText} />
           </div>
           <div className="min-w-0">
-            <p className="text-[13px] font-semibold text-[#111111] truncate">{section.title}</p>
+            <p className="text-[13px] font-semibold text-white truncate">{section.title}</p>
             <p className="text-[11px] text-[#9CA3AF] mt-0.5 hidden sm:block truncate">
               {section.intro}
             </p>
@@ -393,7 +393,7 @@ function SectionBlock({ section }: { section: Section }) {
         <span
           className={`w-[22px] h-[22px] rounded-full border flex items-center justify-center shrink-0 text-xs font-bold transition-colors ${
             open
-              ? 'border-[#F5820A]/40 bg-orange-50 text-[#E07200]'
+              ? 'border-[#F97316]/40 bg-[#F97316]/10 text-[#F97316]'
               : 'border-[#D1D5DB] text-[#6B7280]'
           }`}
         >
@@ -409,10 +409,10 @@ function SectionBlock({ section }: { section: Section }) {
           <ol className="space-y-3">
             {section.steps.map(({ step, text }) => (
               <li key={step} className="flex items-start gap-3">
-                <span className="w-[22px] h-[22px] rounded-full bg-[#F5820A] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                <span className="w-[22px] h-[22px] rounded-full bg-[#F97316] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                   {step}
                 </span>
-                <p className="text-[13px] text-[#374151] leading-relaxed">{text}</p>
+                <p className="text-[13px] text-[#D7D7D7] leading-relaxed">{text}</p>
               </li>
             ))}
           </ol>
@@ -449,7 +449,7 @@ export default function NeedHelpPage() {
         />
         <div className="relative z-10 max-w-3xl mx-auto flex items-center gap-6">
           <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
-            <FiHelpCircle size={26} className="text-[#F5820A]" />
+            <FiHelpCircle size={26} className="text-[#F97316]" />
           </div>
           <div className="flex-1">
             <h1 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight mb-1">
@@ -460,7 +460,7 @@ export default function NeedHelpPage() {
               and order issues. Find what you need below.
             </p>
           </div>
-          <span className="hidden sm:inline-flex shrink-0 items-center rounded-full border border-[#F5820A]/35 bg-[#F5820A]/12 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#F5820A]">
+          <span className="hidden sm:inline-flex shrink-0 items-center rounded-full border border-[#F97316]/35 bg-[#F97316]/12 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#F97316]">
             Help guides
           </span>
         </div>
@@ -481,7 +481,7 @@ export default function NeedHelpPage() {
         </section>
 
         {/* ── Divider ── */}
-        <hr className="border-[#E5E7EB]" />
+        <hr className="border-white/[0.08]" />
 
         {/* ── Quick links ── */}
         <section>
@@ -493,7 +493,7 @@ export default function NeedHelpPage() {
               <Link
                 key={label}
                 href={href}
-                className="bg-white border border-[#E5E7EB] rounded-xl px-4 py-3 text-[12px] font-medium text-[#374151] hover:border-[#F5820A] hover:text-[#E07200] transition-all duration-150 text-center hover:-translate-y-0.5"
+                className="bg-[#141414] border border-white/[0.08] rounded-xl px-4 py-3 text-[12px] font-medium text-[#D7D7D7] hover:border-[#F97316] hover:text-[#E07200] transition-all duration-150 text-center hover:-translate-y-0.5"
               >
                 {label}
               </Link>
@@ -502,12 +502,12 @@ export default function NeedHelpPage() {
         </section>
 
         {/* ── Divider ── */}
-        <hr className="border-[#E5E7EB]" />
+        <hr className="border-white/[0.08]" />
 
         {/* ── Still need help CTA ── */}
         <section
           className="relative overflow-hidden rounded-2xl px-6 py-8 sm:px-8 text-white text-center"
-          style={{ background: 'linear-gradient(135deg, #c45e00 0%, #e07200 40%, #f5820a 100%)' }}
+          style={{ background: 'linear-gradient(135deg, #c45e00 0%, #e07200 40%, #F97316 100%)' }}
         >
           {/* Subtle inner glow ring */}
           <div
@@ -531,7 +531,7 @@ export default function NeedHelpPage() {
                 href="https://wa.me/2349075308722"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-white text-[#C45E00] font-semibold text-[13px] px-6 py-2.5 rounded-xl hover:bg-orange-50 transition-colors"
+                className="inline-flex items-center gap-2 bg-white text-[#C45E00] font-semibold text-[13px] px-6 py-2.5 rounded-xl hover:bg-[#F97316]/10 transition-colors"
               >
                 <RiWhatsappLine size={17} /> WhatsApp us
               </a>

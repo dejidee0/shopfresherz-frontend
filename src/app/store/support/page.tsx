@@ -44,7 +44,7 @@
 //     sub: 'Mon – Sat, 8 am – 8 pm',
 //     href: 'tel:+2349075308722',
 //     cta: 'Call now',
-//     color: 'bg-orange-50 text-[#F5820A]',
+//     color: 'bg-orange-50 text-[#F97316]',
 //   },
 //   {
 //     icon: RiWhatsappLine,
@@ -85,19 +85,19 @@
 // function FaqItem({ q, a }: { q: string; a: string }) {
 //   const [open, setOpen] = useState(false)
 //   return (
-//     <div className="border border-[#E5E7EB] rounded-lg overflow-hidden">
+//     <div className="border border-white/[0.08] rounded-lg overflow-hidden">
 //       <button
 //         onClick={() => setOpen((v) => !v)}
-//         className="w-full flex items-center justify-between px-5 py-4 text-left text-sm font-semibold text-[#111111] hover:bg-orange-50 transition-colors"
+//         className="w-full flex items-center justify-between px-5 py-4 text-left text-sm font-semibold text-white hover:bg-[#F97316]/10 transition-colors"
 //         aria-expanded={open}
 //       >
 //         <span>{q}</span>
 //         {open
-//           ? <FiChevronUp size={16} className="text-[#F5820A] shrink-0 ml-3" />
+//           ? <FiChevronUp size={16} className="text-[#F97316] shrink-0 ml-3" />
 //           : <FiChevronDown size={16} className="text-[#6B7280] shrink-0 ml-3" />}
 //       </button>
 //       {open && (
-//         <div className="px-5 pb-4 text-sm text-[#6B7280] leading-relaxed border-t border-[#E5E7EB] pt-3">
+//         <div className="px-5 pb-4 text-sm text-[#6B7280] leading-relaxed border-t border-white/[0.08] pt-3">
 //           {a}
 //         </div>
 //       )}
@@ -110,7 +110,7 @@
 //     <div className="bg-[#F5F5F5] min-h-screen">
 
 //       {/* Hero */}
-//       <section className="bg-[#F5820A] text-white py-14 px-4">
+//       <section className="bg-[#F97316] text-white py-14 px-4">
 //         <div className="max-w-3xl mx-auto text-center">
 //           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-white/20 mb-4">
 //             <FiHeadphones size={28} />
@@ -129,7 +129,7 @@
 
 //         {/* Contact channels */}
 //         <section>
-//           <h2 className="text-base font-bold text-[#111111] mb-4 uppercase tracking-wide">
+//           <h2 className="text-base font-bold text-white mb-4 uppercase tracking-wide">
 //             Get in Touch
 //           </h2>
 //           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -139,17 +139,17 @@
 //                 href={href}
 //                 target={href.startsWith('http') ? '_blank' : undefined}
 //                 rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
-//                 className="bg-white border border-[#E5E7EB] rounded-xl p-5 flex flex-col gap-3 hover:border-[#F5820A] hover:shadow-md transition-all group"
+//                 className="bg-[#141414] border border-white/[0.08] rounded-xl p-5 flex flex-col gap-3 hover:border-[#F97316] hover:shadow-md transition-all group"
 //               >
 //                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${color}`}>
 //                   <Icon size={20} />
 //                 </div>
 //                 <div>
-//                   <p className="font-bold text-sm text-[#111111]">{title}</p>
-//                   <p className="text-sm text-[#F5820A] font-medium mt-0.5">{detail}</p>
+//                   <p className="font-bold text-sm text-white">{title}</p>
+//                   <p className="text-sm text-[#F97316] font-medium mt-0.5">{detail}</p>
 //                   <p className="text-xs text-[#6B7280] mt-0.5">{sub}</p>
 //                 </div>
-//                 <span className="text-xs font-semibold text-[#F5820A] group-hover:underline mt-auto">
+//                 <span className="text-xs font-semibold text-[#F97316] group-hover:underline mt-auto">
 //                   {cta} →
 //                 </span>
 //               </a>
@@ -159,10 +159,10 @@
 
 //         {/* Business hours + location */}
 //         <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-//           <div className="bg-white border border-[#E5E7EB] rounded-xl p-5">
+//           <div className="bg-[#141414] border border-white/[0.08] rounded-xl p-5">
 //             <div className="flex items-center gap-2 mb-4">
-//               <FiClock size={16} className="text-[#F5820A]" />
-//               <h2 className="font-bold text-sm text-[#111111] uppercase tracking-wide">
+//               <FiClock size={16} className="text-[#F97316]" />
+//               <h2 className="font-bold text-sm text-white uppercase tracking-wide">
 //                 Business Hours
 //               </h2>
 //             </div>
@@ -173,7 +173,7 @@
 //                 ['Sunday',          'Closed'],
 //               ].map(([day, hours]) => (
 //                 <li key={day} className="flex justify-between">
-//                   <span className="text-[#111111] font-medium">{day}</span>
+//                   <span className="text-white font-medium">{day}</span>
 //                   <span>{hours}</span>
 //                 </li>
 //               ))}
@@ -184,14 +184,14 @@
 //             </p>
 //           </div>
 
-//           <div className="bg-white border border-[#E5E7EB] rounded-xl p-5">
+//           <div className="bg-[#141414] border border-white/[0.08] rounded-xl p-5">
 //             <div className="flex items-center gap-2 mb-4">
-//               <FiMapPin size={16} className="text-[#F5820A]" />
-//               <h2 className="font-bold text-sm text-[#111111] uppercase tracking-wide">
+//               <FiMapPin size={16} className="text-[#F97316]" />
+//               <h2 className="font-bold text-sm text-white uppercase tracking-wide">
 //                 Our Location
 //               </h2>
 //             </div>
-//             <p className="text-sm text-[#111111] font-semibold">ShopFresherz HQ</p>
+//             <p className="text-sm text-white font-semibold">ShopFresherz HQ</p>
 //             <p className="text-sm text-[#6B7280] mt-1 leading-relaxed">
 //               Lagos, Nigeria
 //             </p>
@@ -201,7 +201,7 @@
 //             </p>
 //             <a
 //               href="tel:+2349075308722"
-//               className="inline-flex items-center gap-1.5 mt-4 text-xs font-semibold text-[#F5820A] hover:underline"
+//               className="inline-flex items-center gap-1.5 mt-4 text-xs font-semibold text-[#F97316] hover:underline"
 //             >
 //               <FiPhone size={12} /> Book a pickup call
 //             </a>
@@ -210,7 +210,7 @@
 
 //         {/* Quick topic links */}
 //         <section>
-//           <h2 className="text-base font-bold text-[#111111] mb-4 uppercase tracking-wide">
+//           <h2 className="text-base font-bold text-white mb-4 uppercase tracking-wide">
 //             What do you need help with?
 //           </h2>
 //           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -218,12 +218,12 @@
 //               <Link
 //                 key={label}
 //                 href={href}
-//                 className="bg-white border border-[#E5E7EB] rounded-xl p-4 flex flex-col items-center gap-2 text-center hover:border-[#F5820A] hover:shadow-sm transition-all"
+//                 className="bg-[#141414] border border-white/[0.08] rounded-xl p-4 flex flex-col items-center gap-2 text-center hover:border-[#F97316] hover:shadow-sm transition-all"
 //               >
 //                 <div className="w-9 h-9 rounded-full bg-orange-50 flex items-center justify-center">
-//                   <Icon size={17} className="text-[#F5820A]" />
+//                   <Icon size={17} className="text-[#F97316]" />
 //                 </div>
-//                 <span className="text-xs font-semibold text-[#111111]">{label}</span>
+//                 <span className="text-xs font-semibold text-white">{label}</span>
 //               </Link>
 //             ))}
 //           </div>
@@ -231,7 +231,7 @@
 
 //         {/* FAQ */}
 //         <section id="faq">
-//           <h2 className="text-base font-bold text-[#111111] mb-4 uppercase tracking-wide">
+//           <h2 className="text-base font-bold text-white mb-4 uppercase tracking-wide">
 //             Frequently Asked Questions
 //           </h2>
 //           <div className="space-y-3">
@@ -241,7 +241,7 @@
 //           </div>
 //           <p className="text-sm text-[#6B7280] mt-5 text-center">
 //             Didn&apos;t find your answer?{' '}
-//             <Link href="/store/need-help" className="text-[#F5820A] font-semibold hover:underline">
+//             <Link href="/store/need-help" className="text-[#F97316] font-semibold hover:underline">
 //               Visit our Help Centre →
 //             </Link>
 //           </p>
@@ -348,19 +348,19 @@ function FaqItem({ q, a }: { q: string; a: string }) {
   return (
     <div
       className={`border rounded-xl overflow-hidden transition-colors ${
-        open ? 'border-[#F5820A]/40' : 'border-[#E5E7EB]'
+        open ? 'border-[#F97316]/40' : 'border-white/[0.08]'
       }`}
     >
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="w-full flex items-center justify-between px-5 py-4 text-left text-sm font-medium text-[#111111] hover:bg-orange-50/60 transition-colors gap-3"
+        className="w-full flex items-center justify-between px-5 py-4 text-left text-sm font-medium text-white hover:bg-white/[0.04] transition-colors gap-3"
       >
         <span>{q}</span>
         <span
           className={`w-[22px] h-[22px] rounded-full border flex items-center justify-center shrink-0 transition-colors text-xs font-bold ${
             open
-              ? 'border-[#F5820A]/40 bg-orange-50 text-[#E07200]'
+              ? 'border-[#F97316]/40 bg-[#F97316]/10 text-[#F97316]'
               : 'border-[#D1D5DB] text-[#6B7280]'
           }`}
         >
@@ -368,7 +368,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
         </span>
       </button>
       {open && (
-        <div className="px-5 pb-4 pt-3 text-sm text-[#6B7280] leading-relaxed border-t border-[#E5E7EB]">
+        <div className="px-5 pb-4 pt-3 text-sm text-[#6B7280] leading-relaxed border-t border-white/[0.08]">
           {a}
         </div>
       )}
@@ -395,7 +395,7 @@ export default function CustomerSupportPage() {
         />
         <div className="relative z-10 max-w-3xl mx-auto flex items-center gap-6">
           <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
-            <FiHeadphones size={26} className="text-[#F5820A]" />
+            <FiHeadphones size={26} className="text-[#F97316]" />
           </div>
           <div className="flex-1">
             <h1 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight mb-1">
@@ -406,7 +406,7 @@ export default function CustomerSupportPage() {
               our frequently asked questions — we typically respond within minutes.
             </p>
           </div>
-          <span className="hidden sm:inline-flex shrink-0 items-center rounded-full border border-[#F5820A]/40 bg-[#F5820A]/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#F5820A]">
+          <span className="hidden sm:inline-flex shrink-0 items-center rounded-full border border-[#F97316]/40 bg-[#F97316]/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#F97316]">
             Live support
           </span>
         </div>
@@ -426,13 +426,13 @@ export default function CustomerSupportPage() {
                 href={href}
                 target={href.startsWith('http') ? '_blank' : undefined}
                 rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                className="group bg-white border border-[#E5E7EB] rounded-xl p-[18px] flex flex-col gap-3 hover:border-[#F5820A] hover:-translate-y-0.5 transition-all duration-150"
+                className="group bg-[#141414] border border-white/[0.08] rounded-xl p-[18px] flex flex-col gap-3 hover:border-[#F97316] hover:-translate-y-0.5 transition-all duration-150"
               >
                 <div className={`w-9 h-9 rounded-[10px] ${bg} flex items-center justify-center`}>
                   <Icon size={17} className={iconColor} />
                 </div>
                 <div>
-                  <p className="text-[13px] font-semibold text-[#111111]">{title}</p>
+                  <p className="text-[13px] font-semibold text-white">{title}</p>
                   <p className="text-[12px] font-medium text-[#E07200] mt-0.5">{detail}</p>
                   <p className="text-[11px] text-[#9CA3AF] mt-0.5">{sub}</p>
                 </div>
@@ -445,12 +445,12 @@ export default function CustomerSupportPage() {
         </section>
 
         {/* ── Divider ── */}
-        <hr className="border-[#E5E7EB]" />
+        <hr className="border-white/[0.08]" />
 
         {/* ── Business hours + Location ── */}
         <section className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Hours */}
-          <div className="bg-white border border-[#E5E7EB] rounded-xl p-5">
+          <div className="bg-[#141414] border border-white/[0.08] rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <FiClock size={14} className="text-[#E07200]" />
               <p className="text-[10px] font-semibold uppercase tracking-[1.2px] text-[#9CA3AF]">
@@ -469,7 +469,7 @@ export default function CustomerSupportPage() {
                   key={day}
                   className="flex justify-between items-center py-[7px] border-b border-[#F3F4F6] last:border-b-0"
                 >
-                  <span className="text-[12px] font-medium text-[#111111]">{day}</span>
+                  <span className="text-[12px] font-medium text-white">{day}</span>
                   <span className="text-[12px] text-[#6B7280]">{hours}</span>
                 </li>
               ))}
@@ -480,14 +480,14 @@ export default function CustomerSupportPage() {
           </div>
 
           {/* Location */}
-          <div className="bg-white border border-[#E5E7EB] rounded-xl p-5">
+          <div className="bg-[#141414] border border-white/[0.08] rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <FiMapPin size={14} className="text-[#E07200]" />
               <p className="text-[10px] font-semibold uppercase tracking-[1.2px] text-[#9CA3AF]">
                 Our location
               </p>
             </div>
-            <p className="text-[13px] font-semibold text-[#111111]">ShopFresherz HQ</p>
+            <p className="text-[13px] font-semibold text-white">ShopFresherz HQ</p>
             <p className="text-[12px] text-[#6B7280] mt-1">Lagos, Nigeria</p>
             <p className="text-[11px] text-[#9CA3AF] mt-3 leading-relaxed">
               We operate primarily online and deliver nationwide across Nigeria.
@@ -503,7 +503,7 @@ export default function CustomerSupportPage() {
         </section>
 
         {/* ── Divider ── */}
-        <hr className="border-[#E5E7EB]" />
+        <hr className="border-white/[0.08]" />
 
         {/* ── Topic shortcuts ── */}
         <section>
@@ -515,19 +515,19 @@ export default function CustomerSupportPage() {
               <Link
                 key={label}
                 href={href}
-                className="bg-white border border-[#E5E7EB] rounded-xl p-4 flex flex-col items-center gap-2 text-center hover:border-[#F5820A] hover:-translate-y-0.5 transition-all duration-150"
+                className="bg-[#141414] border border-white/[0.08] rounded-xl p-4 flex flex-col items-center gap-2 text-center hover:border-[#F97316] hover:-translate-y-0.5 transition-all duration-150"
               >
                 <div className="w-9 h-9 rounded-[10px] bg-orange-50 flex items-center justify-center">
                   <Icon size={16} className="text-[#E07200]" />
                 </div>
-                <span className="text-[11px] font-medium text-[#111111] leading-snug">{label}</span>
+                <span className="text-[11px] font-medium text-white leading-snug">{label}</span>
               </Link>
             ))}
           </div>
         </section>
 
         {/* ── Divider ── */}
-        <hr className="border-[#E5E7EB]" />
+        <hr className="border-white/[0.08]" />
 
         {/* ── FAQ ── */}
         <section id="faq">

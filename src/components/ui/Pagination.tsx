@@ -99,8 +99,8 @@ function PageBtn({ children, onClick, active, disabled, ...rest }: PageBtnProps)
       className={cn(
         'w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-150 select-none',
         active
-          ? 'bg-[#F5820A] text-white shadow-sm shadow-orange-200'
-          : 'border border-[#E5E7EB] text-[#6B7280] bg-white hover:border-[#F5820A] hover:text-[#F5820A]',
+          ? 'bg-[#F97316] text-white shadow-sm shadow-orange-500/20'
+          : 'border border-white/[0.1] text-[#A0A0A0] bg-[#141414] hover:border-[#F97316] hover:text-[#F97316]',
         disabled && 'opacity-40 cursor-not-allowed pointer-events-none'
       )}
       {...rest}

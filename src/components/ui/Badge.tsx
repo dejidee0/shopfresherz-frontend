@@ -11,36 +11,30 @@ interface BadgeProps {
 
 const variantConfig: Record<
   BadgeVariant,
-  { bg: string; text: string; defaultLabel: string }
+  { className: string; defaultLabel: string }
 > = {
   sale: {
-    bg: 'bg-[#F5820A]',
-    text: 'text-white',
+    className: 'badge-orange',
     defaultLabel: 'SALE',
   },
   new: {
-    bg: 'bg-[#7B2FBE]',
-    text: 'text-white',
+    className: 'badge-dark',
     defaultLabel: 'NEW',
   },
   hot: {
-    bg: 'bg-[#EF4444]',
-    text: 'text-white',
+    className: 'badge-dark',
     defaultLabel: '🔥 HOT',
   },
   out_of_stock: {
-    bg: 'bg-[#6B7280]',
-    text: 'text-white',
+    className: 'badge-red',
     defaultLabel: 'OUT OF STOCK',
   },
   low_stock: {
-    bg: 'bg-[#F59E0B]',
-    text: 'text-white',
+    className: 'badge-orange',
     defaultLabel: 'LOW STOCK',
   },
   custom: {
-    bg: 'bg-[#0D0D0D]',
-    text: 'text-white',
+    className: 'badge-blue',
     defaultLabel: '',
   },
 }
@@ -56,9 +50,8 @@ export function Badge({ variant, label, discountPercent, className }: BadgeProps
   return (
     <span
       className={cn(
-        'inline-flex items-center px-1.5 py-0.5 rounded-badge text-[9px] md:text-[11px] font-bold leading-none uppercase tracking-wide rounded',
-        config.bg,
-        config.text,
+        'badge leading-none uppercase',
+        config.className,
         className
       )}
     >

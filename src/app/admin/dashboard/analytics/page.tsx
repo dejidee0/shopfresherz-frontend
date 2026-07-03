@@ -534,8 +534,8 @@ export default function AnalyticsPage() {
             label="This Month"
             value={fmt(data.revenueThisMonth)}
             sub="Revenue this month"
-            iconBg="bg-purple-50"
-            iconColor="text-purple-500"
+            iconBg="bg-orange-50"
+            iconColor="text-orange-500"
           />
           <StatCard
             icon={HiOutlineCurrencyDollar}
@@ -581,8 +581,8 @@ export default function AnalyticsPage() {
             label="Shipped"
             value={data.shippedOrders}
             sub="On the way"
-            iconBg="bg-purple-50"
-            iconColor="text-purple-500"
+            iconBg="bg-orange-50"
+            iconColor="text-orange-500"
           />
         </div>
       </div>

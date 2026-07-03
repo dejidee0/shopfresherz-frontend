@@ -6,10 +6,8 @@ import Image from "next/image";
 import { cn } from "@/lib/utils/format";
 import { productsApi } from "@/lib/api/products";
 import type { Banner } from "@/lib/types/product";
-import { FiArrowRight } from "react-icons/fi";
+import { FiArrowRight, FiChevronRight, FiZap } from "react-icons/fi";
 import { CarouselSkeleton, HeroPromoSkeleton } from "./Skeletons";
-
-/* ─── Slide types ─────────────────────────────────────────────────── */
 
 interface HeroSlide {
   id: string;
@@ -40,13 +38,11 @@ function bannerToSlide(banner: Banner): HeroSlide {
   return {
     ...banner,
     tag: undefined,
-    tagColor: "text-[#A5F3FC]",
+    tagColor: "text-[#F97316]",
     theme: "dark",
-    bgColor: "bg-linear-to-br from-[#0B1120] via-[#0D2758] to-[#0B4A8D]",
+    bgColor: "bg-linear-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460]",
   };
 }
-
-/* ─── Component ───────────────────────────────────────────────────── */
 
 export function HeroBanner() {
   const [current, setCurrent] = useState(0);
@@ -68,11 +64,14 @@ export function HeroBanner() {
 
   const total = slides?.length || 0;
 
-  const next = useCallback(() => setCurrent((c) => (c + 1) % total), [total]);
-  const prev = useCallback(
-    () => setCurrent((c) => (c - 1 + total) % total),
-    [total],
-  );
+  const next = useCallback(() => {
+    if (!total) return;
+    setCurrent((c) => (c + 1) % total);
+  }, [total]);
+  const prev = useCallback(() => {
+    if (!total) return;
+    setCurrent((c) => (c - 1 + total) % total);
+  }, [total]);
   const goTo = useCallback((i: number) => setCurrent(i), []);
 
   useEffect(() => {
@@ -125,17 +124,21 @@ export function HeroBanner() {
   }, []);
 
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || total < 2) return;
     intervalRef.current = setInterval(next, 7000);
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [isPaused, next]);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isPaused, next, total]);
 
   useEffect(() => {
     if (isPromoPaused1 || promos.length < 2) return;
     promoInterval1Ref.current = setInterval(() => {
       setPromoIndex1((i) => (i + 1) % promos.length);
     }, 5000);
-    return () => { if (promoInterval1Ref.current) clearInterval(promoInterval1Ref.current); };
+    return () => {
+      if (promoInterval1Ref.current) clearInterval(promoInterval1Ref.current);
+    };
   }, [isPromoPaused1, promos.length]);
 
   useEffect(() => {
@@ -143,7 +146,9 @@ export function HeroBanner() {
     promoInterval2Ref.current = setInterval(() => {
       setPromoIndex2((i) => (i + 1) % promos.length);
     }, 7000);
-    return () => { if (promoInterval2Ref.current) clearInterval(promoInterval2Ref.current); };
+    return () => {
+      if (promoInterval2Ref.current) clearInterval(promoInterval2Ref.current);
+    };
   }, [isPromoPaused2, promos.length]);
 
   function handleTouchStart(e: React.TouchEvent) {
@@ -157,16 +162,17 @@ export function HeroBanner() {
     touchStartX.current = null;
   }
 
-  return (
-    <section className="max-w-content mx-auto px-3 sm:px-6 lg:px-10 py-3 sm:py-4 lg:py-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
+  const promo1 = promos[promoIndex1];
+  const promo2 = promos[promoIndex2];
 
-        {/* ━━━━━━ LEFT: Hero Slider ━━━━━━ */}
+  return (
+    <section className="w-full bg-[#0A0A0A] px-4 py-6 md:px-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-4 min-h-[520px]">
         {isSlideLoading ? (
           <CarouselSkeleton />
         ) : (
           <div
-            className="lg:col-span-2 relative overflow-hidden rounded-2xl h-50 sm:h-70 lg:h-105"
+            className="relative overflow-hidden rounded-[24px] min-h-[480px] bg-linear-to-br from-[#1a0800] via-[#0D0D0D] to-[#0a1020] border border-[rgba(249,115,22,0.15)] shadow-[inset_0_0_80px_rgba(249,115,22,0.05)]"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
             onTouchStart={handleTouchStart}
@@ -176,104 +182,74 @@ export function HeroBanner() {
             aria-roledescription="carousel"
           >
             <div
-              className="flex h-full transition-transform duration-1200 ease-in-out"
+              className="flex h-full transition-transform duration-700 ease-in-out"
               style={{ transform: `translateX(-${current * 100}%)` }}
             >
               {slides?.map((s, i) => {
-                const dark = s.theme === "dark";
                 const isActive = i === current;
+                const titleWords = s.title.split(" ");
+                const lastWord = titleWords.pop();
+                const leadingTitle = titleWords.join(" ");
+
                 return (
                   <div
                     key={s.id}
-                    className={cn(
-                      "min-w-full h-full",
-                      // s.bgColor ?? "bg-linear-to-br from-[#0B1120] via-[#0D2758] to-[#0B4A8D]",
-                       "bg-black",
-                    )}
+                    className="min-w-full min-h-[480px]"
                     aria-roledescription="slide"
                     aria-label={s.title}
                   >
-                    <div className="relative h-full md:flex md:flex-row md:items-center md:px-8 lg:px-10">
+                    <div className="relative grid min-h-[480px] grid-cols-1 md:grid-cols-[1fr_42%] items-end gap-5 px-6 py-10 sm:px-12 sm:py-12">
+                      <div className="pointer-events-none absolute right-0 top-0 h-[300px] w-[300px] rounded-full bg-[radial-gradient(circle,rgba(249,115,22,0.08)_0%,transparent_70%)]" />
                       <div
                         className={cn(
-                          "absolute inset-y-0 right-0 w-[55%] md:hidden pointer-events-none select-none",
-                          "transition-all duration-1200 ease-out delay-300 will-change-transform",
-                          isActive ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4",
+                          "relative z-10 max-w-xl pb-6 transition-all duration-700",
+                          isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
                         )}
                       >
-                        {s.imageUrl && (
-                          <Image src={s.imageUrl} alt={s.title} fill sizes="55vw"
-                            className="object-contain object-right-center"
-                            style={{ mixBlendMode: "multiply" }} priority={i === 0} />
-                        )}
-                      </div>
+                        <span className="sf-badge sf-badge-orange mb-4">{s.tag ?? "Fresh Deal"}</span>
 
-                      <div
-                        className={cn(
-                          "relative z-10 flex flex-col items-start text-left h-full justify-center",
-                          "pl-4 pr-[48%] py-5 sm:pl-6 sm:pr-[50%] sm:py-7 md:flex-1 md:pr-0 md:pl-0 md:py-8",
-                          "transition-all duration-1200 ease-out will-change-transform",
-                          isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-                        )}
-                      >
-                        {s.tag && (
-                          <p className={cn(
-                            "text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-widest mb-1 sm:mb-1.5 md:mb-2 flex items-center gap-1.5",
-                            s.tagColor,
-                            isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3",
-                            "transition-all duration-1200 ease-out delay-300",
-                          )}>
-                            <span className="w-4 h-0.5 bg-current hidden md:inline-block" />
-                            {s.tag}
-                          </p>
-                        )}
-                        <h2 className={cn(
-                          "font-extrabold leading-tight mb-1.5 sm:mb-2 md:mb-3",
-                          "text-base sm:text-xl md:text-3xl lg:text-4xl",
-                          dark ? "text-white" : "text-[#111111]",
-                          isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-                          "transition-all duration-1200 ease-out delay-400",
-                        )}>
-                          {s.title}
-                        </h2>
-                        <p className={cn(
-                          "leading-relaxed mb-3 sm:mb-4 md:mb-6",
-                          "text-[10px] sm:text-xs md:text-sm",
-                          "max-w-40 sm:max-w-50 md:max-w-xs",
-                          "hidden xs:block sm:block",
-                          dark ? "text-white/70" : "text-[#6B7280]",
-                          isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-                          "transition-all duration-1200 ease-out delay-500",
-                        )}>
+                        <h1 className="text-[34px] sm:text-[44px] font-bold leading-[1.1] text-white tracking-[-1.5px]">
+                          {leadingTitle}{" "}
+                          {lastWord && <span className="text-[#F97316] sf-text-glow">{lastWord}</span>}
+                        </h1>
+
+                        <p className="mt-3 max-w-[420px] text-[15px] leading-[1.6] text-[#888888]">
                           {s.subTitle}
                         </p>
-                        <Link href={s.linkUrl} className={cn(
-                          "inline-flex items-center gap-1.5",
-                          "text-[10px] sm:text-xs md:text-sm font-semibold",
-                          "px-3 py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3 rounded-lg",
-                          "bg-linear-to-r from-[#F5820A] to-[#E06B00] text-white",
-                          "hover:shadow-lg hover:shadow-orange-200/50 transition-all active:scale-[0.97]",
-                          isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-                          "duration-1200 ease-out delay-600",
-                        )}>
-                          {s.ctaText}
-                          <FiArrowRight size={12} />
-                        </Link>
+
+                        <div className="mt-5 flex items-center gap-3 flex-wrap">
+                          <span className="text-[34px] font-bold text-white">Fresh Deal</span>
+                          <span className="text-base text-[#555555] line-through">Regular Price</span>
+                          <span className="sf-badge sf-badge-orange">Save More</span>
+                        </div>
+
+                        <div className="mt-6 flex items-center gap-3">
+                          <Link
+                            href={s.linkUrl}
+                            className="sf-btn-primary"
+                          >
+                            {s.ctaText || "Shop Now"} <FiArrowRight size={15} />
+                          </Link>
+                          <Link
+                            href={s.linkUrl}
+                            className="sf-btn-ghost"
+                          >
+                            Learn More
+                          </Link>
+                        </div>
                       </div>
 
-                      <div className={cn(
-                        "hidden md:flex flex-1 items-center justify-center w-full",
-                        "transition-all duration-1200 ease-out delay-300 will-change-transform",
-                        isActive ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-4 scale-[0.98]",
-                      )}>
-                        <div className="relative w-full h-75 sm:h-85 md:h-90 lg:h-100 md:aspect-square md:max-w-95 lg:max-w-110">
-                          {s.imageUrl && (
-                            <Image src={s.imageUrl} alt={s.title} fill
-                              sizes="(max-width: 768px) 80vw, 40vw"
-                              className="object-contain"
-                              style={{ mixBlendMode: "multiply" }} priority={i === 0} />
-                          )}
-                        </div>
+                      <div className="relative hidden h-[360px] md:block">
+                        {s.imageUrl && (
+                          <Image
+                            src={s.imageUrl}
+                            alt={s.title}
+                            fill
+                            sizes="(max-width: 1024px) 40vw, 360px"
+                            className="object-contain drop-shadow-2xl"
+                            priority={i === 0}
+                          />
+                        )}
                       </div>
                     </div>
                   </div>
@@ -281,14 +257,14 @@ export function HeroBanner() {
               })}
             </div>
 
-            <div className="absolute bottom-3 sm:bottom-4 left-8.75 sm:left-6 lg:left-10 flex items-center gap-1.5 z-10">
-              {slides?.map((_, i) => (
-                <button key={i} onClick={() => goTo(i)}
+            <div className="absolute bottom-6 right-6 flex items-center gap-2 z-10">
+              {slides?.slice(0, 4).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => goTo(i)}
                   className={cn(
-                    "rounded-full transition-all duration-300",
-                    i === current
-                      ? "w-4 sm:w-5 h-1.5 sm:h-2 bg-[#F5820A]"
-                      : "w-1.5 sm:w-2 h-1.5 sm:h-2 bg-[#D1D5DB] hover:bg-[#F5820A]/50",
+                    "h-2 rounded-full transition-all duration-300",
+                    i === current ? "w-7 bg-[#F97316] shadow-[0_0_8px_rgba(249,115,22,0.6)]" : "w-2 bg-[#6B7280]",
                   )}
                   aria-label={`Go to slide ${i + 1}`}
                   aria-current={i === current}
@@ -298,165 +274,111 @@ export function HeroBanner() {
           </div>
         )}
 
-        {/* ━━━━━━ RIGHT: Two Promo Carousels ━━━━━━ */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:flex lg:flex-col lg:gap-5 lg:h-105">
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3">
           {isPromoLoading ? (
             <>
+              <HeroPromoSkeleton />
               <HeroPromoSkeleton />
               <HeroPromoSkeleton />
             </>
           ) : (
             <>
-              {/* ── Card 1: Dark ── */}
-              <div
-                className="group relative bg-[#0B0C0E] rounded-xl lg:rounded-2xl overflow-hidden flex flex-col h-40 sm:h-50 lg:flex-1 lg:h-auto border border-white/5"
+              <HeroSideCard
+                promo={promo1}
+                theme="dark"
                 onMouseEnter={() => setIsPromoPaused1(true)}
                 onMouseLeave={() => setIsPromoPaused1(false)}
-              >
-                <div
-                  className="flex h-full w-full transition-transform duration-700 ease-in-out"
-                  style={{ transform: `translateX(-${promoIndex1 * 100}%)` }}
-                >
-                  {promos.map((p, i) => (
-                    <Link
-                      key={i}
-                      href={p.slug ? `/store/product/${p.slug}` : "#"}
-                      className="min-w-full h-full relative shrink-0 block"
-                    >
-                      {p.badge && (
-                        <span className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 lg:top-4 lg:right-4 bg-[#7B2FBE] text-white text-[9px] sm:text-[10px] font-extrabold px-2 py-1 rounded shadow-lg z-20">
-                          {p.badge}
-                        </span>
-                      )}
-                      <div className="absolute bottom-0 left-0 z-10 p-3 sm:p-4 lg:p-5 flex flex-col justify-end max-w-[55%]">
-                        {p.tag && (
-                          <p className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold uppercase tracking-widest text-[#F5820A] mb-0.5 sm:mb-1">
-                            {p.tag}
-                          </p>
-                        )}
-                        <h3 className="text-white text-xs sm:text-sm lg:text-lg font-extrabold leading-tight mb-2 sm:mb-3 tracking-tight line-clamp-2">
-                          {p.title}
-                        </h3>
-                        <span className="inline-flex items-center gap-1 self-start bg-white text-[#0B1528] text-[9px] sm:text-[10px] font-bold px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg shadow-md group-hover:bg-[#F3F4F6] transition-all duration-300">
-                          {p.ctaText}
-                          <FiArrowRight size={9} className="stroke-[2.5]" />
-                        </span>
-                      </div>
-                      <div className="absolute right-0 bottom-0 w-[48%] h-full pointer-events-none select-none z-10">
-                        {p.imageUrl && (
-                          <Image src={p.imageUrl} alt={p.title ?? ""} fill
-                            sizes="(max-width: 640px) 30vw, 25vw"
-                            className="object-contain object-bottom-right" priority={i === 0} />
-                        )}
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-
-                {promos.length > 1 && (
-                  <div className="absolute bottom-2 left-3 flex items-center gap-1 z-20">
-                    {promos.map((_, i) => (
-                      <button key={i} onClick={() => setPromoIndex1(i)}
-                        className={cn(
-                          "rounded-full transition-all duration-300",
-                          i === promoIndex1
-                            ? "w-3 h-1 bg-[#F5820A]"
-                            : "w-1 h-1 bg-white/40 hover:bg-white/70",
-                        )}
-                        aria-label={`Go to promo ${i + 1}`} />
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* ── Card 2: Light ── */}
-              <div
-                className="group relative bg-[#F5F5F5] border border-neutral-200/80 rounded-xl lg:rounded-2xl overflow-hidden flex flex-col h-40 sm:h-50 lg:flex-1 lg:h-auto"
+              />
+              <HeroSideCard
+                promo={promo2}
+                theme="blue"
                 onMouseEnter={() => setIsPromoPaused2(true)}
                 onMouseLeave={() => setIsPromoPaused2(false)}
-              >
-                <div
-                  className="flex h-full w-full transition-transform duration-700 ease-in-out"
-                  style={{ transform: `translateX(-${promoIndex2 * 100}%)` }}
-                >
-                  {promos.map((p, i) => (
-                    <Link
-                      key={i}
-                      href={p.slug ? `/store/product/${p.slug}` : "#"}
-                      className="min-w-full h-full relative shrink-0"
-                    >
-                      {/* ── Mobile/tablet: image top-right absolute, text bottom-left ── */}
-                      <div className="lg:hidden absolute inset-0 flex items-end">
-                        <div className="absolute top-0 right-0 w-[48%] h-full pointer-events-none select-none">
-                          {p.imageUrl && (
-                            <Image src={p.imageUrl} alt={p.title ?? ""} fill
-                              sizes="25vw"
-                              className="object-contain object-top-right" priority={i === 0} />
-                          )}
-                        </div>
-                        <div className="relative z-10 p-3 sm:p-4 flex flex-col max-w-[55%]">
-                          <h3 className="text-neutral-950 text-xs sm:text-sm font-extrabold leading-tight mb-1 line-clamp-2">
-                            {p.title}
-                          </h3>
-                          {p.price && (
-                            <p className="text-[#F5820A] text-xs sm:text-sm font-extrabold mb-2">
-                              {p.price}
-                            </p>
-                          )}
-                          <span className="inline-flex items-center gap-1 self-start bg-[#F5820A] text-white text-[9px] sm:text-[10px] font-bold px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg shadow-md group-hover:bg-[#E06B00] transition-all duration-300">
-                            {p.ctaText}
-                            <FiArrowRight size={9} className="stroke-[2.5]" />
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* ── Desktop: clean flex row, no absolute conflicts ── */}
-                      <div className="hidden lg:flex flex-row items-center h-full w-full px-4 gap-3">
-                        <div className="relative w-28 shrink-0 self-stretch">
-                          {p.imageUrl && (
-                            <Image src={p.imageUrl} alt={p.title ?? ""} fill
-                              sizes="112px"
-                              className="object-contain object-center" priority={i === 0} />
-                          )}
-                        </div>
-                        <div className="flex flex-col flex-1 min-w-0 py-4">
-                          <h3 className="text-neutral-950 text-wrap w-72 text-base font-extrabold leading-tight mb-1.5 line-clamp-2">
-                            {p.title}
-                          </h3>
-                          {p.price && (
-                            <p className="text-[#F5820A] text-base font-extrabold mb-3">
-                              {p.price}
-                            </p>
-                          )}
-                          <span className="inline-flex items-center gap-1.5 self-start bg-[#F5820A] text-white text-xs font-bold px-4 py-2 rounded-lg shadow-md group-hover:bg-[#E06B00] transition-all duration-300">
-                            {p.ctaText}
-                            <FiArrowRight size={10} className="stroke-[2.5]" />
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-
-                {promos.length > 1 && (
-                  <div className="absolute bottom-2 left-3 flex items-center gap-1 z-20">
-                    {promos.map((_, i) => (
-                      <button key={i} onClick={() => setPromoIndex2(i)}
-                        className={cn(
-                          "rounded-full transition-all duration-300",
-                          i === promoIndex2
-                            ? "w-3 h-1 bg-[#F5820A]"
-                            : "w-1 h-1 bg-neutral-400/50 hover:bg-neutral-500/70",
-                        )}
-                        aria-label={`Go to promo ${i + 1}`} />
-                    ))}
-                  </div>
-                )}
-              </div>
+              />
+              <FlashCountdownCard />
             </>
           )}
         </div>
       </div>
     </section>
+  );
+}
+
+function HeroSideCard({
+  promo,
+  theme,
+  onMouseEnter,
+  onMouseLeave,
+}: {
+  promo?: PromoCard;
+  theme: "dark" | "blue";
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+}) {
+  const href = promo?.slug ? `/store/product/${promo.slug}` : promo?.linkUrl ?? "/store/category/all";
+  const bg =
+    theme === "blue"
+      ? "bg-linear-to-br from-[#0a1628] to-[#0f2040] border border-[rgba(96,165,250,0.15)]"
+      : "bg-linear-to-br from-[#1A1A1A] to-[#141414] border border-white/[0.08]";
+
+  return (
+    <Link
+      href={href}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      className={cn("sf-card-3d relative min-h-[132px] rounded-[16px] p-5 overflow-hidden group", bg)}
+    >
+      <span className="sf-badge sf-badge-orange absolute right-4 top-4">Limited</span>
+      <div className="flex items-center gap-4 pr-16">
+        <div className="relative w-16 h-16 rounded-[12px] bg-linear-to-br from-[#1F1F1F] to-[#2A2A2A] shrink-0 overflow-hidden flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
+          {promo?.imageUrl ? (
+            <Image
+              src={promo.imageUrl}
+              alt={promo.title ?? "Promo product"}
+              fill
+              sizes="70px"
+              className="object-contain p-2"
+            />
+          ) : (
+            <span className="text-3xl">💻</span>
+          )}
+        </div>
+        <div className="min-w-0">
+          <p className="text-[10px] text-[#F97316] uppercase tracking-[0.14em] line-clamp-1">
+            {promo?.tag ?? promo?.badge ?? "Featured Deal"}
+          </p>
+          <h3 className="mt-1 text-[15px] font-semibold text-white leading-snug line-clamp-2">
+            {promo?.title ?? "Premium gadgets on deal"}
+          </h3>
+          {promo?.price && (
+            <p className={cn("mt-1 text-[17px] font-bold", theme === "blue" ? "text-[#60A5FA] [text-shadow:0_0_20px_rgba(96,165,250,0.4)]" : "text-[#F97316] [text-shadow:0_0_20px_rgba(249,115,22,0.4)]")}>{promo.price}</p>
+          )}
+        </div>
+      </div>
+      <FiChevronRight
+        size={20}
+        className="absolute right-5 bottom-5 text-white/70 transition-transform group-hover:translate-x-1"
+      />
+    </Link>
+  );
+}
+
+function FlashCountdownCard() {
+  return (
+    <Link
+      href="/store/category/all"
+      className="min-h-[132px] rounded-[16px] border border-[rgba(249,115,22,0.2)] bg-[#141414] p-5 flex flex-col justify-center shadow-[0_0_30px_rgba(249,115,22,0.08)]"
+    >
+      <span className="w-11 h-11 rounded-full bg-linear-to-br from-[#F97316] to-[#EA580C] text-white flex items-center justify-center shrink-0 shadow-[var(--shadow-orange-glow)]">
+        <FiZap size={22} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="mt-3 block text-[11px] text-[#666666]">Flash sale ends in</span>
+        <span className="mt-1 block text-2xl font-bold tracking-[3px] text-[#F97316] sf-text-glow">16d : 21h</span>
+        <span className="sf-btn-primary mt-3 w-full !px-4 !py-2 text-xs">
+          View Deals
+        </span>
+      </span>
+    </Link>
   );
 }
