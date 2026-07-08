@@ -50,7 +50,7 @@ export function OrderStepper({ steps }: OrderStepperProps) {
   return (
     <div className="relative flex items-start justify-between px-4 py-6">
       {/* Connecting line */}
-      <div className="absolute top-9.5 left-[10%] right-[10%] h-0.5 bg-[#E5E7EB]">
+      <div className="absolute top-9.5 left-[10%] right-[10%] h-0.5 bg-[#E5E5E5]">
         {/* Completed fill */}
         {(() => {
           const lastCompleted = steps.filter((s) => s.status === 'completed').length
@@ -78,8 +78,8 @@ export function OrderStepper({ steps }: OrderStepperProps) {
                 isCompleted
                   ? 'bg-[#F97316] border-[#F97316] text-white'
                   : isActive
-                  ? 'bg-[#1A1A1A] border-[#F97316] text-[#F97316]'
-                  : 'bg-[#1A1A1A] border-white/[0.15] text-[#555555]'
+                  ? 'bg-[#FFFFFF] border-[#F97316] text-[#F97316]'
+                  : 'bg-[#FFFFFF] border-[#E5E5E5] text-[#888888]'
               )}
             >
               <Icon size={16} />
@@ -89,7 +89,7 @@ export function OrderStepper({ steps }: OrderStepperProps) {
             <div
               className={cn(
                 'w-8 h-8 rounded flex items-center justify-center',
-                isCompleted ? 'text-[#F97316]' : 'text-[#D1D5DB]'
+                isCompleted ? 'text-[#F97316]' : 'text-[#888888]'
               )}
             >
               <Icon size={20} />
@@ -99,7 +99,7 @@ export function OrderStepper({ steps }: OrderStepperProps) {
             <p
               className={cn(
                 'text-xs font-semibold text-center',
-                isCompleted || isActive ? 'text-[#111111]' : 'text-[#D1D5DB]'
+                isCompleted || isActive ? 'text-[#111111]' : 'text-[#888888]'
               )}
             >
               {step.label}

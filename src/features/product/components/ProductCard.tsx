@@ -124,8 +124,8 @@ export function ProductCard({
         onClick={handleWishlist}
         disabled={isFavLoading(product.id)}
         className={cn(
-          "absolute top-3 right-3 z-10 w-8 h-8 bg-[#1A1A1A]/95 rounded-full border border-white/[0.08] flex items-center justify-center transition-colors shadow-[0_4px_12px_rgba(0,0,0,0.35)]",
-          favorited ? "text-[#F97316]" : "text-[#666666] hover:text-white",
+          "absolute top-3 right-3 z-10 w-8 h-8 bg-white/95 rounded-full border border-black/[0.08] flex items-center justify-center transition-colors shadow-[0_4px_12px_rgba(0,0,0,0.15)]",
+          favorited ? "text-[#F97316]" : "text-[#666666] hover:text-[#111111]",
           isFavLoading(product.id) && "opacity-50 cursor-wait",
         )}
         aria-label={favorited ? "Remove from wishlist" : "Add to wishlist"}
@@ -134,7 +134,7 @@ export function ProductCard({
       </button>
 
       {/* Image */}
-      <div className="overflow-hidden bg-[#1A1A1A] h-[190px] sm:h-[200px] flex items-center justify-center transition-shadow group-hover:shadow-[inset_0_0_30px_rgba(249,115,22,0.05)]">
+      <div className="overflow-hidden bg-[#F8F8F8] h-[190px] sm:h-[200px] flex items-center justify-center transition-shadow group-hover:shadow-[inset_0_0_30px_rgba(249,115,22,0.05)]">
         {imageSrc ? (
           <Image
             src={imageSrc}
@@ -149,7 +149,7 @@ export function ProductCard({
             unoptimized
           />
         ) : (
-          <div className="w-full h-full bg-[#1F1F1F] flex items-center justify-center text-[#555555] text-[11px]">
+          <div className="w-full h-full bg-[#F5F5F5] flex items-center justify-center text-[#999999] text-[11px]">
             No image
           </div>
         )}
@@ -157,11 +157,11 @@ export function ProductCard({
 
       {/* Info */}
       <div className="p-4 flex flex-col gap-2 flex-1">
-        <p className="text-[10px] text-[#555555] uppercase tracking-[0.8px] leading-none">
+        <p className="text-[10px] text-[#999999] uppercase tracking-[0.8px] leading-none">
           {product.brandName ?? product.brand?.name ?? product.categoryName ?? "ShopFresherz"}
         </p>
 
-        <p className="text-[13px] text-white font-medium leading-[1.45] line-clamp-2 min-h-[38px] group-hover:text-[#F97316] transition-colors">
+        <p className="text-[13px] text-[#111111] font-medium leading-[1.45] line-clamp-2 min-h-[38px] group-hover:text-[#F97316] transition-colors">
           {product.name}
         </p>
 
@@ -178,17 +178,17 @@ export function ProductCard({
               <span key={i}>{i < Math.round(product.averageRating ?? 0) ? "\u2605" : "\u2606"}</span>
             ))}
           </span>
-          <span className="text-[#555555]">({product.reviewCount ?? 0})</span>
+          <span className="text-[#999999]">({product.reviewCount ?? 0})</span>
         </div>
 
         <div className="mt-auto flex items-end justify-between gap-2">
           <div className="flex flex-col">
-            <span className="text-[16px] font-bold text-[#F97316] leading-tight [text-shadow:0_0_12px_rgba(249,115,22,0.3)]">
+            <span className="text-[16px] font-bold text-[#F97316] leading-tight">
               {formatPrice(product.price)}
             </span>
 
             {product.compareAtPrice && (
-              <span className="text-[11px] text-[#555555] line-through">
+              <span className="text-[11px] text-[#BBBBBB] line-through">
                 {formatPrice(product.compareAtPrice)}
               </span>
             )}

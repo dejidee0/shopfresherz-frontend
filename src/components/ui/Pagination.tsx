@@ -53,7 +53,7 @@ export function Pagination({
       {/* Page numbers */}
       {pages.map((p, i) =>
         p === 'ellipsis' ? (
-          <span key={`ellipsis-${i}`} className="w-9 h-9 flex items-center justify-center text-[#6B7280] text-sm select-none">
+          <span key={`ellipsis-${i}`} className="w-9 h-9 flex items-center justify-center text-[#888888] text-sm select-none">
             …
           </span>
         ) : (
@@ -99,8 +99,8 @@ function PageBtn({ children, onClick, active, disabled, ...rest }: PageBtnProps)
       className={cn(
         'w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-150 select-none',
         active
-          ? 'bg-[#F97316] text-white shadow-sm shadow-orange-500/20'
-          : 'border border-white/[0.1] text-[#A0A0A0] bg-[#141414] hover:border-[#F97316] hover:text-[#F97316]',
+          ? 'bg-[#F97316] text-white border border-[#F97316] shadow-sm shadow-orange-500/20'
+          : 'border border-[rgba(0,0,0,0.1)] text-[#666666] bg-[#FFFFFF] hover:border-[#F97316] hover:text-[#F97316]',
         disabled && 'opacity-40 cursor-not-allowed pointer-events-none'
       )}
       {...rest}

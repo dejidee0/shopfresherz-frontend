@@ -1,6 +1,6 @@
 export function TopBar() {
   return (
-    <div className="flex h-9 w-full items-center bg-black">
+    <div className="flex h-9 w-full items-center bg-[#1A1A2E]">
       <div className="grid w-full grid-cols-1 items-center gap-2 px-4 md:grid-cols-3 md:px-8">
         <div className="hidden text-[11px] text-[#666666] md:block">
           Free shipping on orders over ₦100,000

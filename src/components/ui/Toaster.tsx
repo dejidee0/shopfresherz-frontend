@@ -30,29 +30,29 @@ const TYPE_CONFIG: Record<
     icon: FiCheckCircle,
     bar: "bg-[#22C55E]",
     iconClass: "text-[#22C55E]",
-    bg: "bg-[#141414]",
-    border: "border-[#22C55E]/20",
+    bg: "bg-[#FFFFFF]",
+    border: "border-[rgba(0,0,0,0.08)]",
   },
   error: {
     icon: FiXCircle,
     bar: "bg-[#EF4444]",
     iconClass: "text-[#EF4444]",
-    bg: "bg-[#141414]",
-    border: "border-[#EF4444]/20",
+    bg: "bg-[#FFFFFF]",
+    border: "border-[rgba(0,0,0,0.08)]",
   },
   warning: {
     icon: FiAlertTriangle,
     bar: "bg-[#F59E0B]",
     iconClass: "text-[#F59E0B]",
-    bg: "bg-[#141414]",
-    border: "border-[#F59E0B]/20",
+    bg: "bg-[#FFFFFF]",
+    border: "border-[rgba(0,0,0,0.08)]",
   },
   info: {
     icon: FiInfo,
     bar: "bg-[#F97316]",
     iconClass: "text-[#F97316]",
-    bg: "bg-[#141414]",
-    border: "border-[#F97316]/20",
+    bg: "bg-[#FFFFFF]",
+    border: "border-[rgba(0,0,0,0.08)]",
   },
 };
 
@@ -86,7 +86,7 @@ function ToastItem({ toast }: { toast: Toast }) {
       role="alert"
       aria-live="assertive"
       className={cn(
-        "relative flex items-start gap-3 w-90 rounded-card border shadow-lg overflow-hidden px-4 py-3.5",
+        "relative flex items-start gap-3 w-90 rounded-card border shadow-[0_12px_32px_rgba(0,0,0,0.15)] overflow-hidden px-4 py-3.5",
         "animate-in slide-in-from-right-4 duration-300",
         config.bg,
         config.border,
@@ -100,11 +100,11 @@ function ToastItem({ toast }: { toast: Toast }) {
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-white leading-snug">
+        <p className="text-sm font-semibold text-[#111111] leading-snug">
           {toast.title}
         </p>
         {toast.message && (
-          <p className="text-xs text-[#6B7280] mt-0.5 leading-relaxed">
+          <p className="text-xs text-[#666666] mt-0.5 leading-relaxed">
             {toast.message}
           </p>
         )}
@@ -113,7 +113,7 @@ function ToastItem({ toast }: { toast: Toast }) {
       {/* Dismiss button */}
       <button
         onClick={() => dismiss(toast.id)}
-        className="shrink-0 w-5 h-5 flex items-center justify-center text-[#9CA3AF] hover:text-white transition-colors mt-0.5"
+        className="shrink-0 w-5 h-5 flex items-center justify-center text-[#9CA3AF] hover:text-[#111111] transition-colors mt-0.5"
         aria-label="Dismiss"
       >
         <FiX size={13} />

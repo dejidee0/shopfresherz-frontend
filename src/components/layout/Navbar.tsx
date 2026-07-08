@@ -120,7 +120,7 @@ export function Navbar() {
 
   const SuggestionsDropdown = () =>
     isSuggestionsOpen && suggestions ? (
-      <div className="absolute top-full left-0 right-0 bg-[#141414] shadow-2xl rounded-b-[12px] border border-t-0 border-white/[0.08] z-50 overflow-hidden">
+      <div className="absolute top-full left-0 right-0 bg-[#242436] shadow-2xl rounded-b-[12px] border border-t-0 border-white/[0.08] z-50 overflow-hidden">
         {suggestions.categories.length > 0 && (
           <div className="px-3 py-2 border-b border-white/[0.06]">
             <p className="text-[10px] font-bold uppercase text-[#888888] mb-1 tracking-wide">
@@ -177,8 +177,8 @@ export function Navbar() {
     ) : null
 
   return (
-    <div className="sticky top-0 z-30 w-full bg-[#0A0A0A]">
-      <header className="bg-[#0A0A0A] border-b border-white/[0.06]">
+    <div className="sticky top-0 z-30 w-full bg-[#1A1A2E]">
+      <header className="bg-[#1A1A2E] border-b border-white/[0.06]">
         <div className="px-4 md:px-8 py-3.5 flex items-center gap-4 lg:gap-6">
           <Link href="/store" className="shrink-0 flex items-center gap-2.5">
             <Image
@@ -266,7 +266,7 @@ export function Navbar() {
         </div>
 
         {isMobileSearchOpen && (
-          <div ref={mobileSearchRef} className="md:hidden bg-[#0A0A0A] px-4 pb-3 relative">
+          <div ref={mobileSearchRef} className="md:hidden bg-[#1A1A2E] px-4 pb-3 relative">
             <form onSubmit={handleSearch}>
               <div className="relative">
                 <button
@@ -292,7 +292,7 @@ export function Navbar() {
         )}
       </header>
 
-      <nav className="hidden md:block bg-[rgba(10,10,10,0.95)] backdrop-blur-xl border-b border-white/[0.05] relative">
+      <nav className="hidden md:block bg-[rgba(36,36,54,0.95)] backdrop-blur-xl border-b border-white/[0.05] relative">
         <div className="px-8 py-2.5 flex items-center gap-6">
           <div className="relative">
             <button
@@ -342,7 +342,7 @@ export function Navbar() {
             aria-hidden="true"
           />
 
-          <div className="fixed inset-y-0 right-0 z-50 w-72 bg-[#0D0D0D] shadow-2xl md:hidden flex flex-col border-l border-white/[0.08]">
+          <div className="fixed inset-y-0 right-0 z-50 w-72 bg-[#242436] shadow-2xl md:hidden flex flex-col border-l border-white/[0.08]">
             <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
               <Link href="/store" onClick={closeMenu} className="flex items-center gap-2.5">
                 <Image
@@ -429,7 +429,7 @@ export function Navbar() {
                 </button>
 
                 {isMobileCatsOpen && (
-                  <div className="bg-[#141414] border-t border-white/[0.05]">
+                  <div className="bg-[#242436] border-t border-white/[0.05]">
                     <Link
                       href="/store/category/all"
                       onClick={closeMenu}

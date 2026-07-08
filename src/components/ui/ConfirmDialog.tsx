@@ -82,7 +82,7 @@ export function ConfirmDialog() {
         aria-describedby={options.message ? 'confirm-message' : undefined}
         className="fixed inset-0 z-9991 flex items-center justify-center p-4 pointer-events-none"
       >
-        <div className="pointer-events-auto bg-[#141414] border border-white/[0.08] rounded-modal shadow-2xl shadow-black/40 w-full max-w-100 p-6 animate-in zoom-in-95 duration-200">
+        <div className="pointer-events-auto bg-[#FFFFFF] border border-[rgba(0,0,0,0.08)] rounded-modal shadow-[0_20px_60px_rgba(0,0,0,0.2)] w-full max-w-100 p-6 animate-in zoom-in-95 duration-200">
 
           {/* Icon */}
           <div className={cn('w-12 h-12 rounded-full flex items-center justify-center mb-4', config.iconBg)}>
@@ -92,7 +92,7 @@ export function ConfirmDialog() {
           {/* Title */}
           <h2
             id="confirm-title"
-            className="text-base font-bold text-white leading-snug"
+            className="text-base font-bold text-[#111111] leading-snug"
           >
             {options.title}
           </h2>
@@ -101,7 +101,7 @@ export function ConfirmDialog() {
           {options.message && (
             <p
               id="confirm-message"
-              className="text-sm text-[#6B7280] mt-2 leading-relaxed"
+              className="text-sm text-[#666666] mt-2 leading-relaxed"
             >
               {options.message}
             </p>
@@ -112,7 +112,7 @@ export function ConfirmDialog() {
             {/* Cancel */}
             <button
               onClick={() => _answer(false)}
-              className="flex-1 h-10 border border-white/[0.1] rounded-btn text-sm font-semibold text-white hover:bg-white/[0.06] transition-colors"
+              className="flex-1 h-10 border border-[rgba(0,0,0,0.1)] bg-[#F5F5F5] rounded-btn text-sm font-semibold text-[#111111] hover:bg-[#ECECEC] transition-colors"
               autoFocus
             >
               {options.cancelLabel ?? 'Cancel'}

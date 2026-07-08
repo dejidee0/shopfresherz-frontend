@@ -79,7 +79,7 @@ function ProductCard({ product }: { product: AccessoriesProduct }) {
 
   return (
     <div
-      className="group relative rounded-[8px] block overflow-hidden border border-white/[0.08] bg-[#141414] transition-all duration-200 hover:border-[#F97316]/60 hover:shadow-[0_16px_36px_rgba(249,115,22,0.14)]"
+      className="group relative rounded-[8px] block overflow-hidden border border-black/[0.06] bg-[#FFFFFF] transition-all duration-200 hover:border-[#F97316]/60 hover:shadow-[0_16px_36px_rgba(249,115,22,0.14)]"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -101,10 +101,10 @@ function ProductCard({ product }: { product: AccessoriesProduct }) {
           }}
           disabled={isLoading(product.id)}
           aria-label={isFavorited(product.id) ? "Added to favorites" : "Add to favorites"}
-          className={`w-7 h-7 bg-[#1F1F1F] border border-white/[0.08] rounded-full shadow flex items-center justify-center transition-colors
+          className={`w-7 h-7 bg-[#FFFFFF] border border-black/[0.08] rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.08)] flex items-center justify-center transition-colors
             ${isFavorited(product.id)
               ? "text-[#F97316]"
-              : "text-[#6B7280] hover:text-[#F97316]"}
+              : "text-[#888888] hover:text-[#F97316]"}
             ${isLoading(product.id) ? "opacity-50 cursor-wait" : ""}
           `}
         >
@@ -128,7 +128,7 @@ function ProductCard({ product }: { product: AccessoriesProduct }) {
               unoptimized
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center rounded bg-[#1F1F1F] text-[11px] text-[#9CA3AF]">
+            <div className="flex h-full w-full items-center justify-center rounded bg-[#F5F5F5] text-[11px] text-[#9CA3AF]">
               No image available
             </div>
           )}
@@ -147,7 +147,7 @@ function ProductCard({ product }: { product: AccessoriesProduct }) {
           </div>
 
           {/* Name */}
-          <p className="line-clamp-2 text-[12px] font-semibold leading-snug text-[#D7D7D7] group-hover:text-[#F97316] transition-colors">
+          <p className="line-clamp-2 text-[12px] font-semibold leading-snug text-[#111111] group-hover:text-[#F97316] transition-colors">
             {product.name}
           </p>
 
@@ -308,7 +308,7 @@ export function ComputerAccessoriesSection() {
             {/* ── Header row ── */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
-              <h2 className="shrink-0 text-xl font-bold text-white sm:text-2xl">
+              <h2 className="shrink-0 text-xl font-bold text-[#111111] sm:text-2xl">
                 Computer Accessories
               </h2>
 
@@ -325,7 +325,7 @@ export function ComputerAccessoriesSection() {
                   className={`shrink-0 pb-0.5 transition-colors ${
                     activeCategoryId === null
                       ? "border-b-2 border-[#F97316] text-[#F97316]"
-                       : "text-[#A0A0A0] hover:text-[#F97316]"
+                       : "text-[#666666] hover:text-[#F97316]"
                   }`}
                 >
                   All Product
@@ -340,7 +340,7 @@ export function ComputerAccessoriesSection() {
                     className={`shrink-0 pb-0.5 transition-colors ${
                       activeCategoryId === cat.id
                         ? "border-b-2 border-[#F97316] text-[#F97316]"
-                        : "text-[#A0A0A0] hover:text-[#F97316]"
+                        : "text-[#666666] hover:text-[#F97316]"
                     }`}
                   >
                     {cat.name}
@@ -365,7 +365,7 @@ export function ComputerAccessoriesSection() {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-[14px] md:grid-cols-4">
               {loading
                 ? Array.from({ length: 8 }).map((_, i) => (
-                    <div key={i} className="h-56 animate-pulse rounded bg-[#1F1F1F]" />
+                    <div key={i} className="h-56 animate-pulse rounded bg-[#ECECEC]" />
                   ))
                 : products.map((p) => <ProductCard key={p.id} product={p} />)}
             </div>

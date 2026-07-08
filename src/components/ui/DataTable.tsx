@@ -34,10 +34,10 @@ export function DataTable<T>({
   footer,
 }: DataTableProps<T>) {
   return (
-    <div className={cn('bg-[#141414] rounded-[12px] border-[0.5px] border-white/[0.08] transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(0,0,0,0.35)]', className)}>
+    <div className={cn('bg-[#FFFFFF] rounded-[12px] border-[0.5px] border-[rgba(0,0,0,0.07)] shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.12),0_4px_8px_rgba(0,0,0,0.06)]', className)}>
       {title && (
-        <div className="px-6 py-4 border-b border-white/[0.08]">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wide">
+        <div className="px-6 py-4 border-b border-[rgba(0,0,0,0.07)]">
+          <h3 className="text-sm font-bold text-[#111111] uppercase tracking-wide">
             {title}
           </h3>
         </div>
@@ -46,12 +46,12 @@ export function DataTable<T>({
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-white/[0.08]">
+            <tr className="bg-[#F8F8F8] border-b border-[rgba(0,0,0,0.07)]">
               {columns.map((col) => (
                 <th
                   key={String(col.key)}
                   className={cn(
-                    'px-6 py-3 text-xs font-bold text-[#6B7280] uppercase tracking-wider whitespace-nowrap',
+                    'px-6 py-3 text-xs font-bold text-[#111111] uppercase tracking-wider whitespace-nowrap',
                     alignClass[col.align ?? 'left']
                   )}
                 >
@@ -61,12 +61,12 @@ export function DataTable<T>({
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-[#F5F5F5]">
+          <tbody className="divide-y divide-[rgba(0,0,0,0.07)]">
             {data.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="py-12 text-center text-sm text-[#6B7280]"
+                  className="py-12 text-center text-sm text-[#888888]"
                 >
                   {emptyMessage}
                 </td>
@@ -75,13 +75,13 @@ export function DataTable<T>({
               data.map((row) => (
                 <tr
                   key={String(row[rowKey])}
-                  className="hover:bg-white/[0.04] transition-colors"
+                  className="hover:bg-[rgba(0,0,0,0.02)] transition-colors"
                 >
                   {columns.map((col) => (
                     <td
                       key={String(col.key)}
                       className={cn(
-                        'px-6 py-4 text-white whitespace-nowrap',
+                        'px-6 py-4 text-[#111111] whitespace-nowrap',
                         alignClass[col.align ?? 'left']
                       )}
                     >
@@ -98,7 +98,7 @@ export function DataTable<T>({
       </div>
 
       {footer && (
-        <div className="px-6 py-4 border-t border-white/[0.08]">{footer}</div>
+        <div className="px-6 py-4 border-t border-[rgba(0,0,0,0.07)]">{footer}</div>
       )}
     </div>
   )

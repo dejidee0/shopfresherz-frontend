@@ -97,8 +97,8 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="border-b border-white/[0.04] pb-5 mb-5 last:border-none last:mb-0">
-      <h3 className="text-[13px] font-semibold text-white uppercase tracking-wide mb-3">
+    <div className="border-b border-black/[0.06] pb-5 mb-5 last:border-none last:mb-0">
+      <h3 className="text-[13px] font-semibold text-[#111111] uppercase tracking-wide mb-3">
         {title}
       </h3>
       {children}
@@ -149,7 +149,7 @@ export function ShopSidebar({
   }, []);
 
   return (
-    <aside className="w-52 sm:w-56 md:w-[260px] shrink-0 space-y-0 max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-hide bg-[#0F0F0F] border-r border-white/[0.04] px-5 py-8">
+    <aside className="w-52 sm:w-56 md:w-[260px] shrink-0 space-y-0 max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-hide bg-[#FFFFFF] border-r border-black/[0.07] px-5 py-8">
       {/* ── Category ── */}
       <Section title="Category">
         <ul className="space-y-0.5 max-h-64 overflow-y-auto scrollbar-hide flex flex-col">
@@ -162,7 +162,7 @@ export function ShopSidebar({
                   "flex items-center gap-2 w-full text-left text-xs sm:text-sm py-1 sm:py-1.5 px-1 rounded transition-colors",
                   filters.categorySlug === cat.slug
                     ? "text-[#F97316] font-semibold"
-                    : "text-[#A0A0A0] hover:text-white",
+                    : "text-[#666666] hover:text-[#111111]",
                 )}
               >
                 <span
@@ -170,7 +170,7 @@ export function ShopSidebar({
                     "w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 shrink-0 transition-colors",
                     filters.categorySlug === cat.slug
                       ? "border-[#F97316] bg-[#F97316]"
-                      : "border-white/[0.18]",
+                      : "border-black/[0.18]",
                   )}
                 />
                 <span className="truncate">{cat.label}</span>
@@ -186,7 +186,7 @@ export function ShopSidebar({
                         "flex items-center gap-2 w-full text-left text-xs py-0.5 sm:py-1 px-1 rounded transition-colors",
                         filters.categorySlug === child.slug
                           ? "text-[#F97316] font-semibold"
-                          : "text-[#666666] hover:text-white",
+                          : "text-[#666666] hover:text-[#111111]",
                       )}
                     >
                       <span
@@ -194,7 +194,7 @@ export function ShopSidebar({
                           "w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border-2 shrink-0 transition-colors",
                           filters.categorySlug === child.slug
                             ? "border-[#F97316] bg-[#F97316]"
-                            : "border-white/[0.18]",
+                            : "border-black/[0.18]",
                         )}
                       />
                       <span className="truncate">{child.label}</span>
@@ -229,7 +229,7 @@ export function ShopSidebar({
                     "flex items-center gap-2 w-full text-left text-xs sm:text-sm py-0.5 transition-colors",
                     isActive
                       ? "text-[#F97316] font-medium"
-                      : "text-[#666666] hover:text-white",
+                      : "text-[#666666] hover:text-[#111111]",
                   )}
                 >
                   <span
@@ -237,7 +237,7 @@ export function ShopSidebar({
                       "w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border-2 shrink-0",
                       isActive
                         ? "border-[#F97316] bg-[#F97316]"
-                        : "border-white/[0.18]",
+                        : "border-black/[0.18]",
                     )}
                   />
                   <span className="truncate">{label}</span>
@@ -264,7 +264,7 @@ export function ShopSidebar({
                     "w-3.5 h-3.5 sm:w-4 sm:h-4 rounded border-2 shrink-0 flex items-center justify-center transition-colors",
                     checked
                       ? "bg-[#F97316] border-[#F97316]"
-                      : "border-white/[0.18] group-hover:border-[#F97316]",
+                      : "border-black/[0.18] group-hover:border-[#F97316]",
                   )}
                 >
                   {checked && (
@@ -285,7 +285,7 @@ export function ShopSidebar({
                     "text-[10px] sm:text-xs transition-colors truncate",
                     checked
                       ? "text-[#F97316] font-medium"
-                      : "text-[#666666] group-hover:text-white",
+                      : "text-[#666666] group-hover:text-[#111111]",
                   )}
                 >
                   {brand.name} {/* ← name for display only */}
@@ -309,7 +309,7 @@ export function ShopSidebar({
                   "px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs rounded border transition-all duration-150",
                   active
                     ? "bg-[#F97316] border-[#F97316] text-white"
-                    : "border-white/[0.08] text-[#666666] hover:border-[#F97316] hover:text-[#F97316]",
+                    : "border-black/[0.1] text-[#666666] hover:border-[#F97316] hover:text-[#F97316]",
                 )}
               >
                 {tag}
@@ -322,7 +322,7 @@ export function ShopSidebar({
       {/* ── Promo card ── */}
       <div className="sf-card-3d overflow-hidden hidden sm:block">
         {/* Product image */}
-        <div className="bg-[#1A1A1A] aspect-square flex items-center justify-center p-3 sm:p-4">
+        <div className="bg-[#F8F8F8] aspect-square flex items-center justify-center p-3 sm:p-4">
           <Image
             src={PROMO.image}
             alt={PROMO.name}
@@ -337,10 +337,10 @@ export function ShopSidebar({
           <p className="text-[10px] sm:text-xs font-bold text-[#F97316] uppercase tracking-wide mb-0.5">
             {PROMO.tag}
           </p>
-          <p className="text-xs sm:text-base font-extrabold text-white leading-tight">
+          <p className="text-xs sm:text-base font-extrabold text-[#111111] leading-tight">
             {PROMO.name}
           </p>
-          <p className="text-[10px] sm:text-sm font-bold text-white mt-0.5 sm:mt-1">
+          <p className="text-[10px] sm:text-sm font-bold text-[#111111] mt-0.5 sm:mt-1">
             {PROMO.headline}
           </p>
           <p className="text-[10px] sm:text-sm text-[#666666]">

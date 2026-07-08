@@ -107,12 +107,12 @@ export function PDPActions({ product }: PDPActionsProps) {
       </div>
 
       {/* ── Title ── */}
-      <h1 className="text-[32px] font-bold text-white leading-[1.2] tracking-[-0.8px] mt-1 mb-1">
+      <h1 className="text-[32px] font-bold text-[#111111] leading-[1.2] tracking-[-0.8px] mt-1 mb-1">
         {product.name}
       </h1>
 
       {/* ── Meta row ── */}
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-[#555555]">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-[#888888]">
         <span>SKU: {product.sku || 'N/A'}</span>
         <span className="text-[#D1D5DB]">|</span>
         <span>Brand: {product.brandName ?? product.brand?.name ?? 'ShopFresherz'}</span>
@@ -120,15 +120,15 @@ export function PDPActions({ product }: PDPActionsProps) {
         <span>Category: {product.categoryName ?? product.category?.name ?? 'Gadgets'}</span>
       </div>
 
-      <div className="h-px bg-white/[0.05]" />
+      <div className="h-px bg-black/[0.06]" />
 
       {/* ── Price ── */}
       <div className="flex items-center gap-3 flex-wrap">
-        <span className="text-[36px] font-bold text-white">
+        <span className="text-[36px] font-bold text-[#111111]">
           {formatPrice(product.price)}
         </span>
         {product.compareAtPrice && (
-          <span className="text-[18px] text-[#444444] line-through">
+          <span className="text-[18px] text-[#BBBBBB] line-through">
             {formatPrice(product.compareAtPrice)}
           </span>
         )}
@@ -137,7 +137,7 @@ export function PDPActions({ product }: PDPActionsProps) {
         )}
       </div>
 
-      <div className="h-px bg-white/[0.05]" />
+      <div className="h-px bg-black/[0.06]" />
 
       {/* ── Variants ── */}
 
@@ -180,7 +180,7 @@ export function PDPActions({ product }: PDPActionsProps) {
         </div>
       )}
 
-      <div className="h-px bg-white/[0.05]" />
+      <div className="h-px bg-black/[0.06]" />
 
       {/* ── Qty + CTA row ── */}
       <div className="flex flex-wrap items-center gap-3">
@@ -189,18 +189,18 @@ export function PDPActions({ product }: PDPActionsProps) {
           <button
             onClick={() => setQty((q) => clampQty(q - 1, availableStock))}
             disabled={qty <= 1}
-            className="w-10 h-10 rounded-[8px] border border-white/[0.1] bg-[#141414] flex items-center justify-center text-white hover:border-[#F97316] disabled:opacity-40 transition-colors"
+            className="w-10 h-10 rounded-[8px] border border-black/[0.1] bg-[#F5F5F5] flex items-center justify-center text-[#111111] hover:border-[#F97316] disabled:opacity-40 transition-colors"
             aria-label="Decrease quantity"
           >
             <FiMinus size={18} />
           </button>
-          <span className="w-12 h-10 border-y border-white/[0.1] bg-[#1A1A1A] flex items-center justify-center text-sm font-medium text-white">
+          <span className="w-12 h-10 border-y border-black/[0.1] bg-[#F5F5F5] flex items-center justify-center text-sm font-medium text-[#111111]">
             {qty}
           </span>
           <button
             onClick={() => setQty((q) => clampQty(q + 1, availableStock))}
             disabled={qty >= Math.min(availableStock, 10)}
-            className="w-10 h-10 rounded-[8px] border border-white/[0.1] bg-[#141414] flex items-center justify-center text-white hover:border-[#F97316] disabled:opacity-40 transition-colors"
+            className="w-10 h-10 rounded-[8px] border border-black/[0.1] bg-[#F5F5F5] flex items-center justify-center text-[#111111] hover:border-[#F97316] disabled:opacity-40 transition-colors"
             aria-label="Increase quantity"
           >
             <FiPlus size={18} />
@@ -214,7 +214,7 @@ export function PDPActions({ product }: PDPActionsProps) {
           className={cn(
             'flex-1 min-w-[180px] h-12 flex items-center justify-center gap-2 px-4 rounded-[10px] text-[15px] font-semibold transition-colors',
             isOutOfStock
-              ? 'bg-[#1A1A1A] text-[#444444] cursor-not-allowed'
+              ? 'bg-[#F0F0F0] text-[#AAAAAA] cursor-not-allowed'
               : 'sf-btn-primary text-white'
           )}
         >
@@ -226,7 +226,7 @@ export function PDPActions({ product }: PDPActionsProps) {
         <button
           onClick={handleBuyNow}
           disabled={isOutOfStock}
-          className="shrink-0 w-[140px] h-12 bg-white/[0.08] text-white border border-white/[0.12] font-bold rounded-[10px] text-[15px] hover:border-[#F97316] hover:text-[#F97316] hover:shadow-[0_4px_20px_rgba(249,115,22,0.15)] transition-all disabled:opacity-40"
+          className="shrink-0 w-[140px] h-12 bg-[#111111] text-white border border-[#111111] font-bold rounded-[10px] text-[15px] hover:bg-[#333333] hover:border-[#333333] transition-all disabled:opacity-40"
         >
           BUY NOW
         </button>
@@ -258,7 +258,7 @@ export function PDPActions({ product }: PDPActionsProps) {
               'w-7 h-7 rounded-full flex items-center justify-center border transition-colors',
               copyDone
                 ? 'border-[#22C55E] text-[#22C55E]'
-                : 'border-white/[0.1] hover:border-[#F97316] hover:text-[#F97316]'
+                : 'border-black/[0.1] hover:border-[#F97316] hover:text-[#F97316]'
             )}
           >
             <FiCopy size={12} />
@@ -267,7 +267,7 @@ export function PDPActions({ product }: PDPActionsProps) {
             href={`https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-7 h-7 rounded-full flex items-center justify-center border border-white/[0.1] hover:border-[#1877F2] hover:text-[#1877F2] transition-colors"
+            className="w-7 h-7 rounded-full flex items-center justify-center border border-black/[0.1] hover:border-[#1877F2] hover:text-[#1877F2] transition-colors"
           >
             <RiFacebookFill size={12} />
           </a>
@@ -275,7 +275,7 @@ export function PDPActions({ product }: PDPActionsProps) {
             href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}&text=${encodeURIComponent(product.name)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-7 h-7 rounded-full flex items-center justify-center border border-white/[0.1] hover:border-white hover:text-white transition-colors"
+            className="w-7 h-7 rounded-full flex items-center justify-center border border-black/[0.1] hover:border-black hover:text-black transition-colors"
           >
             <RiTwitterXFill size={12} />
           </a>
@@ -283,7 +283,7 @@ export function PDPActions({ product }: PDPActionsProps) {
             href={`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}&description=${encodeURIComponent(product.name)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-7 h-7 rounded-full flex items-center justify-center border border-white/[0.1] hover:border-[#E60023] hover:text-[#E60023] transition-colors"
+            className="w-7 h-7 rounded-full flex items-center justify-center border border-black/[0.1] hover:border-[#E60023] hover:text-[#E60023] transition-colors"
           >
             <RiPinterestFill size={12} />
           </a>
@@ -297,7 +297,7 @@ export function PDPActions({ product }: PDPActionsProps) {
           { icon: FiRefreshCw, text: 'Easy Returns' },
           { icon: FiLock, text: 'Secure Payment' },
         ].map(({ icon: Icon, text }) => (
-          <span key={text} className="inline-flex items-center gap-1 text-[11px] text-[#555555]">
+          <span key={text} className="inline-flex items-center gap-1 text-[11px] text-[#888888]">
             <Icon size={12} className="text-[#F97316]" />
             {text}
           </span>

@@ -45,7 +45,7 @@ export function DeliveryStep({
       }
     >
       <StepIndicator step={2} />
-      <h2 className="text-lg font-bold text-white mb-5">Delivery Method</h2>
+      <h2 className="text-lg font-bold text-[#111111] mb-5">Delivery Method</h2>
 
       <div className="flex flex-col gap-3">
         {DELIVERY_OPTIONS.map((opt) => (

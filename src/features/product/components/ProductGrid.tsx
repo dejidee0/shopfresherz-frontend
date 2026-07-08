@@ -147,14 +147,14 @@ interface ProductGridSectionProps {
 
 function SkeletonCard() {
   return (
-    <div className="bg-[#141414] border border-white/[0.08] rounded-card overflow-hidden animate-pulse">
-      <div className="aspect-square bg-[#1F1F1F]" />
+    <div className="bg-[#FFFFFF] border border-black/[0.08] rounded-card overflow-hidden animate-pulse">
+      <div className="aspect-square bg-[#F5F5F5]" />
       <div className="p-3 space-y-2">
-        <div className="h-3 bg-white/[0.08] rounded w-1/3" />
-        <div className="h-4 bg-white/[0.08] rounded w-full" />
-        <div className="h-4 bg-white/[0.08] rounded w-4/5" />
-        <div className="h-5 bg-white/[0.08] rounded w-1/2" />
-        <div className="h-9 bg-white/[0.08] rounded w-full" />
+        <div className="h-3 bg-black/[0.06] rounded w-1/3" />
+        <div className="h-4 bg-black/[0.06] rounded w-full" />
+        <div className="h-4 bg-black/[0.06] rounded w-4/5" />
+        <div className="h-5 bg-black/[0.06] rounded w-1/2" />
+        <div className="h-9 bg-black/[0.06] rounded w-full" />
       </div>
     </div>
   )
@@ -195,10 +195,10 @@ export function ProductGridSection({
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
               <div className="w-1 h-7 bg-[#F97316] rounded-full shrink-0" />
-              <h2 className="text-xl font-bold text-white">{title}</h2>
+              <h2 className="text-xl font-bold text-[#111111]">{title}</h2>
             </div>
             {tabs && tabs.length > 0 && (
-              <div className="flex flex-wrap items-center gap-1 bg-white/[0.06] border border-white/[0.08] rounded-btn p-1">
+              <div className="flex flex-wrap items-center gap-1 bg-[#F5F5F5] border border-black/[0.08] rounded-btn p-1">
                 {tabs.map((tab) => (
                   <button
                     key={tab.key}
@@ -207,7 +207,7 @@ export function ProductGridSection({
                       'px-3 py-1 text-xs font-semibold rounded transition-all duration-200',
                       activeTab === tab.key
                         ? 'bg-[#F97316] text-white shadow-sm shadow-orange-500/20'
-                        : 'text-[#A0A0A0] hover:text-white'
+                        : 'text-[#666666] hover:text-[#111111]'
                     )}
                   >
                     {tab.label}

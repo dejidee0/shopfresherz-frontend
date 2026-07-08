@@ -24,11 +24,11 @@ export function PDPBottomProducts({
   ]
 
   return (
-    <div className="mt-12 border-t border-white/[0.08] pt-10">
+    <div className="mt-12 border-t border-black/[0.08] pt-10">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {sections.map(({ title, products, isFlashDeal }) => (
           <div key={title}>
-            <h3 className="text-sm font-bold text-white uppercase tracking-wide mb-4 pb-2 border-b border-white/[0.08]">
+            <h3 className="text-sm font-bold text-[#111111] uppercase tracking-wide mb-4 pb-2 border-b border-black/[0.08]">
               {title}
             </h3>
             <ul className="space-y-4">
@@ -52,10 +52,10 @@ export function PDPBottomProducts({
                   <li key={product.id}>
                     <Link
                       href={href}
-                       className="flex items-center gap-3 group rounded-[10px] p-2 hover:bg-white/[0.04] transition-colors"
+                       className="flex items-center gap-3 group rounded-[10px] p-2 hover:bg-black/[0.03] transition-colors"
                     >
                       {/* Thumb */}
-                      <div className="w-14 h-14 shrink-0 bg-[#1F1F1F] rounded-card overflow-hidden">
+                      <div className="w-14 h-14 shrink-0 bg-[#F5F5F5] rounded-card overflow-hidden">
                          <Image
                           src={image}
                           alt={name}
@@ -67,7 +67,7 @@ export function PDPBottomProducts({
 
                       {/* Info */}
                       <div className="min-w-0">
-                        <p className="text-xs text-[#D7D7D7] line-clamp-2 leading-snug group-hover:text-[#F97316] transition-colors">
+                        <p className="text-xs text-[#666666] line-clamp-2 leading-snug group-hover:text-[#F97316] transition-colors">
                           {name}
                         </p>
                         <div className="flex items-baseline gap-1.5 mt-1">

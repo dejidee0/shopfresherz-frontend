@@ -18,11 +18,11 @@ const variantConfig: Record<
     defaultLabel: 'SALE',
   },
   new: {
-    className: 'badge-dark',
+    className: 'badge-new',
     defaultLabel: 'NEW',
   },
   hot: {
-    className: 'badge-dark',
+    className: 'badge-hot',
     defaultLabel: '🔥 HOT',
   },
   out_of_stock: {

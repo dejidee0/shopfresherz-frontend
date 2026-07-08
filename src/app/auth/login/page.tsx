@@ -40,7 +40,7 @@ function Field({
   return (
     <label className="flex flex-col gap-1.5">
       <span className="text-[12px] font-medium text-[#666666]">{label}</span>
-      <span className="flex h-12 items-center gap-3 rounded-lg border border-white/[0.08] bg-[#141414] px-3 text-[#666666] transition focus-within:border-[#F97316] focus-within:ring-4 focus-within:ring-[#F97316]/10">
+      <span className="flex h-12 items-center gap-3 rounded-lg border border-[rgba(0,0,0,0.12)] bg-[#FFFFFF] px-3 text-[#888888] transition focus-within:border-[rgba(249,115,22,0.5)] focus-within:ring-4 focus-within:ring-[#F97316]/10">
         <span className="text-[17px]">{icon}</span>
         <input
           type={type}
@@ -48,7 +48,7 @@ function Field({
           value={value}
           autoComplete={autoComplete}
           onChange={(event) => onChange(event.target.value)}
-          className="min-w-0 flex-1 bg-transparent text-sm font-medium text-white outline-none placeholder:text-[#444444]"
+          className="min-w-0 flex-1 bg-transparent text-sm font-medium text-[#111111] outline-none placeholder:text-[#AAAAAA]"
         />
       </span>
     </label>
@@ -67,7 +67,7 @@ function PasswordField({
   return (
     <label className="flex flex-col gap-1.5">
       <span className="text-[12px] font-medium text-[#666666]">{label}</span>
-      <span className="flex h-12 items-center gap-3 rounded-lg border border-white/[0.08] bg-[#141414] px-3 text-[#666666] transition focus-within:border-[#F97316] focus-within:ring-4 focus-within:ring-[#F97316]/10">
+      <span className="flex h-12 items-center gap-3 rounded-lg border border-[rgba(0,0,0,0.12)] bg-[#FFFFFF] px-3 text-[#888888] transition focus-within:border-[rgba(249,115,22,0.5)] focus-within:ring-4 focus-within:ring-[#F97316]/10">
         <FiLock className="text-[17px]" />
         <input
           type={showPassword ? "text" : "password"}
@@ -75,12 +75,12 @@ function PasswordField({
           value={value}
           autoComplete={autoComplete}
           onChange={(event) => onChange(event.target.value)}
-          className="min-w-0 flex-1 bg-transparent text-sm font-medium text-white outline-none placeholder:text-[#444444]"
+          className="min-w-0 flex-1 bg-transparent text-sm font-medium text-[#111111] outline-none placeholder:text-[#AAAAAA]"
         />
         <button
           type="button"
           onClick={() => setShowPassword((current) => !current)}
-          className="grid h-8 w-8 place-items-center rounded-md text-[#666666] transition hover:bg-white/[0.04] hover:text-white"
+          className="grid h-8 w-8 place-items-center rounded-md text-[#666666] transition hover:bg-black/[0.04] hover:text-[#111111]"
           aria-label={showPassword ? "Hide password" : "Show password"}
         >
           {showPassword ? <FiEyeOff /> : <FiEye />}
@@ -156,10 +156,10 @@ export default function ShopFresherzAuth() {
   };
 
   return (
-    <section className="grid min-h-screen bg-[#0A0A0A] lg:grid-cols-[45%_55%]">
+    <section className="grid min-h-screen bg-[#F5F2ED] lg:grid-cols-[45%_55%]">
       <AuthLeftPanel />
 
-      <main className="flex items-center justify-center px-6 py-12">
+      <main className="flex items-center justify-center bg-[#F5F2ED] px-6 py-12">
         <div className="w-full max-w-[440px]">
           <div className="mb-8 flex items-center gap-3 lg:hidden">
             <Image
@@ -170,14 +170,14 @@ export default function ShopFresherzAuth() {
               style={{ borderRadius: '10px', objectFit: 'contain' }}
             />
             <div>
-              <p className="text-base font-extrabold text-white">ShopFresherz</p>
+              <p className="text-base font-extrabold text-[#111111]">ShopFresherz</p>
               <p className="text-[10px] font-bold uppercase tracking-[1.5px] text-[#F97316]">
                 Gadget Store
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-1 rounded-[12px] bg-[#141414] p-1">
+          <div className="grid grid-cols-2 gap-1 rounded-[12px] border border-[rgba(0,0,0,0.07)] bg-[#FFFFFF] p-1">
             {(["signin", "signup"] as AuthMode[]).map((authMode) => {
               const active = mode === authMode;
               return (
@@ -186,7 +186,7 @@ export default function ShopFresherzAuth() {
                   type="button"
                   onClick={() => switchMode(authMode)}
                   className={`h-11 rounded-[9px] text-sm font-medium transition-all duration-200 ${
-                    active ? "bg-[#2A2A2A] text-white" : "text-[#555555] hover:text-white"
+                    active ? "bg-[#F5F2ED] text-[#111111]" : "text-[#888888] hover:text-[#111111]"
                   }`}
                 >
                   {authMode === "signin" ? "Sign in" : "Create account"}
@@ -199,7 +199,7 @@ export default function ShopFresherzAuth() {
             <p className="text-[11px] font-bold uppercase text-[#F97316]">
               {isSignup ? "New here?" : "Welcome back"}
             </p>
-            <h2 className="mt-2 text-3xl font-extrabold tracking-[-0.5px] text-white">
+            <h2 className="mt-2 text-3xl font-extrabold tracking-[-0.5px] text-[#111111]">
               {isSignup ? "Create your account" : "Access your account"}
             </h2>
             <p className="mt-2 text-sm leading-6 text-[#666666]">
@@ -210,7 +210,7 @@ export default function ShopFresherzAuth() {
           </div>
 
           {error && (
-            <div className="mt-5 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-300">
+            <div className="mt-5 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-600">
               {error}
             </div>
           )}
@@ -233,7 +233,7 @@ export default function ShopFresherzAuth() {
             {!isSignup ? (
               <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">
                 <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-[#666666]">
-                  <input type="checkbox" checked={remember} onChange={(event) => setRemember(event.target.checked)} className="h-4 w-4 rounded border-white/[0.12] accent-[#F97316]" />
+                  <input type="checkbox" checked={remember} onChange={(event) => setRemember(event.target.checked)} className="h-4 w-4 rounded border-black/[0.12] accent-[#F97316]" />
                   Remember me
                 </label>
                 <Link href="/auth/forget-password" className="text-sm font-bold text-[#F97316] transition hover:underline">
@@ -242,7 +242,7 @@ export default function ShopFresherzAuth() {
               </div>
             ) : (
               <label className="flex cursor-pointer items-start gap-2 pt-1 text-sm leading-6 text-[#666666]">
-                <input type="checkbox" checked={agreedToTerms} onChange={(event) => setAgreedToTerms(event.target.checked)} className="mt-1 h-4 w-4 shrink-0 rounded border-white/[0.12] accent-[#F97316]" />
+                <input type="checkbox" checked={agreedToTerms} onChange={(event) => setAgreedToTerms(event.target.checked)} className="mt-1 h-4 w-4 shrink-0 rounded border-black/[0.12] accent-[#F97316]" />
                 <span>
                   I agree to ShopFresherz{" "}
                   <a href="#" className="font-bold text-[#F97316] hover:underline">Terms</a>{" "}
@@ -272,9 +272,9 @@ export default function ShopFresherzAuth() {
           </form>
 
           <div className="my-6 flex items-center gap-3">
-            <div className="h-px flex-1 bg-white/[0.06]" />
-            <span className="text-[11px] font-bold uppercase text-[#444444]">or</span>
-            <div className="h-px flex-1 bg-white/[0.06]" />
+            <div className="h-px flex-1 bg-black/[0.08]" />
+            <span className="text-[11px] font-bold uppercase text-[#888888]">or</span>
+            <div className="h-px flex-1 bg-black/[0.08]" />
           </div>
 
           <GoogleLogin

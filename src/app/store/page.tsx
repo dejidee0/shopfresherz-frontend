@@ -117,7 +117,7 @@ function ProductCard({ product }: { product: HomeProduct }) {
   return (
     <div
       className={`sf-product-card group relative block ${
-        isFavorited(product.id) ? "border-2 border-[#F97316]" : "border border-white/[0.06]"
+        isFavorited(product.id) ? "border-2 border-[#F97316]" : "border border-transparent"
       }`}
     >
       {Boolean(discountPercent || product.badge) && (
@@ -136,10 +136,10 @@ function ProductCard({ product }: { product: HomeProduct }) {
         }}
         disabled={isLoading(product.id)}
         aria-label={isFavorited(product.id) ? "Added to favorites" : "Add to favorites"}
-        className={`absolute top-3 right-3 z-20 w-8 h-8 bg-[#1A1A1A]/95 rounded-full border border-white/[0.08] flex items-center justify-center transition-colors ${
+        className={`absolute top-3 right-3 z-20 w-8 h-8 bg-white/90 rounded-full border border-black/[0.08] shadow-sm flex items-center justify-center transition-colors ${
           isFavorited(product.id)
             ? "text-[#F97316]"
-            : "text-[#666666] hover:text-white"
+            : "text-[#666666] hover:text-[#111111]"
         } ${isLoading(product.id) ? "opacity-50 cursor-wait" : ""}`}
       >
         <FiHeart
@@ -149,44 +149,44 @@ function ProductCard({ product }: { product: HomeProduct }) {
       </button>
 
       <Link href={`/store/product/${product.slug}`} className="flex flex-col flex-1 z-10">
-        <div className="product-image h-[190px] sm:h-[200px] bg-[#1A1A1A] overflow-hidden flex items-center justify-center">
+        <div className="product-image h-[190px] sm:h-[200px] bg-[#F5F2ED] overflow-hidden flex items-center justify-center">
           {imageSrc ? (
             <Image
               src={imageSrc}
               alt={product.name}
               width={200}
               height={200}
-              className="w-full h-full object-contain p-5 transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_12px_24px_rgba(0,0,0,0.45)]"
+              className="w-full h-full object-contain p-5 transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_12px_24px_rgba(0,0,0,0.15)]"
               unoptimized
             />
           ) : (
-            <div className="w-full h-full bg-[#1F1F1F] flex items-center justify-center text-[#555555] text-[11px]">
+            <div className="w-full h-full bg-[#EEEAE3] flex items-center justify-center text-[#888888] text-[11px]">
               No image
             </div>
           )}
         </div>
 
         <div className="p-4 flex flex-col gap-2 flex-1">
-          <p className="text-[10px] text-[#555555] uppercase tracking-[0.8px] leading-none">
+          <p className="text-[10px] text-[#888888] uppercase tracking-[0.8px] leading-none">
             {product.categoryName ?? product.category?.name ?? "ShopFresherz"}
           </p>
 
-          <p className="text-[13px] text-white font-medium leading-[1.45] line-clamp-2 min-h-[38px] group-hover:text-[#F97316] transition-colors">
+          <p className="text-[13px] text-[#111111] font-medium leading-[1.45] line-clamp-2 min-h-[38px] group-hover:text-[#F97316] transition-colors">
             {product.name}
           </p>
 
           <div className="flex items-center gap-1.5">
             <StarRating rating={product.rating} />
-            <span className="text-[11px] text-[#555555]">(0)</span>
+            <span className="text-[11px] text-[#888888]">(0)</span>
           </div>
 
           <div className="mt-auto flex items-end justify-between gap-2">
             <div className="flex flex-col">
-              <span className="text-[16px] font-bold text-[#F97316] leading-tight [text-shadow:0_0_12px_rgba(249,115,22,0.3)]">
+              <span className="text-[16px] font-bold text-[#F97316] leading-tight">
                 ₦{product.price.toLocaleString()}
               </span>
               {originalPrice != null && (
-                <span className="text-[11px] text-[#555555] line-through">
+                <span className="text-[11px] text-[#888888] line-through">
                   ₦{originalPrice.toLocaleString()}
                 </span>
               )}
@@ -402,7 +402,7 @@ export default function HomePage() {
       <HeroBanner />
 
       {/* 2. Trust signals */}
-      <div className="bg-[#0A0A0A] px-0 py-0">
+      <div className="bg-[#F5F2ED] px-0 py-0">
         <TrustSignals />
       </div>
 
@@ -416,7 +416,7 @@ export default function HomePage() {
       
       {/* ─── 6. BEST DEALS ──────────────────────────────────────────────── */}
 
-      <div className="bg-[#0A0A0A] py-10">
+      <div className="bg-[#FFFFFF] py-10">
         <div className="px-4 md:px-8">
           <SectionHeader
             title="Best Deals"
@@ -447,7 +447,7 @@ export default function HomePage() {
 
 
 
-      <div className="bg-[#0A0A0A] py-10">
+      <div className="bg-[#F5F2ED] py-10">
         <div className="px-4 md:px-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-5">
             <h2 className="sf-section-title">Featured Products</h2>
@@ -459,7 +459,7 @@ export default function HomePage() {
                 className={`shrink-0 rounded-full px-4 py-2 text-xs font-medium transition-colors ${
                   activeCategorySlug === "all"
                     ? "bg-[#F97316] text-white"
-                    : "border border-white/[0.08] bg-transparent text-[#666666] hover:border-white/[0.2] hover:text-white"
+                    : "border border-black/[0.1] bg-transparent text-[#666666] hover:border-black/[0.25] hover:text-[#111111]"
                 }`}
               >
                 All
@@ -472,7 +472,7 @@ export default function HomePage() {
                   className={`shrink-0 rounded-full px-4 py-2 text-xs font-medium transition-colors ${
                     activeCategorySlug === category.slug
                       ? "bg-[#F97316] text-white"
-                      : "border border-white/[0.08] bg-transparent text-[#666666] hover:border-white/[0.2] hover:text-white"
+                      : "border border-black/[0.1] bg-transparent text-[#666666] hover:border-black/[0.25] hover:text-[#111111]"
                   }`}
                 >
                   {category.name}

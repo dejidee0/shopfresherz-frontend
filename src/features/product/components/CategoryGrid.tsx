@@ -125,7 +125,7 @@ export function CategoryGrid({
       <div className="max-w-content mx-auto px-3 sm:px-6 lg:px-10">
         <div className="sf-card-3d rounded-[16px] p-6">
           <div className="flex items-center justify-between gap-4 mb-5">
-            <h2 className="text-xl font-bold text-white">
+            <h2 className="text-xl font-bold text-[#111111]">
               Shop by Category
             </h2>
             <Link
@@ -192,7 +192,7 @@ function CategoryItem({ category, index }: { category: CategoryWithImage; index:
 
       </div>
 
-      <span className="text-[11px] font-medium text-[#CFCFCF] text-center leading-tight group-hover:text-[#F97316] transition-colors">
+      <span className="text-[11px] font-medium text-[#111111] text-center leading-tight group-hover:text-[#F97316] transition-colors">
         {category.name}
       </span>
     </Link>

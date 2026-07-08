@@ -60,18 +60,18 @@ export function CartDrawer() {
         aria-modal="true"
         aria-label="Shopping cart"
         className={cn(
-          'fixed top-0 right-0 h-full w-full max-w-[420px] bg-[#0D0D0D] z-50 flex flex-col border-l border-white/[0.06]',
-          'shadow-[-20px_0_60px_rgba(0,0,0,0.8)] transition-transform duration-300 ease-out',
+          'fixed top-0 right-0 h-full w-full max-w-[420px] bg-[#FFFFFF] z-50 flex flex-col border-l border-black/[0.08]',
+          'shadow-[-8px_0_32px_rgba(0,0,0,0.12)] transition-transform duration-300 ease-out',
           isOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 bg-[#0D0D0D] border-b border-white/[0.06]">
+        <div className="flex items-center justify-between px-6 py-5 bg-[#FFFFFF] border-b border-black/[0.06]">
           <div className="flex items-center gap-2">
-            <h2 className="text-[18px] font-bold text-white">
+            <h2 className="text-[18px] font-bold text-[#111111]">
               Shopping Cart
               {items.length > 0 && (
-                <span className="ml-2 text-[14px] font-normal text-[#555555]">
+                <span className="ml-2 text-[14px] font-normal text-[#888888]">
                   ({items.length} {items.length === 1 ? 'item' : 'items'})
                 </span>
               )}
@@ -79,7 +79,7 @@ export function CartDrawer() {
           </div>
           <button
             onClick={closeCart}
-            className="w-8 h-8 rounded-[8px] bg-[#1A1A1A] border border-white/[0.06] flex items-center justify-center text-[#777777] hover:text-white hover:bg-[#242424] transition-colors"
+            className="w-8 h-8 rounded-[8px] bg-[#F5F5F5] border border-black/[0.08] flex items-center justify-center text-[#888888] hover:text-[#111111] hover:bg-[#EAEAEA] transition-colors"
             aria-label="Close cart"
           >
             <FiX size={18} />
@@ -93,12 +93,12 @@ export function CartDrawer() {
           ) : (
             <ul>
               {items.map((item) => (
-                <li key={item.id} className="px-6 py-4 flex gap-3 border-b border-white/[0.04]">
+                <li key={item.id} className="px-6 py-4 flex gap-3 border-b border-black/[0.05] bg-[#FFFFFF]">
                   {/* Image */}
                   <Link
                     href={`/store/product/${item.slug}`}
                     onClick={closeCart}
-                    className="w-[72px] h-[72px] shrink-0 bg-[#1A1A1A] rounded-[10px] border border-white/[0.06] overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
+                    className="w-[72px] h-[72px] shrink-0 bg-[#F5F5F5] rounded-[10px] border border-black/[0.06] overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
                   >
                     <Image
                       src={item.image || '/images/device-placeholder.jpg'}
@@ -111,17 +111,17 @@ export function CartDrawer() {
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] text-[#555555] uppercase tracking-[0.5px] mb-1">
+                    <p className="text-[10px] text-[#888888] uppercase tracking-[0.5px] mb-1">
                       ShopFresherz
                     </p>
                     <Link
                       href={`/store/product/${item.slug}`}
                       onClick={closeCart}
-                      className="text-[13px] font-medium text-white leading-snug line-clamp-2 hover:text-[#F97316] transition-colors"
+                      className="text-[13px] font-medium text-[#111111] leading-snug line-clamp-2 hover:text-[#F97316] transition-colors"
                     >
                       {item.name}
                     </Link>
-                    <p className="text-[15px] font-bold text-[#F97316] mt-1 [text-shadow:0_0_12px_rgba(249,115,22,0.3)]">
+                    <p className="text-[15px] font-bold text-[#F97316] mt-1">
                       {formatPrice(item.price)}
                     </p>
 
@@ -131,18 +131,18 @@ export function CartDrawer() {
                         <button
                           onClick={() => updateQty(item.id, item.quantity - 1)}
                           disabled={item.quantity <= 1}
-                          className="w-7 h-7 rounded-[6px] border border-white/[0.08] bg-[#1A1A1A] flex items-center justify-center text-white hover:border-[#F97316] disabled:opacity-40 transition-colors"
+                          className="w-7 h-7 rounded-[6px] border border-black/[0.1] bg-[#F5F5F5] flex items-center justify-center text-[#111111] hover:border-[#F97316] disabled:opacity-40 transition-colors"
                           aria-label="Decrease quantity"
                         >
                           <FiMinus size={12} />
                         </button>
-                        <span className="w-7 h-7 rounded-[6px] border border-white/[0.08] bg-[#1A1A1A] flex items-center justify-center text-[12px] font-semibold text-white">
+                        <span className="w-7 h-7 rounded-[6px] border border-black/[0.1] bg-[#F5F5F5] flex items-center justify-center text-[12px] font-semibold text-[#111111]">
                           {item.quantity}
                         </span>
                         <button
                           onClick={() => updateQty(item.id, item.quantity + 1)}
                           disabled={item.quantity >= item.stockQty}
-                          className="w-7 h-7 rounded-[6px] border border-white/[0.08] bg-[#1A1A1A] flex items-center justify-center text-white hover:border-[#F97316] disabled:opacity-40 transition-colors"
+                          className="w-7 h-7 rounded-[6px] border border-black/[0.1] bg-[#F5F5F5] flex items-center justify-center text-[#111111] hover:border-[#F97316] disabled:opacity-40 transition-colors"
                           aria-label="Increase quantity"
                         >
                           <FiPlus size={12} />
@@ -151,7 +151,7 @@ export function CartDrawer() {
 
                       {/* Line total + remove */}
                       <div className="flex flex-col items-end gap-2">
-                        <span className="text-[13px] font-bold text-white">
+                        <span className="text-[13px] font-bold text-[#111111]">
                           {formatPrice(item.price * item.quantity)}
                         </span>
                         <button
@@ -172,7 +172,7 @@ export function CartDrawer() {
 
         {/* Order summary + actions */}
         {items.length > 0 && (
-          <div className="border-t border-white/[0.06] px-6 pt-4 pb-5 space-y-4 bg-[#0F0F0F]">
+          <div className="border-t border-black/[0.06] px-6 pt-4 pb-5 space-y-4 bg-[#FFFFFF]">
             {/* Free delivery progress */}
             <div>
               <p className={cn('text-[12px]', afterDiscount >= DELIVERY_THRESHOLD ? 'text-[#16A34A]' : 'text-[#888888]')}>
@@ -180,7 +180,7 @@ export function CartDrawer() {
                   ? "You've unlocked free delivery!"
                   : <>Add <span className="font-semibold text-[#F97316]">{formatPrice(DELIVERY_THRESHOLD - afterDiscount)}</span> more for free delivery</>}
               </p>
-                <div className="mt-2 h-1 bg-[#1A1A1A] rounded-[20px] overflow-hidden">
+                <div className="mt-2 h-1 bg-[#F0F0F0] rounded-[20px] overflow-hidden">
                 <div
                   className="h-full bg-linear-to-r from-[#F97316] to-[#FBBF24] rounded-[20px] transition-all duration-500 shadow-[0_0_8px_rgba(249,115,22,0.4)]"
                   style={{ width: `${Math.min(100, (afterDiscount / DELIVERY_THRESHOLD) * 100)}%` }}
@@ -190,9 +190,9 @@ export function CartDrawer() {
 
             {/* Summary lines */}
             <div className="space-y-2 text-[14px]">
-              <div className="flex justify-between text-[#777777]">
+              <div className="flex justify-between text-[#666666]">
                 <span>Subtotal</span>
-                <span>{formatPrice(sub)}</span>
+                <span className="text-[#111111]">{formatPrice(sub)}</span>
               </div>
               {discount > 0 && (
                 <div className="flex justify-between text-[#22C55E]">
@@ -200,15 +200,15 @@ export function CartDrawer() {
                   <span>-{formatPrice(discount)}</span>
                 </div>
               )}
-              <div className="flex justify-between text-[#777777]">
+              <div className="flex justify-between text-[#666666]">
                 <span>Delivery</span>
-                <span>{deliveryFee === 0 ? <span className="text-[#22C55E] font-medium">FREE</span> : formatPrice(deliveryFee)}</span>
+                <span>{deliveryFee === 0 ? <span className="text-[#22C55E] font-medium">FREE</span> : <span className="text-[#111111]">{formatPrice(deliveryFee)}</span>}</span>
               </div>
-              <div className="flex justify-between text-[#777777]">
+              <div className="flex justify-between text-[#666666]">
                 <span>VAT (7.5%)</span>
-                <span>{formatPrice(vat)}</span>
+                <span className="text-[#111111]">{formatPrice(vat)}</span>
               </div>
-              <div className="flex justify-between font-bold text-white text-[16px] pt-3 border-t border-white/[0.08]">
+              <div className="flex justify-between font-bold text-[#111111] text-[16px] pt-3 border-t border-black/[0.08]">
                 <span>Total</span>
                 <span>{formatPrice(total)}</span>
               </div>
@@ -225,7 +225,7 @@ export function CartDrawer() {
               </Link>
               <button
                 onClick={closeCart}
-                className="w-full text-center text-[13px] text-[#555555] hover:text-[#888888] transition-colors"
+                className="w-full text-center text-[13px] text-[#888888] hover:text-[#111111] transition-colors"
               >
                 Continue Shopping
               </button>
@@ -240,10 +240,10 @@ export function CartDrawer() {
 function EmptyCart({ onClose }: { onClose: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center h-full px-8 py-16 text-center">
-      <div className="w-24 h-24 rounded-full bg-[#1A1A1A] border border-white/[0.06] flex items-center justify-center mb-5">
-        <FiShoppingBag size={36} className="text-[#555555]" />
+      <div className="w-24 h-24 rounded-full bg-[#F5F5F5] border border-black/[0.06] flex items-center justify-center mb-5">
+        <FiShoppingBag size={36} className="text-[#888888]" />
       </div>
-      <h3 className="text-base font-bold text-white mb-2">Your cart is empty</h3>
+      <h3 className="text-base font-bold text-[#111111] mb-2">Your cart is empty</h3>
       <p className="text-sm text-[#666666] mb-6">
         Looks like you haven&apos;t added anything yet.
       </p>

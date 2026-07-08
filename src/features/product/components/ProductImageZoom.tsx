@@ -304,7 +304,7 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
           <div
             ref={mainRef}
             className={cn(
-              'relative rounded-[20px] overflow-hidden bg-[#141414] border border-white/[0.06] shrink-0 shadow-[0_20px_60px_rgba(0,0,0,0.5)]',
+              'relative rounded-[20px] overflow-hidden bg-[#FFFFFF] border border-black/[0.07] shrink-0 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]',
               'w-full h-[360px] sm:h-[440px] p-8',
               isOutOfStock || !hasProvidedImages ? 'grayscale cursor-default' : 'cursor-crosshair'
             )}
@@ -351,7 +351,7 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
               draggable={false}
             />
             ) : (
-              <div className="absolute inset-6 rounded-[10px] bg-[#1F1F1F] flex flex-col items-center justify-center gap-2 text-[#555555]">
+              <div className="absolute inset-6 rounded-[10px] bg-[#F5F5F5] flex flex-col items-center justify-center gap-2 text-[#999999]">
                 <FiCamera size={28} />
                 <span className="text-[12px]">No image available</span>
               </div>
@@ -374,7 +374,7 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
             {!isOutOfStock && (
               <button
                 className={cn(
-                  'absolute top-3 right-3 w-8 h-8 rounded-full bg-[#1A1A1A]/90 shadow flex items-center justify-center',
+                  'absolute top-3 right-3 w-8 h-8 rounded-full bg-[#FFFFFF] border border-black/[0.07] shadow-[0_2px_12px_rgba(0,0,0,0.06)] flex items-center justify-center',
                   'text-[#777777] hover:text-[#F97316] transition-all duration-200',
                   isHovering ? 'opacity-100' : 'opacity-0'
                 )}
@@ -404,7 +404,7 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
           {/* ── Zoom preview panel (desktop, right of image) ── */}
           {isHovering && !isOutOfStock && zoomImageLoaded[activeIndex] && scrollZoom === 1 && (
             <div
-              className="hidden lg:block shrink-0 rounded-card overflow-hidden border border-white/[0.08] shadow-lg shadow-black/30"
+              className="hidden lg:block shrink-0 rounded-card overflow-hidden border border-black/[0.07] shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] bg-white"
               style={{ width: PREVIEW_SIZE, height: PREVIEW_SIZE }}
               aria-hidden="true"
             >
@@ -438,10 +438,10 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
                 setMobilePan({ x: 0, y: 0 })
               }}
               className={cn(
-                'relative shrink-0 w-[72px] h-[72px] rounded-[10px] border overflow-hidden bg-[#1F1F1F] transition-all duration-150',
+                'relative shrink-0 w-[72px] h-[72px] rounded-[10px] border overflow-hidden bg-[#F5F5F5] transition-all duration-150',
                 i === activeIndex
-                  ? 'border-2 border-[#F97316] shadow-[0_0_16px_rgba(249,115,22,0.3)]'
-                  : 'border border-white/[0.06] hover:border-white/[0.2]'
+                  ? 'border-2 border-[#F97316] shadow-[0_0_0_3px_rgba(249,115,22,0.12)]'
+                  : 'border border-black/[0.07] hover:border-black/[0.2]'
               )}
             >
               <Image

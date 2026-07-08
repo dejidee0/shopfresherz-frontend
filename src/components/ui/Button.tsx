@@ -17,9 +17,9 @@ const variantClasses: Record<Variant, string> = {
   primary:
     'bg-[#F97316] text-white border border-transparent rounded-[8px] hover:bg-[#EA580C] active:scale-[0.98]',
   secondary:
-    'border-[1.5px] border-white/[0.18] text-white bg-transparent rounded-[8px] hover:border-[#F97316] hover:text-[#F97316] hover:bg-[#F97316]/10 active:scale-[0.98]',
+    'border-[1.5px] border-[rgba(0,0,0,0.12)] text-[#111111] bg-transparent rounded-[8px] hover:border-[#F97316] hover:text-[#F97316] hover:bg-[#F97316]/10 active:scale-[0.98]',
   ghost:
-    'border-[1.5px] border-white/[0.18] text-white bg-transparent rounded-[8px] hover:border-[#F97316] hover:text-[#F97316] hover:bg-[#F97316]/10 active:scale-[0.98]',
+    'border-[1.5px] border-[rgba(0,0,0,0.12)] text-[#111111] bg-transparent rounded-[8px] hover:border-[#F97316] hover:text-[#F97316] hover:bg-[#F97316]/10 active:scale-[0.98]',
   danger:
     'bg-[#DC2626] text-white border border-transparent rounded-[8px] hover:bg-red-700 active:scale-[0.98]',
 }

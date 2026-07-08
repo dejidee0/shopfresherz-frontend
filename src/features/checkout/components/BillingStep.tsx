@@ -75,7 +75,7 @@ export function BillingStep({
       }
     >
       <StepIndicator step={1} />
-      <h2 className="text-lg font-bold text-white mb-5">
+      <h2 className="text-lg font-bold text-[#111111] mb-5">
         Billing Information
       </h2>
 
@@ -83,7 +83,7 @@ export function BillingStep({
         {/* Full name + company */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="sm:col-span-1">
-            <p className="text-sm font-medium text-[#A0A0A0] mb-1">Full Name</p>
+            <p className="text-sm font-medium text-[#666666] mb-1">Full Name</p>
             <div className="grid grid-cols-2 gap-2">
               <Field
                 placeholder="First name"
@@ -196,7 +196,7 @@ export function BillingStep({
             onChange={(e) => set("saveAddress", e.target.checked)}
             className="w-4 h-4 accent-[#F97316]"
           />
-          <span className="text-sm text-[#A0A0A0]">Save this address</span>
+          <span className="text-sm text-[#666666]">Save this address</span>
         </label>
 
         {/* CTA */}

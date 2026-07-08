@@ -69,7 +69,7 @@ export function ActiveFilters({
 
       {/* Right: result count */}
       <p className="text-[10px] sm:text-xs text-[#6B7280] shrink-0">
-        <span className="font-bold text-white">
+        <span className="font-bold text-[#111111]">
           {resultCount?.toLocaleString()}
         </span>{' '}
         Results
@@ -80,7 +80,7 @@ export function ActiveFilters({
 
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <span className="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2.5 py-0.5 sm:py-1 bg-white/[0.06] border border-white/[0.1] rounded-full text-[10px] sm:text-xs font-medium text-white">
+    <span className="inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2.5 py-0.5 sm:py-1 bg-[#F5F5F5] border border-black/[0.1] rounded-full text-[10px] sm:text-xs font-medium text-[#111111]">
       <span className="truncate max-w-20 sm:max-w-none">{label}</span>
       <button
         onClick={onRemove}

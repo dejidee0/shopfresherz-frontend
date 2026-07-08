@@ -60,7 +60,7 @@ function SummarySection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-[#141414] border border-white/[0.08] rounded-[12px] p-5 mb-4 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
+    <div className="bg-white border border-[rgba(0,0,0,0.07)] rounded-[12px] p-5 mb-4 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           {title.toLowerCase().includes("delivery") ? (
@@ -200,7 +200,7 @@ export function RegisteredCheckout({
       >
         <div className="flex flex-col gap-4">
           {/* ── Delivery Address ─────────────────────────────────────────────── */}
-          <div className="bg-[#141414] border border-white/[0.08] rounded-[12px] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
+          <div className="bg-white border border-[rgba(0,0,0,0.07)] rounded-[12px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <FiMapPin size={15} className="text-[#F97316] shrink-0" />
@@ -220,13 +220,13 @@ export function RegisteredCheckout({
                     onClick={() => onSelectAddress(addr.id)}
                     className={`w-full text-left flex items-start gap-3 p-3 rounded-[8px] border transition-all duration-150 ${
                       isSelected
-                        ? "border-[#F97316] bg-[#F97316]/10 shadow-[0_0_26px_rgba(249,115,22,0.16)]"
-                        : "border-white/[0.08] bg-[#101010] hover:border-[#F97316]/40 hover:bg-[#181818]"
+                        ? "border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_1px_rgba(249,115,22,0.2)]"
+                        : "border-[rgba(0,0,0,0.08)] bg-[#F8F8F8] hover:border-[#F97316]/40 hover:bg-[#F2F2F2]"
                     }`}
                   >
                     <span
                       className={`mt-0.5 shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${
-                        isSelected ? "border-[#F97316]" : "border-white/25"
+                        isSelected ? "border-[#F97316]" : "border-[rgba(0,0,0,0.15)]"
                       }`}
                     >
                       {isSelected && (
@@ -235,11 +235,11 @@ export function RegisteredCheckout({
                     </span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <p className="text-sm font-semibold text-white">
+                        <p className="text-sm font-semibold text-[#111111]">
                           {user?.firstName} {user?.lastName}
                         </p>
                         {addr.label && (
-                          <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-white/[0.08] text-[#A0A0A0]">
+                          <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-[#EFEFEF] text-[#666666]">
                             {addr.label}
                           </span>
                         )}
@@ -249,7 +249,7 @@ export function RegisteredCheckout({
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-[#A0A0A0] mt-0.5 leading-relaxed">
+                      <p className="text-xs text-[#666666] mt-0.5 leading-relaxed">
                         {addr.line1}
                         {addr.line2 ? `, ${addr.line2}` : ""}
                         <br />
@@ -274,7 +274,7 @@ export function RegisteredCheckout({
 
               <button
                 onClick={() => setIsAddressModalOpen(true)}
-                className="mt-1 flex w-full items-center justify-center gap-2 rounded-[8px] border border-dashed border-white/[0.14] px-4 py-3 text-[13px] text-[#888888] font-medium hover:border-[#F97316] hover:text-[#F97316] transition-colors"
+                className="mt-1 flex w-full items-center justify-center gap-2 rounded-[8px] border border-dashed border-[rgba(0,0,0,0.15)] px-4 py-3 text-[13px] text-[#888888] font-medium hover:border-[#F97316] hover:text-[#F97316] transition-colors"
               >
                 <span className="w-4 h-4 rounded-full border border-dashed border-current flex items-center justify-center">
                   <FiPlus size={10} />
@@ -288,7 +288,7 @@ export function RegisteredCheckout({
           <SummarySection title="Delivery Details" onEdit={onEditDelivery}>
             <div className="flex items-center gap-2">
               <FiTruck size={14} className="text-[#888888] shrink-0" />
-              <p className="text-[14px] font-medium text-white">
+              <p className="text-[14px] font-medium text-[#111111]">
                 {DELIVERY_LABELS[delivery] ?? "Standard Delivery"}
               </p>
             </div>
@@ -301,7 +301,7 @@ export function RegisteredCheckout({
             </p>
           </SummarySection>
 
-          <div className="bg-[#141414] border border-white/[0.08] rounded-[12px] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
+          <div className="bg-white border border-[rgba(0,0,0,0.07)] rounded-[12px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <FiCreditCard size={15} className="text-[#F97316] shrink-0" />
@@ -327,16 +327,16 @@ export function RegisteredCheckout({
                       onClick={() => onSelectCard(card.id)}
                       className={`w-full flex items-center gap-3 rounded-[8px] border px-4 py-3 text-left transition-colors ${
                         isSelected
-                          ? "border-[1.5px] border-[#F97316] bg-[#F97316]/10"
-                          : "border-white/[0.08] bg-[#101010] hover:border-[#F97316]/40 hover:bg-[#181818]"
+                          ? "border-[1.5px] border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_1px_rgba(249,115,22,0.2)]"
+                          : "border-[rgba(0,0,0,0.08)] bg-[#F8F8F8] hover:border-[#F97316]/40 hover:bg-[#F2F2F2]"
                       }`}
                     >
-                       <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${isSelected ? "border-[#F97316]" : "border-white/25"}`}>
+                       <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${isSelected ? "border-[#F97316]" : "border-[rgba(0,0,0,0.15)]"}`}>
                         {isSelected && <span className="w-2 h-2 rounded-full bg-[#F97316]" />}
                       </span>
                       <FiCreditCard size={16} className="text-[#F97316]" />
                       <span className="flex flex-col">
-                         <span className="text-sm font-medium text-white">{cardBrandLabel(card)}</span>
+                         <span className="text-sm font-medium text-[#111111]">{cardBrandLabel(card)}</span>
                         <span className="text-xs text-[#888888]">{maskNumber(card.cardNumber?.slice(-4))}</span>
                       </span>
                     </button>
@@ -347,15 +347,15 @@ export function RegisteredCheckout({
                   onClick={() => onSelectPayment("card")}
                   className={`w-full flex items-center gap-3 rounded-[8px] border px-4 py-3 text-left transition-colors ${
                     selectedPayment === "card"
-                      ? "border-[1.5px] border-[#F97316] bg-[#F97316]/10"
-                      : "border-white/[0.08] bg-[#101010] hover:border-[#F97316]/40 hover:bg-[#181818]"
+                      ? "border-[1.5px] border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_1px_rgba(249,115,22,0.2)]"
+                      : "border-[rgba(0,0,0,0.08)] bg-[#F8F8F8] hover:border-[#F97316]/40 hover:bg-[#F2F2F2]"
                   }`}
                 >
-                  <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedPayment === "card" ? "border-[#F97316]" : "border-white/25"}`}>
+                  <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedPayment === "card" ? "border-[#F97316]" : "border-[rgba(0,0,0,0.15)]"}`}>
                     {selectedPayment === "card" && <span className="w-2 h-2 rounded-full bg-[#F97316]" />}
                   </span>
                   <FiCreditCard size={16} className="text-[#F97316]" />
-                  <span className="text-sm font-medium text-white">Card</span>
+                  <span className="text-sm font-medium text-[#111111]">Card</span>
                 </button>
               )}
 
@@ -365,15 +365,15 @@ export function RegisteredCheckout({
                   onClick={() => onSelectPayment(method)}
                   className={`w-full flex items-center gap-3 rounded-[8px] border px-4 py-3 text-left transition-colors ${
                     selectedPayment === method
-                      ? "border-[1.5px] border-[#F97316] bg-[#F97316]/10"
-                      : "border-white/[0.08] bg-[#101010] hover:border-[#F97316]/40 hover:bg-[#181818]"
+                      ? "border-[1.5px] border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_1px_rgba(249,115,22,0.2)]"
+                      : "border-[rgba(0,0,0,0.08)] bg-[#F8F8F8] hover:border-[#F97316]/40 hover:bg-[#F2F2F2]"
                   }`}
                 >
-                  <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedPayment === method ? "border-[#F97316]" : "border-white/25"}`}>
+                  <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedPayment === method ? "border-[#F97316]" : "border-[rgba(0,0,0,0.15)]"}`}>
                     {selectedPayment === method && <span className="w-2 h-2 rounded-full bg-[#F97316]" />}
                   </span>
                   <FiCreditCard size={16} className="text-[#F97316]" />
-                  <span className="text-sm font-medium text-white">
+                  <span className="text-sm font-medium text-[#111111]">
                     {PAYMENT_METHOD_LABELS[method]}
                   </span>
                 </button>
@@ -389,7 +389,7 @@ export function RegisteredCheckout({
             className={`w-full h-[52px] rounded-[10px] text-[16px] font-semibold flex items-center justify-center gap-2 transition-colors ${
               paymentReady
                 ? "sf-btn-primary text-white cursor-pointer"
-                : "bg-[#252525] text-[#888888] cursor-not-allowed"
+                : "bg-[#E0E0E0] text-[#AAAAAA] cursor-not-allowed"
             }`}
           >
             PLACE ORDER — {formatPrice(total)} <FiArrowRight size={16} />

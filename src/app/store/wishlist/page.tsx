@@ -26,12 +26,14 @@ function getStockLabel(item: FavoriteProduct) {
 
 function SkeletonCard() {
   return (
-    <div className="bg-[#141414] border border-white/[0.08] rounded-xl p-4 flex gap-4 animate-pulse">
-      <div className="w-20 h-20 rounded-lg bg-[#1F1F1F] shrink-0" />
+    <div
+      className="bg-white border border-black/[0.07] rounded-xl p-4 flex gap-4 animate-pulse shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]"
+    >
+      <div className="w-20 h-20 rounded-lg bg-[#EEEAE3] shrink-0" />
       <div className="flex-1 space-y-2 py-1">
-        <div className="h-3 bg-white/[0.08] rounded w-3/4" />
-        <div className="h-3 bg-white/[0.08] rounded w-1/2" />
-        <div className="h-3 bg-white/[0.08] rounded w-1/4" />
+        <div className="h-3 bg-black/[0.06] rounded w-3/4" />
+        <div className="h-3 bg-black/[0.06] rounded w-1/2" />
+        <div className="h-3 bg-black/[0.06] rounded w-1/4" />
       </div>
     </div>
   )
@@ -53,12 +55,12 @@ function WishlistCard({ item, onRemove, onAddToCart, isRemoving }: WishlistCardP
 
   return (
     <div
-      className={`bg-[#141414] border border-white/[0.08] rounded-xl p-4 flex gap-4 transition-all duration-200
+      className={`bg-white border border-black/[0.07] rounded-xl p-4 flex gap-4 transition-all duration-200 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]
         ${isRemoving ? 'opacity-40 pointer-events-none scale-[0.98]' : 'hover:border-[#F97316] hover:shadow-[0_16px_34px_rgba(249,115,22,0.14)]'}`}
     >
       {/* Product image */}
       <Link href={`/store/product/${item.slug}`} className="shrink-0">
-        <div className="w-20 h-20 rounded-lg bg-[#1F1F1F] overflow-hidden flex items-center justify-center">
+        <div className="w-20 h-20 rounded-lg bg-[#F5F2ED] overflow-hidden flex items-center justify-center">
           <Image
             src={imageSrc}
             alt={item.name}
@@ -74,13 +76,13 @@ function WishlistCard({ item, onRemove, onAddToCart, isRemoving }: WishlistCardP
       <div className="flex-1 min-w-0 flex flex-col gap-1.5">
         <Link
           href={`/store/product/${item.slug}`}
-          className="text-sm font-semibold text-white line-clamp-2 hover:text-[#F97316] transition-colors"
+          className="text-sm font-semibold text-[#111111] line-clamp-2 hover:text-[#F97316] transition-colors"
         >
           {item.name}
         </Link>
 
         {item.brandName && (
-          <p className="text-[11px] text-[#6B7280] uppercase tracking-wide">{item.brandName}</p>
+          <p className="text-[11px] text-[#666666] uppercase tracking-wide">{item.brandName}</p>
         )}
 
         {/* Price */}
@@ -89,7 +91,7 @@ function WishlistCard({ item, onRemove, onAddToCart, isRemoving }: WishlistCardP
             {formatPrice(item.price)}
           </span>
           {item.compareAtPrice && item.compareAtPrice > item.price && (
-            <span className="text-xs text-[#9CA3AF] line-through">
+            <span className="text-xs text-[#888888] line-through">
               {formatPrice(item.compareAtPrice)}
             </span>
           )}
@@ -99,10 +101,10 @@ function WishlistCard({ item, onRemove, onAddToCart, isRemoving }: WishlistCardP
         <span
           className={`text-[11px] font-semibold w-fit px-2 py-0.5 rounded-full
             ${stockStatus === 'in-stock'
-              ? 'bg-green-500/10 text-green-300'
+              ? 'bg-green-500/10 text-green-700'
               : stockStatus === 'low-stock'
-              ? 'bg-yellow-500/10 text-yellow-300'
-              : 'bg-red-500/10 text-red-300'}`}
+              ? 'bg-yellow-500/10 text-yellow-700'
+              : 'bg-red-500/10 text-red-700'}`}
         >
           {stockStatus === 'in-stock'
             ? 'In Stock'
@@ -119,7 +121,7 @@ function WishlistCard({ item, onRemove, onAddToCart, isRemoving }: WishlistCardP
           onClick={() => onRemove(productId)}
           disabled={isRemoving}
           aria-label="Remove from wishlist"
-          className="w-8 h-8 rounded-full flex items-center justify-center text-[#9CA3AF] hover:text-[#EF4444] hover:bg-red-500/10 transition-colors"
+          className="w-8 h-8 rounded-full flex items-center justify-center text-[#888888] hover:text-[#EF4444] hover:bg-red-500/10 transition-colors"
         >
           {isRemoving
             ? <FiLoader size={15} className="animate-spin" />
@@ -132,7 +134,7 @@ function WishlistCard({ item, onRemove, onAddToCart, isRemoving }: WishlistCardP
           disabled={stockStatus === 'out-of-stock'}
           className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-colors
             ${stockStatus === 'out-of-stock'
-              ? 'bg-[#252525] text-[#9CA3AF] cursor-not-allowed'
+              ? 'bg-[#EEEAE3] text-[#999999] cursor-not-allowed'
               : 'sf-btn-primary text-white'}`}
         >
           <FiShoppingCart size={13} />
@@ -222,16 +224,16 @@ export default function WishlistPage() {
 
   /* ── Render ── */
   return (
-    <div className="bg-[#0A0A0A] min-h-screen">
+    <div className="bg-[#F5F2ED] min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-10 py-8">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <FiHeart size={20} className="text-[#F97316]" />
-            <h1 className="text-xl font-bold text-white">My Wishlist</h1>
+            <h1 className="text-xl font-bold text-[#111111]">My Wishlist</h1>
             {!loading && items.length > 0 && (
-              <span className="text-sm text-[#6B7280] font-medium">
+              <span className="text-sm text-[#666666] font-medium">
                 ({items.length} {items.length === 1 ? 'item' : 'items'})
               </span>
             )}
@@ -253,10 +255,12 @@ export default function WishlistPage() {
 
         {/* Error state */}
         {!loading && error && (
-          <div className="bg-[#141414] border border-red-500/20 rounded-xl p-6 flex flex-col items-center gap-3 text-center">
+          <div
+            className="bg-white border border-red-500/20 rounded-xl p-6 flex flex-col items-center gap-3 text-center shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]"
+          >
             <FiAlertCircle size={32} className="text-[#EF4444]" />
-            <p className="text-sm font-semibold text-white">Could not load your wishlist</p>
-            <p className="text-xs text-[#6B7280]">{error}</p>
+            <p className="text-sm font-semibold text-[#111111]">Could not load your wishlist</p>
+            <p className="text-xs text-[#666666]">{error}</p>
             <button
               onClick={loadFavorites}
               className="mt-1 px-5 py-2 sf-btn-primary text-white text-sm font-bold rounded-lg"
@@ -268,12 +272,14 @@ export default function WishlistPage() {
 
         {/* Empty state */}
         {!loading && !error && items.length === 0 && (
-          <div className="bg-[#141414] border border-white/[0.08] rounded-xl p-10 flex flex-col items-center gap-4 text-center">
+          <div
+            className="bg-white border border-black/[0.07] rounded-xl p-10 flex flex-col items-center gap-4 text-center shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]"
+          >
             <div className="w-16 h-16 rounded-full bg-[#F97316]/10 flex items-center justify-center">
               <FiHeart size={28} className="text-[#F97316]" />
             </div>
-            <p className="text-base font-bold text-white">Your wishlist is empty</p>
-            <p className="text-sm text-[#6B7280] max-w-xs">
+            <p className="text-base font-bold text-[#111111]">Your wishlist is empty</p>
+            <p className="text-sm text-[#666666] max-w-xs">
               Browse our store and tap the heart icon on any product to save it here.
             </p>
             <Link

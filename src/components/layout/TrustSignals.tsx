@@ -33,18 +33,18 @@ const TRUST_SIGNALS = [
 
 export function TrustSignals() {
   return (
-    <div className="w-full bg-[#0F0F0F] border-y border-white/[0.05]">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-white/[0.04]">
+    <div className="w-full bg-[#FFFFFF] border-y border-black/[0.06]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-black/[0.06]">
         {TRUST_SIGNALS.map(({ icon: Icon, iconBg, iconColor, title, subtitle }) => (
           <div key={title} className="flex items-center gap-3.5 px-6 py-5">
             <span className={`trust-icon w-11 h-11 rounded-[12px] flex items-center justify-center shrink-0 ${iconBg}`}>
               <Icon className={iconColor} size={20} />
             </span>
             <span className="min-w-0">
-              <span className="block text-[13px] font-semibold text-white leading-tight">
+              <span className="block text-[13px] font-semibold text-[#111111] leading-tight">
                 {title}
               </span>
-              <span className="block mt-1 text-[11px] text-[#555555] leading-tight">
+              <span className="block mt-1 text-[11px] text-[#888888] leading-tight">
                 {subtitle}
               </span>
             </span>

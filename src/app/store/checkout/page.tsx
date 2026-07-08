@@ -344,8 +344,8 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="bg-[#0A0A0A] px-4 py-16 min-h-screen text-center">
-        <h1 className="text-xl font-bold text-white">Your cart is empty</h1>
+      <div className="bg-[#F5F2ED] px-4 py-16 min-h-screen text-center">
+        <h1 className="text-xl font-bold text-[#111111]">Your cart is empty</h1>
         <p className="mt-2 text-sm text-[#666666]">
           Add products to your cart before checking out.
         </p>
@@ -360,7 +360,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="bg-[#0A0A0A] px-4 sm:px-6 lg:px-8 py-8 min-h-screen">
+    <div className="bg-[#F5F2ED] px-4 sm:px-6 lg:px-8 py-8 min-h-screen">
       <div className="max-w-content mx-auto">
       {step === 1 && (
         <RegisteredCheckout

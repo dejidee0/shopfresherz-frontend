@@ -48,7 +48,7 @@ export function AccountSidebar({ onNavigate }: AccountSidebarProps) {
   }
 
   return (
-    <nav className="w-full lg:w-56 bg-[#141414] border border-white/[0.08] rounded overflow-hidden">
+    <nav className="w-full lg:w-56 bg-[#FFFFFF] border border-black/[0.07] rounded overflow-hidden">
       <ul className="py-1">
         {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
           // Exact match for dashboard, prefix match for everything else
@@ -63,8 +63,8 @@ export function AccountSidebar({ onNavigate }: AccountSidebarProps) {
                 className={cn(
                   'flex items-center gap-3 px-4 py-2.5 text-sm transition-colors',
                   isActive
-                    ? 'bg-[#F97316] text-white font-semibold'
-                    : 'text-[#A0A0A0] hover:bg-[#F97316]/10 hover:text-[#F97316]'
+                    ? 'bg-[#F97316]/[0.06] text-[#F97316] font-semibold'
+                    : 'text-[#666666] hover:bg-[#F97316]/[0.06] hover:text-[#F97316]'
                 )}
               >
                 <Icon size={16} className="shrink-0" />
@@ -75,10 +75,10 @@ export function AccountSidebar({ onNavigate }: AccountSidebarProps) {
         })}
 
         {/* Divider + Logout */}
-        <li className="border-t border-white/[0.06] mt-1 pt-1">
+        <li className="border-t border-black/[0.06] mt-1 pt-1">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#A0A0A0] hover:bg-red-500/10 hover:text-red-500 transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#666666] hover:bg-red-500/10 hover:text-red-500 transition-colors"
           >
             <FiLogOut size={16} className="shrink-0" />
             Log-out

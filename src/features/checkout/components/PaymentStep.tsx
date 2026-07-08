@@ -522,11 +522,11 @@ function CardFormFields({
   }
 
   return (
-    <div className="border border-white/[0.08] rounded-lg p-4 mt-3 flex flex-col gap-3 bg-[#141414]">
+    <div className="border border-[rgba(0,0,0,0.07)] rounded-lg p-4 mt-3 flex flex-col gap-3 bg-white">
 
       {/* Card type */}
       <div>
-        <p className="text-xs font-medium text-[#A0A0A0] mb-1.5">Card Type</p>
+        <p className="text-xs font-medium text-[#666666] mb-1.5">Card Type</p>
         <div className="flex gap-2">
           {CARD_TYPES.map((t) => (
             <button
@@ -536,7 +536,7 @@ function CardFormFields({
               className={`flex-1 py-1.5 rounded-lg border-2 text-xs font-semibold transition-all ${
                 cardType === t.value
                   ? 'border-[#F97316] text-[#F97316] bg-[#F97316]/10'
-                  : 'border-white/[0.1] text-[#A0A0A0] hover:border-[#F97316]/40 hover:text-white'
+                  : 'border-[rgba(0,0,0,0.1)] text-[#666666] hover:border-[#F97316]/40 hover:text-[#111111]'
               }`}
             >
               {t.label}
@@ -579,14 +579,14 @@ function CardFormFields({
         <input type="checkbox" checked={isDefault}
           onChange={(e) => setIsDefault(e.target.checked)}
           className="w-4 h-4 accent-[#F97316] rounded" />
-        <span className="text-xs text-[#A0A0A0]">Save as default payment method</span>
+        <span className="text-xs text-[#666666]">Save as default payment method</span>
       </label>
 
       {errors.submit && (
-        <p className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{errors.submit}</p>
+        <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{errors.submit}</p>
       )}
       {saved && (
-        <p className="text-xs text-green-300 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
+        <p className="text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
           Card saved — it will appear as a payment option.
         </p>
       )}
@@ -604,8 +604,8 @@ function CardFormFields({
 
 function BankDetailBlock() {
   return (
-    <div className="border border-white/[0.08] rounded-lg p-4 mt-3 bg-[#141414]">
-      <p className="text-sm font-semibold text-white mb-3">Bank Details</p>
+    <div className="border border-[rgba(0,0,0,0.07)] rounded-lg p-4 mt-3 bg-white">
+      <p className="text-sm font-semibold text-[#111111] mb-3">Bank Details</p>
       <div className="flex flex-col gap-2">
         {[
           { label: 'Bank',           value: BANK_DETAILS.bank          },
@@ -613,8 +613,8 @@ function BankDetailBlock() {
           { label: 'Account Number', value: BANK_DETAILS.accountNumber },
         ].map(({ label, value }) => (
           <div key={label} className="flex items-center justify-between text-sm">
-            <span className="text-[#9CA3AF]">{label}</span>
-            <span className="font-medium text-white">{value}</span>
+            <span className="text-[#666666]">{label}</span>
+            <span className="font-medium text-[#111111]">{value}</span>
           </div>
         ))}
       </div>
@@ -626,8 +626,8 @@ function BankDetailBlock() {
 
 function PayOnDeliveryBlock() {
   return (
-    <div className="border border-white/[0.08] rounded-lg p-4 mt-3 bg-[#141414]">
-      <p className="text-sm text-[#A0A0A0] leading-relaxed">
+    <div className="border border-[rgba(0,0,0,0.07)] rounded-lg p-4 mt-3 bg-white">
+      <p className="text-sm text-[#666666] leading-relaxed">
         You'll pay by cash or POS when your order is delivered.{' '}
         <span className="text-[#F97316] font-medium">
           Available for Standard delivery within Lagos only.
@@ -698,7 +698,7 @@ export function PaymentStep({
       }
     >
       <StepIndicator step={3} />
-      <h2 className="text-lg font-bold text-white mb-5">Payment Method</h2>
+      <h2 className="text-lg font-bold text-[#111111] mb-5">Payment Method</h2>
 
       <div className="flex flex-col gap-3">
         {PAYMENT_OPTIONS.map((opt) => (

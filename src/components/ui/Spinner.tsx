@@ -60,13 +60,13 @@ interface PageSpinnerProps {
 export function PageSpinner({ label = 'Loading…' }: PageSpinnerProps) {
   return (
     <div
-      className="fixed inset-0 z-9998 flex flex-col items-center justify-center bg-[#0A0A0A]/80 backdrop-blur-sm"
+      className="fixed inset-0 z-9998 flex flex-col items-center justify-center bg-[rgba(255,255,255,0.7)] backdrop-blur-sm"
       role="status"
       aria-label={label}
     >
       <Spinner size="xl" variant="primary" />
       {label && (
-        <p className="mt-4 text-sm font-medium text-[#6B7280]">{label}</p>
+        <p className="mt-4 text-sm font-medium text-[#666666]">{label}</p>
       )}
     </div>
   )

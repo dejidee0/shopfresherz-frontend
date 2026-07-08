@@ -367,8 +367,8 @@ function SectionBlock({ section }: { section: Section }) {
   return (
     <div
       id={section.id}
-      className={`bg-[#141414] border rounded-xl overflow-hidden transition-colors duration-150 ${
-        open ? 'border-[#F97316]/40' : 'border-white/[0.08]'
+      className={`bg-white border rounded-xl overflow-hidden transition-colors duration-150 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] ${
+        open ? 'border-[#F97316]/40' : 'border-black/[0.07]'
       }`}
     >
       {/* Header button */}
@@ -384,8 +384,8 @@ function SectionBlock({ section }: { section: Section }) {
             <Icon size={16} className={section.accentText} />
           </div>
           <div className="min-w-0">
-            <p className="text-[13px] font-semibold text-white truncate">{section.title}</p>
-            <p className="text-[11px] text-[#9CA3AF] mt-0.5 hidden sm:block truncate">
+            <p className="text-[13px] font-semibold text-[#111111] truncate">{section.title}</p>
+            <p className="text-[11px] text-[#888888] mt-0.5 hidden sm:block truncate">
               {section.intro}
             </p>
           </div>
@@ -404,7 +404,7 @@ function SectionBlock({ section }: { section: Section }) {
       {/* Expanded body */}
       {open && (
         <div className="px-5 pb-5 pt-4 border-t border-[#F3F4F6]">
-          <p className="text-[13px] text-[#6B7280] mb-5 leading-relaxed">{section.intro}</p>
+          <p className="text-[13px] text-[#666666] mb-5 leading-relaxed">{section.intro}</p>
 
           <ol className="space-y-3">
             {section.steps.map(({ step, text }) => (
@@ -412,7 +412,7 @@ function SectionBlock({ section }: { section: Section }) {
                 <span className="w-[22px] h-[22px] rounded-full bg-[#F97316] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                   {step}
                 </span>
-                <p className="text-[13px] text-[#D7D7D7] leading-relaxed">{text}</p>
+                <p className="text-[13px] text-[#444444] leading-relaxed">{text}</p>
               </li>
             ))}
           </ol>
@@ -432,30 +432,30 @@ function SectionBlock({ section }: { section: Section }) {
 /* ─── Page ───────────────────────────────────────────────────── */
 export default function NeedHelpPage() {
   return (
-    <div className="bg-[#F7F6F3] min-h-screen font-sans">
+    <div className="bg-[#F5F2ED] min-h-screen font-sans">
 
       {/* ── Hero ── */}
       <section
         className="relative overflow-hidden py-12 px-4"
-        style={{ background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%)' }}
+        style={{ background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F2ED 60%, #FFFFFF 100%)' }}
       >
         {/* Subtle orange glow */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              'radial-gradient(ellipse 55% 75% at 65% 50%, rgba(245,130,10,0.14) 0%, transparent 70%)',
+              'radial-gradient(ellipse 55% 75% at 65% 50%, rgba(245,130,10,0.08) 0%, transparent 70%)',
           }}
         />
         <div className="relative z-10 max-w-3xl mx-auto flex items-center gap-6">
-          <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-[#F97316]/10 border border-[#F97316]/20 flex items-center justify-center shrink-0">
             <FiHelpCircle size={26} className="text-[#F97316]" />
           </div>
           <div className="flex-1">
-            <h1 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight mb-1">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-[#111111] tracking-tight mb-1">
               Help Centre
             </h1>
-            <p className="text-sm text-white/55 leading-relaxed max-w-md font-light">
+            <p className="text-sm text-[#666666] leading-relaxed max-w-md font-light">
               Step-by-step guides for returns, refunds, shipping, warranty claims,
               and order issues. Find what you need below.
             </p>
@@ -470,7 +470,7 @@ export default function NeedHelpPage() {
 
         {/* ── Help sections ── */}
         <section>
-          <p className="text-[10px] font-semibold uppercase tracking-[1.4px] text-[#9CA3AF] mb-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[1.4px] text-[#888888] mb-3">
             How can we help?
           </p>
           <div className="space-y-2">
@@ -481,11 +481,11 @@ export default function NeedHelpPage() {
         </section>
 
         {/* ── Divider ── */}
-        <hr className="border-white/[0.08]" />
+        <hr className="border-black/[0.08]" />
 
         {/* ── Quick links ── */}
         <section>
-          <p className="text-[10px] font-semibold uppercase tracking-[1.4px] text-[#9CA3AF] mb-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[1.4px] text-[#888888] mb-3">
             Quick links
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -493,7 +493,7 @@ export default function NeedHelpPage() {
               <Link
                 key={label}
                 href={href}
-                className="bg-[#141414] border border-white/[0.08] rounded-xl px-4 py-3 text-[12px] font-medium text-[#D7D7D7] hover:border-[#F97316] hover:text-[#E07200] transition-all duration-150 text-center hover:-translate-y-0.5"
+                className="bg-white border border-black/[0.07] rounded-xl px-4 py-3 text-[12px] font-medium text-[#444444] hover:border-[#F97316] hover:text-[#E07200] transition-all duration-150 text-center hover:-translate-y-0.5 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]"
               >
                 {label}
               </Link>
@@ -502,7 +502,7 @@ export default function NeedHelpPage() {
         </section>
 
         {/* ── Divider ── */}
-        <hr className="border-white/[0.08]" />
+        <hr className="border-black/[0.08]" />
 
         {/* ── Still need help CTA ── */}
         <section

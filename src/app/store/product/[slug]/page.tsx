@@ -67,7 +67,7 @@ export default async function ProductDetailPage({ params }: PDPProps) {
   ];
 
   return (
-    <div className="bg-[#0A0A0A] px-4 sm:px-6 lg:px-8 py-6 min-h-screen">
+    <div className="bg-[#F5F2ED] px-4 sm:px-6 lg:px-8 py-6 min-h-screen">
       {/* Breadcrumb */}
       <Breadcrumb items={breadcrumbs} />
 

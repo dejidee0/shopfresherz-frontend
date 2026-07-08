@@ -86,8 +86,7 @@ function Input({ hasError, className, ...props }: InputProps) {
   return (
     <input
       className={cn(
-        'sf-input h-12 px-4 text-sm',
-        'placeholder:text-[#444444]',
+        'input-light h-12 px-4 text-sm',
         hasError
           ? 'border-[#EF4444] focus:ring-2 focus:ring-[#EF4444]/20'
           : '',
@@ -109,7 +108,7 @@ function PasswordInput({
       <button
         type="button"
         onClick={() => setShow((v) => !v)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666666] hover:text-white transition-colors"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666666] hover:text-[#111111] transition-colors"
         aria-label={show ? 'Hide password' : 'Show password'}
         tabIndex={-1}
       >
@@ -315,14 +314,14 @@ const LoginForm = () => {
     <div className="w-full max-w-[420px] px-6 py-4">
 
       {/* Tab switcher */}
-      <div className="grid grid-cols-2 gap-2 rounded-[10px] border border-white/[0.08] bg-[#141414] p-1">
+      <div className="grid grid-cols-2 gap-2 rounded-[10px] border border-[rgba(0,0,0,0.07)] bg-[#FFFFFF] p-1">
         <button
           onClick={() => router.push('/auth/login')}
           className={cn(
             'flex-1 flex items-center justify-center rounded-[8px] py-3 text-sm font-semibold transition-colors',
             isSignIn
-              ? 'bg-[#242424] text-white'
-              : 'text-[#666666] hover:text-white'
+              ? 'bg-[#F5F2ED] text-[#111111]'
+              : 'text-[#888888] hover:text-[#111111]'
           )}
         >
           Sign In
@@ -332,8 +331,8 @@ const LoginForm = () => {
           className={cn(
             'flex-1 flex items-center justify-center rounded-[8px] py-3 text-sm font-semibold transition-colors',
             !isSignIn
-              ? 'bg-[#242424] text-white'
-              : 'text-[#666666] hover:text-white'
+              ? 'bg-[#F5F2ED] text-[#111111]'
+              : 'text-[#888888] hover:text-[#111111]'
           )}
         >
           Sign Up

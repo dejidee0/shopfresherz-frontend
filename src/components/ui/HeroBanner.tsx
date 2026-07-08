@@ -166,13 +166,13 @@ export function HeroBanner() {
   const promo2 = promos[promoIndex2];
 
   return (
-    <section className="w-full bg-[#0A0A0A] px-4 py-6 md:px-8">
+    <section className="w-full bg-[#F5F2ED] px-4 py-6 md:px-8">
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-4 min-h-[520px]">
         {isSlideLoading ? (
           <CarouselSkeleton />
         ) : (
           <div
-            className="relative overflow-hidden rounded-[24px] min-h-[480px] bg-linear-to-br from-[#1a0800] via-[#0D0D0D] to-[#0a1020] border border-[rgba(249,115,22,0.15)] shadow-[inset_0_0_80px_rgba(249,115,22,0.05)]"
+            className="relative overflow-hidden rounded-[24px] min-h-[480px] bg-[linear-gradient(135deg,#1a0800_0%,#1A1A2E_40%,#0f1628_100%)] border border-[rgba(249,115,22,0.15)] shadow-[inset_0_0_80px_rgba(249,115,22,0.05)]"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
             onTouchStart={handleTouchStart}
@@ -331,8 +331,8 @@ function HeroSideCard({
   const href = promo?.slug ? `/store/product/${promo.slug}` : promo?.linkUrl ?? "/store/category/all";
   const bg =
     theme === "blue"
-      ? "bg-linear-to-br from-[#0a1628] to-[#0f2040] border border-[rgba(96,165,250,0.15)]"
-      : "bg-linear-to-br from-[#1A1A1A] to-[#141414] border border-white/[0.08]";
+      ? "bg-[#FFFFFF] border border-[rgba(0,0,0,0.08)] shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]"
+      : "bg-[#FFFFFF] border border-[rgba(0,0,0,0.08)] shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]";
 
   return (
     <Link
@@ -343,7 +343,7 @@ function HeroSideCard({
     >
       <span className="sf-badge sf-badge-orange absolute right-4 top-4">Limited</span>
       <div className="flex items-center gap-4 pr-16">
-        <div className="relative w-16 h-16 rounded-[12px] bg-linear-to-br from-[#1F1F1F] to-[#2A2A2A] shrink-0 overflow-hidden flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
+        <div className="relative w-16 h-16 rounded-[12px] bg-linear-to-br from-[#F5F2ED] to-[#EEEAE3] shrink-0 overflow-hidden flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.08)]">
           {promo?.imageUrl ? (
             <Image
               src={promo.imageUrl}
@@ -360,17 +360,17 @@ function HeroSideCard({
           <p className="text-[10px] text-[#F97316] uppercase tracking-[0.14em] line-clamp-1">
             {promo?.tag ?? promo?.badge ?? "Featured Deal"}
           </p>
-          <h3 className="mt-1 text-[15px] font-semibold text-white leading-snug line-clamp-2">
+          <h3 className="mt-1 text-[15px] font-semibold text-[#111111] leading-snug line-clamp-2">
             {promo?.title ?? "Premium gadgets on deal"}
           </h3>
           {promo?.price && (
-            <p className={cn("mt-1 text-[17px] font-bold", theme === "blue" ? "text-[#60A5FA] [text-shadow:0_0_20px_rgba(96,165,250,0.4)]" : "text-[#F97316] [text-shadow:0_0_20px_rgba(249,115,22,0.4)]")}>{promo.price}</p>
+            <p className="mt-1 text-[17px] font-bold text-[#F97316]">{promo.price}</p>
           )}
         </div>
       </div>
       <FiChevronRight
         size={20}
-        className="absolute right-5 bottom-5 text-white/70 transition-transform group-hover:translate-x-1"
+        className="absolute right-5 bottom-5 text-[#9CA3AF] transition-transform group-hover:translate-x-1"
       />
     </Link>
   );
@@ -380,7 +380,7 @@ function FlashCountdownCard() {
   return (
     <Link
       href="/store/category/all"
-      className="side-card min-h-[132px] rounded-[16px] border border-[rgba(249,115,22,0.2)] bg-[#141414] p-5 flex flex-col justify-center shadow-[0_0_30px_rgba(249,115,22,0.08)]"
+      className="side-card min-h-[132px] rounded-[16px] border border-[rgba(249,115,22,0.2)] bg-[#FFFFFF] p-5 flex flex-col justify-center shadow-[0_0_30px_rgba(249,115,22,0.08)]"
     >
       <span className="w-11 h-11 rounded-full bg-linear-to-br from-[#F97316] to-[#EA580C] text-white flex items-center justify-center shrink-0 shadow-[var(--shadow-orange-glow)]">
         <FiZap size={22} />

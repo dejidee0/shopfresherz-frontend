@@ -347,14 +347,14 @@ function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false)
   return (
     <div
-      className={`border rounded-xl overflow-hidden transition-colors ${
-        open ? 'border-[#F97316]/40' : 'border-white/[0.08]'
+      className={`bg-white border rounded-xl overflow-hidden transition-colors shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] ${
+        open ? 'border-[#F97316]/40' : 'border-black/[0.07]'
       }`}
     >
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="w-full flex items-center justify-between px-5 py-4 text-left text-sm font-medium text-white hover:bg-white/[0.04] transition-colors gap-3"
+        className="w-full flex items-center justify-between px-5 py-4 text-left text-sm font-medium text-[#111111] hover:bg-black/[0.03] transition-colors gap-3"
       >
         <span>{q}</span>
         <span
@@ -368,7 +368,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
         </span>
       </button>
       {open && (
-        <div className="px-5 pb-4 pt-3 text-sm text-[#6B7280] leading-relaxed border-t border-white/[0.08]">
+        <div className="px-5 pb-4 pt-3 text-sm text-[#666666] leading-relaxed border-t border-black/[0.07]">
           {a}
         </div>
       )}
@@ -378,30 +378,30 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 
 export default function CustomerSupportPage() {
   return (
-    <div className="bg-[#F7F6F3] min-h-screen font-sans">
+    <div className="bg-[#F5F2ED] min-h-screen font-sans">
 
       {/* ── Hero ── */}
       <section
         className="relative overflow-hidden py-12 px-4"
-        style={{ background: 'linear-gradient(135deg, #1a0a00 0%, #2d1200 50%, #1a0a00 100%)' }}
+        style={{ background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F2ED 60%, #FFFFFF 100%)' }}
       >
         {/* Subtle glow */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              'radial-gradient(ellipse 60% 80% at 70% 50%, rgba(245,130,10,0.18) 0%, transparent 70%)',
+              'radial-gradient(ellipse 60% 80% at 70% 50%, rgba(245,130,10,0.10) 0%, transparent 70%)',
           }}
         />
         <div className="relative z-10 max-w-3xl mx-auto flex items-center gap-6">
-          <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-[#F97316]/10 border border-[#F97316]/20 flex items-center justify-center shrink-0">
             <FiHeadphones size={26} className="text-[#F97316]" />
           </div>
           <div className="flex-1">
-            <h1 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight mb-1">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-[#111111] tracking-tight mb-1">
               Customer Support
             </h1>
-            <p className="text-sm text-white/60 leading-relaxed max-w-md font-light">
+            <p className="text-sm text-[#666666] leading-relaxed max-w-md font-light">
               We&apos;re here to help. Reach out through any channel below or browse
               our frequently asked questions — we typically respond within minutes.
             </p>
@@ -416,7 +416,7 @@ export default function CustomerSupportPage() {
 
         {/* ── Contact channels ── */}
         <section>
-          <p className="text-[10px] font-semibold uppercase tracking-[1.4px] text-[#9CA3AF] mb-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[1.4px] text-[#888888] mb-3">
             Get in touch
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -426,15 +426,15 @@ export default function CustomerSupportPage() {
                 href={href}
                 target={href.startsWith('http') ? '_blank' : undefined}
                 rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                className="group bg-[#141414] border border-white/[0.08] rounded-xl p-[18px] flex flex-col gap-3 hover:border-[#F97316] hover:-translate-y-0.5 transition-all duration-150"
+                className="group bg-white border border-black/[0.07] rounded-xl p-[18px] flex flex-col gap-3 hover:border-[#F97316] hover:-translate-y-0.5 transition-all duration-150 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]"
               >
                 <div className={`w-9 h-9 rounded-[10px] ${bg} flex items-center justify-center`}>
                   <Icon size={17} className={iconColor} />
                 </div>
                 <div>
-                  <p className="text-[13px] font-semibold text-white">{title}</p>
+                  <p className="text-[13px] font-semibold text-[#111111]">{title}</p>
                   <p className="text-[12px] font-medium text-[#E07200] mt-0.5">{detail}</p>
-                  <p className="text-[11px] text-[#9CA3AF] mt-0.5">{sub}</p>
+                  <p className="text-[11px] text-[#888888] mt-0.5">{sub}</p>
                 </div>
                 <span className="text-[11px] font-semibold text-[#E07200] mt-auto flex items-center gap-1 group-hover:underline">
                   {cta} →
@@ -445,15 +445,15 @@ export default function CustomerSupportPage() {
         </section>
 
         {/* ── Divider ── */}
-        <hr className="border-white/[0.08]" />
+        <hr className="border-black/[0.08]" />
 
         {/* ── Business hours + Location ── */}
         <section className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Hours */}
-          <div className="bg-[#141414] border border-white/[0.08] rounded-xl p-5">
+          <div className="bg-white border border-black/[0.07] rounded-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]">
             <div className="flex items-center gap-2 mb-4">
               <FiClock size={14} className="text-[#E07200]" />
-              <p className="text-[10px] font-semibold uppercase tracking-[1.2px] text-[#9CA3AF]">
+              <p className="text-[10px] font-semibold uppercase tracking-[1.2px] text-[#888888]">
                 Business hours
               </p>
             </div>
@@ -469,27 +469,27 @@ export default function CustomerSupportPage() {
                   key={day}
                   className="flex justify-between items-center py-[7px] border-b border-[#F3F4F6] last:border-b-0"
                 >
-                  <span className="text-[12px] font-medium text-white">{day}</span>
-                  <span className="text-[12px] text-[#6B7280]">{hours}</span>
+                  <span className="text-[12px] font-medium text-[#111111]">{day}</span>
+                  <span className="text-[12px] text-[#666666]">{hours}</span>
                 </li>
               ))}
             </ul>
-            <p className="text-[11px] text-[#9CA3AF] mt-3 leading-relaxed">
+            <p className="text-[11px] text-[#888888] mt-3 leading-relaxed">
               WhatsApp messages outside business hours are answered the next working day.
             </p>
           </div>
 
           {/* Location */}
-          <div className="bg-[#141414] border border-white/[0.08] rounded-xl p-5">
+          <div className="bg-white border border-black/[0.07] rounded-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]">
             <div className="flex items-center gap-2 mb-4">
               <FiMapPin size={14} className="text-[#E07200]" />
-              <p className="text-[10px] font-semibold uppercase tracking-[1.2px] text-[#9CA3AF]">
+              <p className="text-[10px] font-semibold uppercase tracking-[1.2px] text-[#888888]">
                 Our location
               </p>
             </div>
-            <p className="text-[13px] font-semibold text-white">ShopFresherz HQ</p>
-            <p className="text-[12px] text-[#6B7280] mt-1">Lagos, Nigeria</p>
-            <p className="text-[11px] text-[#9CA3AF] mt-3 leading-relaxed">
+            <p className="text-[13px] font-semibold text-[#111111]">ShopFresherz HQ</p>
+            <p className="text-[12px] text-[#666666] mt-1">Lagos, Nigeria</p>
+            <p className="text-[11px] text-[#888888] mt-3 leading-relaxed">
               We operate primarily online and deliver nationwide across Nigeria.
               Walk-in pickups are available by appointment — contact us to arrange.
             </p>
@@ -503,11 +503,11 @@ export default function CustomerSupportPage() {
         </section>
 
         {/* ── Divider ── */}
-        <hr className="border-white/[0.08]" />
+        <hr className="border-black/[0.08]" />
 
         {/* ── Topic shortcuts ── */}
         <section>
-          <p className="text-[10px] font-semibold uppercase tracking-[1.4px] text-[#9CA3AF] mb-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[1.4px] text-[#888888] mb-3">
             What do you need help with?
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -515,23 +515,23 @@ export default function CustomerSupportPage() {
               <Link
                 key={label}
                 href={href}
-                className="bg-[#141414] border border-white/[0.08] rounded-xl p-4 flex flex-col items-center gap-2 text-center hover:border-[#F97316] hover:-translate-y-0.5 transition-all duration-150"
+                className="bg-white border border-black/[0.07] rounded-xl p-4 flex flex-col items-center gap-2 text-center hover:border-[#F97316] hover:-translate-y-0.5 transition-all duration-150 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]"
               >
                 <div className="w-9 h-9 rounded-[10px] bg-orange-50 flex items-center justify-center">
                   <Icon size={16} className="text-[#E07200]" />
                 </div>
-                <span className="text-[11px] font-medium text-white leading-snug">{label}</span>
+                <span className="text-[11px] font-medium text-[#111111] leading-snug">{label}</span>
               </Link>
             ))}
           </div>
         </section>
 
         {/* ── Divider ── */}
-        <hr className="border-white/[0.08]" />
+        <hr className="border-black/[0.08]" />
 
         {/* ── FAQ ── */}
         <section id="faq">
-          <p className="text-[10px] font-semibold uppercase tracking-[1.4px] text-[#9CA3AF] mb-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[1.4px] text-[#888888] mb-3">
             Frequently asked questions
           </p>
           <div className="space-y-2">
@@ -539,7 +539,7 @@ export default function CustomerSupportPage() {
               <FaqItem key={item.q} q={item.q} a={item.a} />
             ))}
           </div>
-          <p className="text-sm text-[#9CA3AF] mt-5 text-center">
+          <p className="text-sm text-[#888888] mt-5 text-center">
             Didn&apos;t find your answer?{' '}
             <Link href="/store/need-help" className="text-[#E07200] font-semibold hover:underline">
               Visit our Help Centre →

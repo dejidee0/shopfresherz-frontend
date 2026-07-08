@@ -16,11 +16,11 @@ import type { Address } from '@/lib/api/account'
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start justify-between py-2.5 border-b border-white/[0.06] last:border-0 gap-4">
-      <span className="text-xs font-bold uppercase tracking-wider text-[#9CA3AF] shrink-0 w-24">
+    <div className="flex items-start justify-between py-2.5 border-b border-[rgba(0,0,0,0.07)] last:border-0 gap-4">
+      <span className="text-xs font-bold uppercase tracking-wider text-[#888888] shrink-0 w-24">
         {label}
       </span>
-      <span className="text-sm text-white text-right">{value || '—'}</span>
+      <span className="text-sm text-[#111111] text-right">{value || '—'}</span>
     </div>
   )
 }
@@ -100,10 +100,10 @@ export function ReviewStep({
       }
     >
       <StepIndicator step={4} />
-      <h2 className="text-lg font-bold text-white mb-5">Review Your Order</h2>
+      <h2 className="text-lg font-bold text-[#111111] mb-5">Review Your Order</h2>
 
       {/* ── Cart items ── */}
-      <div className="bg-[#141414] border border-white/[0.08] rounded-lg overflow-hidden mb-4">
+      <div className="bg-white border border-[rgba(0,0,0,0.07)] rounded-lg overflow-hidden mb-4 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]">
         {items.length === 0 && (
           <p className="p-4 text-sm text-[#888888]">Your cart is empty.</p>
         )}
@@ -112,10 +112,10 @@ export function ReviewStep({
             key={item.id}
             className={cn(
               'flex items-center gap-4 px-4 py-3',
-              i < items.length - 1 && 'border-b border-white/[0.06]',
+              i < items.length - 1 && 'border-b border-[rgba(0,0,0,0.06)]',
             )}
           >
-            <div className="w-14 h-14 rounded bg-[#1F1F1F] shrink-0 overflow-hidden">
+            <div className="w-14 h-14 rounded bg-[#F0F0F0] shrink-0 overflow-hidden">
               <Image
                 src={item.image || '/images/device-placeholder.jpg'}
                 alt={item.name}
@@ -125,12 +125,12 @@ export function ReviewStep({
               />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-white line-clamp-1">{item.name}</p>
+              <p className="text-sm font-semibold text-[#111111] line-clamp-1">{item.name}</p>
               <p className="text-xs text-[#888888] mt-0.5">
                 Qty {item.quantity} × {formatPrice(item.price)}
               </p>
             </div>
-            <p className="text-sm font-bold text-white shrink-0">
+            <p className="text-sm font-bold text-[#111111] shrink-0">
               {formatPrice(item.price * item.quantity)}
             </p>
           </div>
@@ -138,8 +138,8 @@ export function ReviewStep({
       </div>
 
       {/* ── Delivery details ── */}
-      <div className="bg-[#141414] border border-white/[0.08] rounded-lg p-4 sm:p-5 mb-6">
-        <p className="text-sm font-bold text-white mb-2">Delivery Details</p>
+      <div className="bg-white border border-[rgba(0,0,0,0.07)] rounded-lg p-4 sm:p-5 mb-6 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]">
+        <p className="text-sm font-bold text-[#111111] mb-2">Delivery Details</p>
         <DetailRow label="Name"     value={fullName} />
         <DetailRow label="Email"    value={user?.email    || '—'} />
         <DetailRow label="Phone"    value={user?.phone    || '—'} />
@@ -152,14 +152,14 @@ export function ReviewStep({
       <div className="flex gap-3">
         <button
           onClick={onBack}
-          className="flex-1 sm:flex-none h-12 px-6 rounded border border-white/[0.1] text-sm font-semibold text-[#A0A0A0] flex items-center justify-center gap-2 hover:border-[#F97316] hover:text-[#F97316] transition-colors"
+          className="flex-1 sm:flex-none h-12 px-6 rounded border border-[rgba(0,0,0,0.12)] text-sm font-semibold text-[#666666] flex items-center justify-center gap-2 hover:border-[#F97316] hover:text-[#F97316] transition-colors"
         >
           <FiArrowLeft size={15} /> BACK
         </button>
         <button
           onClick={onPlaceOrder}
           disabled={items.length === 0 || isPlacingOrder}
-          className="flex-1 text-xs md:text-base h-12 rounded sf-btn-primary text-white font-bold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 text-xs md:text-base h-12 rounded sf-btn-primary text-white font-bold flex items-center justify-center gap-2 disabled:bg-none disabled:bg-[#E0E0E0] disabled:text-[#AAAAAA] disabled:cursor-not-allowed"
         >
           {isPlacingOrder ? 'PLACING ORDER...' : `PLACE ORDER — ${formatPrice(total)}`} <FiArrowRight className="hidden md:flex" size={15} />
         </button>

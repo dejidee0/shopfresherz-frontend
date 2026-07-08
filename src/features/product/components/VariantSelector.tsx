@@ -63,7 +63,7 @@ export function VariantDropdown({ label, variants, selected, onSelect }: Variant
       <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-2">{label}</p>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-full h-10 flex items-center justify-between px-3 border border-white/[0.1] rounded-btn text-sm text-white bg-[#141414] hover:border-[#F97316] transition-colors"
+        className="w-full h-10 flex items-center justify-between px-3 border border-black/[0.12] rounded-btn text-sm text-[#111111] bg-[#F5F5F5] hover:border-[#F97316] transition-colors"
       >
         <span>{selectedVariant?.label ?? `Select ${label}`}</span>
         <FiChevronDown
@@ -75,7 +75,7 @@ export function VariantDropdown({ label, variants, selected, onSelect }: Variant
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute top-full left-0 right-0 mt-1 bg-[#141414] border border-white/[0.1] rounded-card shadow-lg shadow-black/30 z-20 py-1 max-h-48 overflow-y-auto">
+          <div className="absolute top-full left-0 right-0 mt-1 bg-[#FFFFFF] border border-black/[0.1] rounded-card shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] z-20 py-1 max-h-48 overflow-y-auto">
             {variants.map((v) => (
               <button
                 key={v.id}
@@ -84,8 +84,8 @@ export function VariantDropdown({ label, variants, selected, onSelect }: Variant
                 className={cn(
                   'w-full text-left px-4 py-2 text-sm transition-colors',
                   v.id === selected
-                    ? 'text-[#F97316] font-medium bg-[#F97316]/10'
-                    : 'text-[#D7D7D7] hover:bg-white/[0.05]',
+                    ? 'text-[#F97316] font-medium bg-[#F97316]/[0.06]'
+                    : 'text-[#111111] hover:bg-black/[0.05]',
                   !v.inStock && 'opacity-40 cursor-not-allowed line-through'
                 )}
               >

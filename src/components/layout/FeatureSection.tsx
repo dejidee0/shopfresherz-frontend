@@ -24,13 +24,13 @@ const FeatureSection = () => {
     <div className="flex flex-col md:flex-row gap-6 p-2 md:p-4 lg:p-10 lg:px-60">
       {/* Feature Section */}
       {features.map((feature, index) => (
-        <div key={index} className={`flex flex-col-reverse py-10 md:py-5 md:flex-row gap-6 md:gap-0 p-2 md:p-4 lg:p-10 justify-between items-center rounded-md ${index === 1 ? "bg-[#0D0D0D]": "bg-[#F5F5F5]"}`}>
+        <div key={index} className={`flex flex-col-reverse py-10 md:py-5 md:flex-row gap-6 md:gap-0 p-2 md:p-4 lg:p-10 justify-between items-center rounded-md border border-black/[0.07] shadow-[var(--shadow-card)] ${index === 1 ? "bg-[#FFFFFF]": "bg-[#FFFFFF]"}`}>
           <div className="flex flex-col gap-3">
             <p className="flex items-center justify-center p-1 px-2 bg-primary text-white text-xs w-fit rounded-xs">
               INTRODUCING
             </p>
-            <p className={`text-2xl font-semibold ${index === 1 && "text-white"}`}>{feature.title}</p>
-            <p className={`text-sm w-full lg:w-[50%] ${index === 1 && "text-gray-300"}`}>{feature.desc}</p>
+            <p className={`text-2xl font-semibold ${index === 1 ? "text-[#111111]" : "text-[#111111]"}`}>{feature.title}</p>
+            <p className={`text-sm w-full lg:w-[50%] ${index === 1 ? "text-[#666666]" : "text-[#666666]"}`}>{feature.desc}</p>
             <a
               href={feature.link}
               className="text-xs w-fit text-white p-2 px-4 rounded-sm bg-primary flex gap-2 items-center justify-center cursor-pointer"

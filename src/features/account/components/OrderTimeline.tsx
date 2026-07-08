@@ -39,13 +39,13 @@ export function OrderTimeline({ activities }: OrderTimelineProps) {
                   'w-8 h-8 rounded-full flex items-center justify-center border-2 shrink-0',
                   isFirst
                     ? 'border-[#F97316] bg-[#F97316]/10 text-[#F97316]'
-                    : 'border-white/[0.15] bg-[#1A1A1A] text-[#888888]'
+                    : 'border-[#E5E5E5] bg-[#FFFFFF] text-[#888888]'
                 )}
               >
                 <Icon size={14} />
               </div>
               {!isLast && (
-                <div className="w-px flex-1 bg-[#E5E7EB] my-1 min-h-6" />
+                <div className="w-px flex-1 bg-[#E5E5E5] my-1 min-h-6" />
               )}
             </div>
 
@@ -54,12 +54,12 @@ export function OrderTimeline({ activities }: OrderTimelineProps) {
               <p
                 className={cn(
                   'text-sm leading-snug',
-                  isFirst ? 'font-semibold text-[#111111]' : 'text-[#6B7280]'
+                  isFirst ? 'font-semibold text-[#111111]' : 'text-[#888888]'
                 )}
               >
                 {activity.message}
               </p>
-              <p className="text-xs text-[#6B7280] mt-0.5">{activity.timestamp}</p>
+              <p className="text-xs text-[#888888] mt-0.5">{activity.timestamp}</p>
             </div>
           </div>
         )

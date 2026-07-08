@@ -34,7 +34,7 @@ function FooterHeading({ children }: { children: React.ReactNode }) {
 
 export function Footer() {
   return (
-    <footer className="border-t border-white/[0.04] bg-[#080808] text-white">
+    <footer className="border-t border-white/[0.06] bg-[#1A1A2E] text-white">
       <div className="px-4 pt-14 md:px-8">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] lg:gap-12">
           <div>
@@ -76,7 +76,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-white/[0.06] bg-[#141414] text-[#555555] transition-all hover:bg-[rgba(249,115,22,0.08)] hover:text-[#F97316] hover:shadow-[0_4px_12px_rgba(249,115,22,0.2)]"
+                  className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-white/[0.1] bg-[rgba(255,255,255,0.08)] text-[rgba(255,255,255,0.6)] transition-all hover:bg-[rgba(249,115,22,0.08)] hover:text-[#F97316] hover:shadow-[0_4px_12px_rgba(249,115,22,0.2)]"
                 >
                   <Icon size={16} />
                 </a>
@@ -89,7 +89,7 @@ export function Footer() {
             <ul className="space-y-3">
               {QUICK_LINKS.map(({ label, href }) => (
                 <li key={label}>
-                  <Link href={href} className="text-[13px] text-[#555555] transition-colors hover:text-[#888888]">
+                  <Link href={href} className="text-[13px] text-[rgba(255,255,255,0.6)] transition-colors hover:text-[rgba(255,255,255,0.9)]">
                     {label}
                   </Link>
                 </li>
@@ -102,7 +102,7 @@ export function Footer() {
             <ul className="space-y-3">
               {CATEGORY_LINKS.map(({ label, href }) => (
                 <li key={label}>
-                  <Link href={href} className="text-[13px] text-[#555555] transition-colors hover:text-[#888888]">
+                  <Link href={href} className="text-[13px] text-[rgba(255,255,255,0.6)] transition-colors hover:text-[rgba(255,255,255,0.9)]">
                     {label}
                   </Link>
                 </li>
@@ -116,7 +116,7 @@ export function Footer() {
               {PAYMENT_OPTIONS.map((label) => (
                 <span
                   key={label}
-                  className="rounded-[6px] border border-white/[0.05] bg-[#141414] px-2.5 py-1.5 text-[11px] text-[#444444]"
+                  className="rounded-[6px] border border-white/[0.1] bg-[rgba(255,255,255,0.08)] px-2.5 py-1.5 text-[11px] text-[rgba(255,255,255,0.7)]"
                 >
                   {label}
                 </span>
@@ -125,16 +125,16 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/[0.04] py-5 sm:flex-row">
-          <p className="text-[12px] text-[#333333]">© 2026 ShopFresherz</p>
+        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/[0.06] py-5 sm:flex-row">
+          <p className="text-[12px] text-[rgba(255,255,255,0.4)]">© 2026 ShopFresherz</p>
           <div className="flex flex-wrap items-center justify-center gap-2">
             {PAYMENT_OPTIONS.map((label) => (
-              <span key={label} className="rounded-[6px] border border-white/[0.05] bg-[#141414] px-2.5 py-1.5 text-[11px] text-[#444444]">
+              <span key={label} className="rounded-[6px] border border-white/[0.1] bg-[rgba(255,255,255,0.08)] px-2.5 py-1.5 text-[11px] text-[rgba(255,255,255,0.7)]">
                 {label}
               </span>
             ))}
           </div>
-          <p className="text-[12px] text-[#333333]">Made with heart in Nigeria</p>
+          <p className="text-[12px] text-[rgba(255,255,255,0.4)]">Made with heart in Nigeria</p>
         </div>
       </div>
     </footer>

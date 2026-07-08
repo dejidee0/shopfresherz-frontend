@@ -50,7 +50,7 @@ const ProductRow: React.FC<{ product: Product }> = ({ product }) => {
   return (
     <Link
       href={`/store/product/${product.slug}`}
-      className="group flex items-center gap-3 cursor-pointer border-b border-white/[0.03] transition-colors duration-150 hover:bg-white/[0.03]"
+      className="group flex items-center gap-3 cursor-pointer border-b border-black/[0.04] transition-colors duration-150 hover:bg-black/[0.03]"
       style={{ padding: "14px 20px" }}
     >
       {/* Image box */}
@@ -59,9 +59,9 @@ const ProductRow: React.FC<{ product: Product }> = ({ product }) => {
         style={{
           width: "60px",
           height: "60px",
-          background: "#1F1F1F",
+          background: "#F5F5F5",
           borderRadius: "10px",
-          border: "1px solid rgba(255,255,255,0.06)",
+          border: "1px solid rgba(0,0,0,0.06)",
         }}
       >
         {product.imageUrl ? (
@@ -75,13 +75,13 @@ const ProductRow: React.FC<{ product: Product }> = ({ product }) => {
             />
           </div>
         ) : (
-          <div className="h-full w-full bg-white/[0.08]" />
+          <div className="h-full w-full bg-black/[0.06]" />
         )}
       </div>
 
       {/* Info */}
       <div className="flex flex-col flex-1 min-w-0">
-        <h3 className="text-[12px] font-medium text-white line-clamp-2 leading-tight transition-colors duration-150 group-hover:text-[#F97316]">
+        <h3 className="text-[12px] font-medium text-[#111111] line-clamp-2 leading-tight transition-colors duration-150 group-hover:text-[#F97316]">
           {product.title}
         </h3>
         <span className="mt-1 text-[13px] font-bold text-[#F97316]">
@@ -164,25 +164,25 @@ export function TopHighlightsSection() {
   }, []);
 
   return (
-    <section className="w-full bg-[#0D0D0D] px-4 md:px-8 py-14">
+    <section className="w-full bg-[#F5F2ED] px-4 md:px-8 py-14">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {highlightsData.map((category) => (
           <div
             key={category.id}
             className="overflow-hidden transition-all duration-300 hover:border-[rgba(249,115,22,0.2)]"
             style={{
-              background: "#141414",
-              border: "1px solid rgba(255,255,255,0.06)",
+              background: "#FFFFFF",
+              border: "1px solid rgba(0,0,0,0.06)",
               borderRadius: "16px",
             }}
           >
             {/* Column header */}
             <div
-              className="flex items-center gap-2 border-b border-white/[0.06]"
-              style={{ padding: "16px 20px", background: "rgba(249,115,22,0.05)" }}
+              className="flex items-center gap-2 border-b border-black/[0.06]"
+              style={{ padding: "16px 20px", background: "rgba(249,115,22,0.06)" }}
             >
               <span aria-hidden="true">{COLUMN_ICONS[category.id]}</span>
-              <h2 className="text-[12px] font-bold uppercase tracking-[0.8px] text-white">
+              <h2 className="text-[12px] font-bold uppercase tracking-[0.8px] text-[#111111]">
                 {category.title}
               </h2>
             </div>

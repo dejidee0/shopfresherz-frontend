@@ -62,7 +62,7 @@ export function AccountLayout({
   ]
 
   return (
-    <div className="max-w-content mx-auto px-4 sm:px-6 lg:px-10 py-4 sm:py-6">
+    <div className="max-w-content mx-auto px-4 sm:px-6 lg:px-10 py-4 sm:py-6 bg-[#F5F2ED]">
 
       {/* ── Breadcrumb + mobile menu trigger ── */}
       <div className="flex items-center justify-between gap-3">
@@ -97,13 +97,13 @@ export function AccountLayout({
             />
 
             {/* Drawer */}
-            <div className="fixed inset-y-0 left-0 z-50 w-72 bg-[#0D0D0D] border-r border-white/[0.08] shadow-xl lg:hidden flex flex-col">
+            <div className="fixed inset-y-0 left-0 z-50 w-72 bg-[#FFFFFF] border-r border-black/[0.07] shadow-xl lg:hidden flex flex-col">
               {/* Drawer header */}
-              <div className="flex items-center justify-between px-4 py-4 border-b border-white/[0.06]">
-                <p className="text-sm font-semibold text-white">My Account</p>
+              <div className="flex items-center justify-between px-4 py-4 border-b border-black/[0.06]">
+                <p className="text-sm font-semibold text-[#111111]">My Account</p>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="text-gray-400 hover:text-[#F97316] transition-colors p-1"
+                  className="text-[#888888] hover:text-[#F97316] transition-colors p-1"
                   aria-label="Close menu"
                 >
                   <FiX size={20} />

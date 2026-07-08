@@ -222,7 +222,7 @@ export function ShopClient({
   const activeSort = SORT_OPTIONS.find((o) => o.value === sort);
 
   return (
-    <div className="bg-[#0A0A0A] px-4 sm:px-6 md:px-8 py-6 min-h-screen">
+    <div className="bg-[#F5F2ED] px-4 sm:px-6 md:px-8 py-6 min-h-screen">
       {/* Breadcrumb */}
       <Breadcrumb items={breadcrumbs} />
 
@@ -230,7 +230,7 @@ export function ShopClient({
       <div className="flex items-center justify-between mt-2 mb-3 sm:hidden">
         <button
           onClick={() => setMobileSidebarOpen(true)}
-          className="flex items-center gap-2 h-9 px-4 border border-white/[0.08] rounded-[8px] text-sm text-white hover:border-[#F97316] transition-colors bg-[#141414]"
+          className="flex items-center gap-2 h-9 px-4 border border-black/[0.1] rounded-[8px] text-sm text-[#111111] hover:border-[#F97316] transition-colors bg-[#FFFFFF]"
         >
           <FiFilter size={15} />
           Filters
@@ -256,12 +256,12 @@ export function ShopClient({
               className="absolute inset-0 bg-black/50"
               onClick={() => setMobileSidebarOpen(false)}
             />
-            <div className="absolute left-0 top-0 h-full w-70 max-w-[85vw] bg-[#0F0F0F] overflow-y-auto">
-              <div className="flex items-center justify-between p-4 border-b border-white/[0.06]">
-                <h2 className="text-lg font-bold text-white">Filters</h2>
+            <div className="absolute left-0 top-0 h-full w-70 max-w-[85vw] bg-[#FFFFFF] overflow-y-auto">
+              <div className="flex items-center justify-between p-4 border-b border-black/[0.08]">
+                <h2 className="text-lg font-bold text-[#111111]">Filters</h2>
                 <button
                   onClick={() => setMobileSidebarOpen(false)}
-                  className="p-1 text-[#666666] hover:text-white"
+                  className="p-1 text-[#666666] hover:text-[#111111]"
                 >
                   <FiX size={20} />
                 </button>
@@ -292,7 +292,7 @@ export function ShopClient({
                   setLocalSearch(e.target.value);
                 }}
                 placeholder="Search for anything..."
-                className="sf-input h-9 sm:h-10 pl-3 sm:pl-4 pr-9 sm:pr-10 text-sm"
+                className="input-light h-9 sm:h-10 pl-3 sm:pl-4 pr-9 sm:pr-10 text-sm"
               />
               <FiSearch
                 size={14}
@@ -304,7 +304,7 @@ export function ShopClient({
             <div className="relative shrink-0">
               <button
                 onClick={() => setSortOpen((v) => !v)}
-                className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-2 sm:px-3 border border-white/[0.08] rounded-[8px] text-xs sm:text-sm text-white hover:border-[#F97316] transition-colors bg-[#141414]"
+                className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-2 sm:px-3 border border-black/[0.1] rounded-[8px] text-xs sm:text-sm text-[#111111] hover:border-[#F97316] transition-colors bg-[#FFFFFF]"
               >
                 <span className="text-[#6B7280] text-[10px] sm:text-xs mr-0.5 sm:mr-1 hidden xs:inline">
                   Sort by:
@@ -324,7 +324,7 @@ export function ShopClient({
                     className="fixed inset-0 z-10"
                     onClick={() => setSortOpen(false)}
                   />
-                  <div className="absolute right-0 top-full mt-1 bg-[#141414] border border-white/[0.08] rounded-[10px] shadow-lg z-20 py-1 min-w-40 sm:min-w-45">
+                  <div className="absolute right-0 top-full mt-1 bg-[#FFFFFF] border border-black/[0.1] rounded-[10px] shadow-lg z-20 py-1 min-w-40 sm:min-w-45">
                     {SORT_OPTIONS.map((opt) => (
                       <button
                         key={opt.value}
@@ -333,10 +333,10 @@ export function ShopClient({
                           setSortOpen(false);
                           setPage(1);
                         }}
-                        className={`w-full text-left px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm transition-colors hover:bg-white/[0.04] hover:text-[#F97316] ${
+                        className={`w-full text-left px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm transition-colors hover:bg-black/[0.04] hover:text-[#F97316] ${
                           sort === opt.value
                             ? "text-[#F97316] font-medium"
-                            : "text-[#A0A0A0]"
+                            : "text-[#666666]"
                         }`}
                       >
                         {opt.label}
@@ -391,10 +391,10 @@ export function ShopClient({
 function EmptyState({ onClear }: { onClear: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 sm:py-16 md:py-24 text-center px-4">
-      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-[#141414] border border-white/[0.06] flex items-center justify-center mb-3 sm:mb-4">
-        <FiGrid size={20} className="text-[#555555]" />
+      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-[#F5F5F5] border border-black/[0.06] flex items-center justify-center mb-3 sm:mb-4">
+        <FiGrid size={20} className="text-[#999999]" />
       </div>
-      <h3 className="text-sm sm:text-base font-bold text-white mb-1.5 sm:mb-2">
+      <h3 className="text-sm sm:text-base font-bold text-[#111111] mb-1.5 sm:mb-2">
         No products found
       </h3>
       <p className="text-xs sm:text-sm text-[#666666] mb-4 sm:mb-6 max-w-xs">

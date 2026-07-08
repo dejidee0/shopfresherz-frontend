@@ -52,7 +52,7 @@ export function MegaMenu({ isOpen, onClose }: MegaMenuProps) {
 
       {/* Menu panel */}
       <div
-        className="absolute top-full left-0 z-50 bg-[#0F0F0F] shadow-2xl shadow-black/40 border-t border-white/[0.08] flex"
+        className="absolute top-full left-0 z-50 bg-[#242436] shadow-2xl shadow-black/40 border-t border-white/[0.08] flex"
         role="navigation"
         aria-label="Category menu"
       >

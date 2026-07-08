@@ -27,7 +27,7 @@ export function FlashDealsStrip({ deals, sessionEndTime }: FlashDealsStripProps)
   if (!deals.length) return null
 
   return (
-    <section className="w-full bg-[#0D0D0D] py-4 sm:py-6" aria-label="Flash deals">
+    <section className="w-full bg-[#FFFFFF] py-4 sm:py-6" aria-label="Flash deals">
       <div className="max-w-content mx-auto px-4 sm:px-6 md:px-10">
 
         {/* Section header */}
@@ -36,7 +36,7 @@ export function FlashDealsStrip({ deals, sessionEndTime }: FlashDealsStripProps)
             <div className="flex items-center gap-1.5 sm:gap-2">
               {/* Orange flame accent bar */}
               <div className="w-1 h-5 sm:h-7 bg-[#F97316] rounded-full" />
-              <h2 className="text-white text-base sm:text-xl font-bold">FLASH DEALS</h2>
+              <h2 className="text-[#111111] text-base sm:text-xl font-bold">FLASH DEALS</h2>
             </div>
             <Countdown endTime={sessionEndTime} variant="dark" />
           </div>
@@ -54,7 +54,7 @@ export function FlashDealsStrip({ deals, sessionEndTime }: FlashDealsStripProps)
           {/* Left arrow - hidden on mobile */}
           <button
             onClick={() => scroll('left')}
-            className="absolute -left-3 sm:-left-4 top-1/2 -translate-y-1/2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#1A1A1A] border border-white/[0.1] shadow flex items-center justify-center text-white hover:bg-[#F97316] transition-colors hidden sm:flex"
+            className="absolute -left-3 sm:-left-4 top-1/2 -translate-y-1/2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#FFFFFF] border border-black/[0.08] shadow-[0_2px_12px_rgba(0,0,0,0.06)] flex items-center justify-center text-[#111111] hover:bg-[#F97316] hover:text-white transition-colors hidden sm:flex"
             aria-label="Scroll left"
           >
             <FiChevronLeft size={14} className="sm:size-16" />
@@ -72,7 +72,7 @@ export function FlashDealsStrip({ deals, sessionEndTime }: FlashDealsStripProps)
           {/* Right arrow - hidden on mobile */}
           <button
             onClick={() => scroll('right')}
-            className="absolute -right-3 sm:-right-4 top-1/2 -translate-y-1/2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#1A1A1A] border border-white/[0.1] shadow flex items-center justify-center text-white hover:bg-[#F97316] transition-colors hidden sm:flex"
+            className="absolute -right-3 sm:-right-4 top-1/2 -translate-y-1/2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#FFFFFF] border border-black/[0.08] shadow-[0_2px_12px_rgba(0,0,0,0.06)] flex items-center justify-center text-[#111111] hover:bg-[#F97316] hover:text-white transition-colors hidden sm:flex"
             aria-label="Scroll right"
           >
             <FiChevronRight size={14} className="sm:size-16" />
@@ -92,10 +92,10 @@ function FlashDealCard({ deal }: { deal: FlashDeal }) {
   return (
     <Link
       href={`/store/product/${deal.productSlug}`}
-      className="group shrink-0 w-40 sm:w-50 bg-[#141414] border border-white/[0.08] rounded-card overflow-hidden hover:border-[#F97316]/60 hover:shadow-[0_16px_34px_rgba(249,115,22,0.14)] transition-all duration-200"
+      className="group shrink-0 w-40 sm:w-50 bg-[#FFFFFF] border border-black/[0.06] rounded-card overflow-hidden hover:border-[#F97316]/60 hover:shadow-[0_16px_34px_rgba(249,115,22,0.14)] transition-all duration-200"
     >
       {/* Image */}
-      <div className="relative aspect-square bg-[#1F1F1F] overflow-hidden">
+      <div className="relative aspect-square bg-[#F5F5F5] overflow-hidden">
         {/* Discount badge */}
         <div className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2 z-10 bg-[#F97316] text-white text-[10px] sm:text-[11px] font-bold px-1 py-0.5 sm:px-1.5 sm:py-0.5 rounded-badge">
           -{deal.discountPercent}%
@@ -112,7 +112,7 @@ function FlashDealCard({ deal }: { deal: FlashDeal }) {
 
       {/* Info */}
       <div className="p-2 sm:p-3">
-        <p className="text-[10px] sm:text-xs text-[#D7D7D7] leading-snug line-clamp-2 mb-1.5 sm:mb-2 group-hover:text-[#F97316] transition-colors">
+        <p className="text-[10px] sm:text-xs text-[#111111] leading-snug line-clamp-2 mb-1.5 sm:mb-2 group-hover:text-[#F97316] transition-colors">
           {deal.productName}
         </p>
 
@@ -128,7 +128,7 @@ function FlashDealCard({ deal }: { deal: FlashDeal }) {
             <span>Sold: {deal.soldQuantity}</span>
             <span>{soldPercent}%</span>
           </div>
-          <div className="w-full h-1 sm:h-1.5 bg-white/[0.08] rounded-full overflow-hidden">
+          <div className="w-full h-1 sm:h-1.5 bg-black/[0.08] rounded-full overflow-hidden">
             <div
               className={cn(
                 'h-full rounded-full transition-all duration-500',
