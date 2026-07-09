@@ -5,7 +5,8 @@ import {
   FiArrowLeft,
   FiArrowRight,
   FiCheckCircle,
-  FiChevronRight,
+  FiLock,
+  FiShield,
   FiTag,
 } from 'react-icons/fi'
 import { useCartStore } from '@/store/cart'
@@ -107,7 +108,7 @@ export function RadioOption({
       onClick={onSelect}
       className={cn(
         'w-full flex items-center justify-between p-3 sm:p-4 rounded-[10px] border text-left transition-all',
-        selected ? 'border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_1px_rgba(249,115,22,0.2)]' : 'border-[rgba(0,0,0,0.08)] bg-[#F8F8F8] hover:border-[#F97316]/40'
+        selected ? 'border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_2px_rgba(249,115,22,0.15)]' : 'border-[rgba(0,0,0,0.08)] bg-[#F8F8F8] hover:border-[#F97316]/40'
       )}
     >
       <div className="flex-1 min-w-0">
@@ -134,41 +135,49 @@ export function RadioOption({
   )
 }
 
-const STEPS: { n: CheckoutStep; label: string }[] = [
-  { n: 1, label: 'Billing Info' },
-  { n: 2, label: 'Delivery' },
+// Progress steps shown at the top of checkout: Delivery -> Payment -> Review.
+// CheckoutStep 1 (address selection) and 2 (delivery method) both map to "Delivery".
+const PROGRESS_STEPS: { n: CheckoutStep; label: string }[] = [
+  { n: 1, label: 'Delivery' },
   { n: 3, label: 'Payment' },
   { n: 4, label: 'Review' },
 ]
 
 export function StepIndicator({ step }: { step: CheckoutStep }) {
+  const activeIndex = step === 2 ? 0 : PROGRESS_STEPS.findIndex((s) => s.n === step)
+
   return (
-    <div className="flex items-center gap-2 mb-6 overflow-x-auto">
-      {STEPS.map(({ n, label }, i) => {
-        const done = n < step
-        const active = n === step
+    <div className="flex items-start justify-center gap-0 mb-8 max-w-md mx-auto">
+      {PROGRESS_STEPS.map(({ label }, i) => {
+        const done = i < activeIndex
+        const active = i === activeIndex
         return (
-          <div key={n} className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5">
+          <div key={label} className="flex items-center flex-1 last:flex-none">
+            <div className="flex flex-col items-center gap-1.5 shrink-0">
               <div
                 className={cn(
-                  'w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
-                  done ? 'bg-green-500 text-white' : active ? 'bg-[#F97316] text-white' : 'bg-[#E5E5E5] text-[#888888]'
+                  'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
+                  done || active ? 'bg-[#F97316] text-white' : 'bg-[#E5E5E5] text-[#999999]'
                 )}
               >
-                {done ? <FiCheckCircle size={13} /> : n}
+                {done ? <FiCheckCircle size={15} /> : i + 1}
               </div>
               <span
                 className={cn(
-                  'text-xs font-medium hidden sm:block whitespace-nowrap transition-colors',
-                  active ? 'text-[#F97316]' : done ? 'text-green-600' : 'text-[#6B7280]'
+                  'text-[11px] whitespace-nowrap transition-colors',
+                  active ? 'text-[#F97316] font-bold' : done ? 'text-[#F97316] font-medium' : 'text-[#999999] font-medium'
                 )}
               >
                 {label}
               </span>
             </div>
-            {i < STEPS.length - 1 && (
-              <FiChevronRight size={14} className="text-[#D1D5DB] shrink-0" />
+            {i < PROGRESS_STEPS.length - 1 && (
+              <div
+                className={cn(
+                  'flex-1 h-[2px] mx-2 mb-5 rounded-full transition-colors',
+                  done ? 'bg-[#F97316]' : 'bg-[#E5E5E5]'
+                )}
+              />
             )}
           </div>
         )
@@ -226,8 +235,8 @@ export function OrderSummary({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="bg-white border border-[rgba(0,0,0,0.07)] rounded-[14px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]">
-        <p className="text-[16px] font-semibold text-[#111111] mb-4">Order Summary</p>
+      <div className="bg-white border border-[rgba(0,0,0,0.07)] rounded-[16px] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+        <p className="text-[18px] font-bold text-[#111111] mb-4">Order Summary</p>
 
         <div className="flex flex-col mb-4">
           {items.length === 0 && (
@@ -275,14 +284,24 @@ export function OrderSummary({
             </div>
           ))}
 
-          <div className="flex justify-between text-[18px] font-bold pt-3 mt-2 border-t border-[rgba(0,0,0,0.08)]">
+          <div className="flex justify-between text-[20px] font-extrabold pt-3 mt-2 border-t border-[rgba(0,0,0,0.08)]">
             <span className="text-[#111111]">Total</span>
             <span className="text-[#111111]">{formatPrice(total)}</span>
           </div>
         </div>
+
+        <div className="flex items-center justify-center gap-4 mt-5 pt-4 border-t border-[rgba(0,0,0,0.06)] text-[11px] text-[#999999]">
+          <span className="flex items-center gap-1">
+            <FiLock size={12} /> Secure Checkout
+          </span>
+          <span className="text-[#D1D5DB]">·</span>
+          <span className="flex items-center gap-1">
+            <FiShield size={12} /> SSL Encrypted
+          </span>
+        </div>
       </div>
 
-      <div className="bg-white border border-[rgba(0,0,0,0.07)] rounded-[14px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]">
+      <div className="bg-white border border-[rgba(0,0,0,0.07)] rounded-[16px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
         <div className="flex items-center gap-2 mb-3">
           <FiTag size={14} className="text-[#F97316]" />
           <p className="text-[14px] font-medium text-[#111111]">Coupon Code</p>
@@ -336,7 +355,7 @@ export function CheckoutLayout({
   return (
     <div className="flex flex-col lg:flex-row gap-6 items-start">
       <div className="flex-1 min-w-0">{children}</div>
-      <div className="w-full lg:w-[400px] shrink-0 lg:sticky lg:top-6">{sidebar}</div>
+      <div className="w-full lg:w-[420px] shrink-0 lg:sticky lg:top-6">{sidebar}</div>
     </div>
   )
 }

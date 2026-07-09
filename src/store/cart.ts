@@ -15,6 +15,7 @@ interface CartState {
   addItem: (item: Omit<CartItem, 'id'>) => void
   removeItem: (id: string) => void
   updateQty: (id: string, qty: number) => void
+  updateItem: (id: string, patch: Partial<Pick<CartItem, 'price' | 'stockQty'>>) => void
   clearCart: () => void
   setCoupon: (code: string, discount: number) => void
   removeCoupon: () => void
@@ -66,6 +67,11 @@ export const useCartStore = create<CartState>()(
           items: state.items.map((i) =>
             i.id === id ? { ...i, quantity: clampQty(qty, i.stockQty) } : i
           ),
+        })),
+
+      updateItem: (id, patch) =>
+        set((state) => ({
+          items: state.items.map((i) => (i.id === id ? { ...i, ...patch } : i)),
         })),
 
       clearCart: () => set({ items: [], couponCode: null, discountAmount: 0 }),

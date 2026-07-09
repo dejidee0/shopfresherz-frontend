@@ -96,6 +96,8 @@
   --color-text: var(--color-text-primary);
 
   --animate-marquee: 15s linear infinite;
+
+  --max-width-content: 1200px;
 }
 
 @keyframes marquee {

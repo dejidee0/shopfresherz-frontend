@@ -104,9 +104,11 @@ export interface FlutterWaveConfig {
 
 export interface InitiatePaymentResponse {
   pendingOrderId: string;
+  orderNumber: string;
   paymentMethod: string;
-  bankDetails: BankDetails;
-  flutterwaveConfig: FlutterWaveConfig;
+  bankDetails?: BankDetails;
+  flutterwaveConfig?: FlutterWaveConfig;
+  message?: string;
 }
 
 export interface ConfirmOrderRequest {

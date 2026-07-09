@@ -60,7 +60,7 @@ function SummarySection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white border border-[rgba(0,0,0,0.07)] rounded-[12px] p-5 mb-4 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]">
+    <div className="bg-white border border-[rgba(0,0,0,0.07)] rounded-[16px] p-5 sm:p-6 mb-4 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           {title.toLowerCase().includes("delivery") ? (
@@ -200,7 +200,7 @@ export function RegisteredCheckout({
       >
         <div className="flex flex-col gap-4">
           {/* ── Delivery Address ─────────────────────────────────────────────── */}
-          <div className="bg-white border border-[rgba(0,0,0,0.07)] rounded-[12px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="bg-white border border-[rgba(0,0,0,0.07)] rounded-[16px] p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <FiMapPin size={15} className="text-[#F97316] shrink-0" />
@@ -220,7 +220,7 @@ export function RegisteredCheckout({
                     onClick={() => onSelectAddress(addr.id)}
                     className={`w-full text-left flex items-start gap-3 p-3 rounded-[8px] border transition-all duration-150 ${
                       isSelected
-                        ? "border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_1px_rgba(249,115,22,0.2)]"
+                        ? "border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_2px_rgba(249,115,22,0.15)]"
                         : "border-[rgba(0,0,0,0.08)] bg-[#F8F8F8] hover:border-[#F97316]/40 hover:bg-[#F2F2F2]"
                     }`}
                   >
@@ -301,7 +301,7 @@ export function RegisteredCheckout({
             </p>
           </SummarySection>
 
-          <div className="bg-white border border-[rgba(0,0,0,0.07)] rounded-[12px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="bg-white border border-[rgba(0,0,0,0.07)] rounded-[16px] p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <FiCreditCard size={15} className="text-[#F97316] shrink-0" />
@@ -327,7 +327,7 @@ export function RegisteredCheckout({
                       onClick={() => onSelectCard(card.id)}
                       className={`w-full flex items-center gap-3 rounded-[8px] border px-4 py-3 text-left transition-colors ${
                         isSelected
-                          ? "border-[1.5px] border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_1px_rgba(249,115,22,0.2)]"
+                          ? "border-[1.5px] border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_2px_rgba(249,115,22,0.15)]"
                           : "border-[rgba(0,0,0,0.08)] bg-[#F8F8F8] hover:border-[#F97316]/40 hover:bg-[#F2F2F2]"
                       }`}
                     >
@@ -347,7 +347,7 @@ export function RegisteredCheckout({
                   onClick={() => onSelectPayment("card")}
                   className={`w-full flex items-center gap-3 rounded-[8px] border px-4 py-3 text-left transition-colors ${
                     selectedPayment === "card"
-                      ? "border-[1.5px] border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_1px_rgba(249,115,22,0.2)]"
+                      ? "border-[1.5px] border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_2px_rgba(249,115,22,0.15)]"
                       : "border-[rgba(0,0,0,0.08)] bg-[#F8F8F8] hover:border-[#F97316]/40 hover:bg-[#F2F2F2]"
                   }`}
                 >
@@ -365,7 +365,7 @@ export function RegisteredCheckout({
                   onClick={() => onSelectPayment(method)}
                   className={`w-full flex items-center gap-3 rounded-[8px] border px-4 py-3 text-left transition-colors ${
                     selectedPayment === method
-                      ? "border-[1.5px] border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_1px_rgba(249,115,22,0.2)]"
+                      ? "border-[1.5px] border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_2px_rgba(249,115,22,0.15)]"
                       : "border-[rgba(0,0,0,0.08)] bg-[#F8F8F8] hover:border-[#F97316]/40 hover:bg-[#F2F2F2]"
                   }`}
                 >
@@ -381,19 +381,23 @@ export function RegisteredCheckout({
             </div>
           </div>
 
-          
           {/* ── Place Order ──────────────────────────────────────────────────── */}
-          <button
-            onClick={onPlaceOrder}
-            disabled={!paymentReady}
-            className={`w-full h-[52px] rounded-[10px] text-[16px] font-semibold flex items-center justify-center gap-2 transition-colors ${
-              paymentReady
-                ? "sf-btn-primary text-white cursor-pointer"
-                : "bg-[#E0E0E0] text-[#AAAAAA] cursor-not-allowed"
-            }`}
-          >
-            PLACE ORDER — {formatPrice(total)} <FiArrowRight size={16} />
-          </button>
+          {/* Spacer so sticky mobile button doesn't cover the last card */}
+          <div className="h-20 lg:hidden" aria-hidden />
+          <div className="fixed inset-x-0 bottom-0 z-30 p-4 bg-gradient-to-t from-[#F5F2ED] via-[#F5F2ED] to-transparent lg:static lg:p-0 lg:bg-none">
+            <button
+              onClick={onPlaceOrder}
+              disabled={!paymentReady}
+              type="button"
+              className={`w-full h-14 rounded-[14px] text-[16px] font-bold flex items-center justify-center gap-2 transition-colors ${
+                paymentReady
+                  ? "bg-gradient-to-br from-[#F97316] to-[#EA580C] text-white cursor-pointer shadow-[0_8px_24px_rgba(249,115,22,0.3)]"
+                  : "bg-[#E0E0E0] text-[#AAAAAA] cursor-not-allowed"
+              }`}
+            >
+              PLACE ORDER — {formatPrice(total)} <FiArrowRight size={16} />
+            </button>
+          </div>
         </div>
       </CheckoutLayout>
 

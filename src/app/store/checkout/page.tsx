@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/auth";
@@ -10,6 +10,7 @@ import { DeliveryStep } from "@/features/checkout/components/DeliveryStep";
 import { PaymentStep } from "@/features/checkout/components/PaymentStep";
 import { ReviewStep } from "@/features/checkout/components/ReviewStep";
 import { RegisteredCheckout } from "@/features/checkout/components/RegisteredCheckout";
+import { StepIndicator } from "@/features/checkout/components/CheckoutShared";
 
 import { useFlutterwave, closePaymentModal } from "flutterwave-react-v3";
 
@@ -27,6 +28,7 @@ import {
   type PaymentMethod as SavedCard,
 } from "@/lib/api/account";
 import { checkoutApi } from "@/lib/api/checkout";
+import { productsApi } from "@/lib/api/products";
 import { toast } from "@/store/toast";
 import { FlutterwavePaymentTrigger } from "@/features/payment/components/FlutterwavePaymentTrigger";
 import {
@@ -53,6 +55,34 @@ export default function CheckoutPage() {
   const setCartCoupon = useCartStore((s) => s.setCoupon);
   const removeCartCoupon = useCartStore((s) => s.removeCoupon);
   const clearCart = useCartStore((s) => s.clearCart);
+  const updateCartItem = useCartStore((s) => s.updateItem);
+
+  // Reconcile persisted cart prices against current product prices — a cart
+  // can sit in localStorage for days/weeks between visits, so prices may have
+  // drifted since the item was added.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      for (const item of items) {
+        try {
+          const product = await productsApi.getBySlug(item.slug);
+          if (cancelled) return;
+          if (product.price !== item.price || product.stockQty !== item.stockQty) {
+            updateCartItem(item.id, {
+              price: product.price,
+              stockQty: product.stockQty,
+            });
+          }
+        } catch {
+          // Ignore — keep the last-known price/stock rather than blocking checkout.
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Addresses ─────────────────────────────────────────────────────────────
   const { data: addresses = [], refetch: refetchAddresses } = useQuery<
@@ -288,7 +318,7 @@ export default function CheckoutPage() {
           payment === "bank_transfer"
             ? "BankTransfer"
             : payment === "pay_on_delivery"
-              ? "POD"
+              ? "PayOnDelivery"
               : "Card",
         pricing: { subtotal, discountAmount, deliveryFee, tax, total },
         couponCode: coupon.applied
@@ -296,9 +326,32 @@ export default function CheckoutPage() {
           : undefined,
       });
 
+      if (result.paymentMethod === "BankTransfer" && result.bankDetails) {
+        clearCart();
+        const params = new URLSearchParams({
+          orderId: result.pendingOrderId,
+          orderNumber: result.orderNumber,
+          bankName: result.bankDetails.bankName,
+          accountNumber: result.bankDetails.accountNumber,
+          accountName: result.bankDetails.accountName,
+          instructions: result.bankDetails.instructions,
+          total: String(total),
+        });
+        router.push(`/store/checkout/bank-transfer?${params.toString()}`);
+        return;
+      }
+
+      if (result.paymentMethod === "PayOnDelivery") {
+        clearCart();
+        router.push(
+          `/store/checkout/confirmation?orderNumber=${result.orderNumber}`,
+        );
+        return;
+      }
+
+      // Card: hand off to the Flutterwave inline popup (triggered in the effect below).
       setPendingOrderId(result.pendingOrderId);
       setFlwConfig(result.flutterwaveConfig);
-      // handleFlutterPayment is triggered in useEffect below
     } catch (error) {
       toast.error(
         "Payment initiation failed",
@@ -360,8 +413,9 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="bg-[#F5F2ED] px-4 sm:px-6 lg:px-8 py-8 min-h-screen">
+    <div className="bg-[#F5F2ED] px-4 sm:px-6 py-6 sm:py-8 min-h-screen">
       <div className="max-w-content mx-auto">
+      <StepIndicator step={step} />
       {step === 1 && (
         <RegisteredCheckout
           {...sidebarProps}
