@@ -12,8 +12,6 @@ import { ReviewStep } from "@/features/checkout/components/ReviewStep";
 import { RegisteredCheckout } from "@/features/checkout/components/RegisteredCheckout";
 import { StepIndicator } from "@/features/checkout/components/CheckoutShared";
 
-import { useFlutterwave, closePaymentModal } from "flutterwave-react-v3";
-
 import {
   EMPTY_CARD,
   type DeliveryMethod,
@@ -328,23 +326,16 @@ export default function CheckoutPage() {
 
       if (result.paymentMethod === "BankTransfer" && result.bankDetails) {
         clearCart();
-        const params = new URLSearchParams({
-          orderId: result.pendingOrderId,
-          orderNumber: result.orderNumber,
-          bankName: result.bankDetails.bankName,
-          accountNumber: result.bankDetails.accountNumber,
-          accountName: result.bankDetails.accountName,
-          instructions: result.bankDetails.instructions,
-          total: String(total),
-        });
-        router.push(`/store/checkout/bank-transfer?${params.toString()}`);
+        router.push(
+          `/store/checkout/success?order=${result.orderNumber}&method=BankTransfer&total=${total}`,
+        );
         return;
       }
 
       if (result.paymentMethod === "PayOnDelivery") {
         clearCart();
         router.push(
-          `/store/checkout/confirmation?orderNumber=${result.orderNumber}`,
+          `/store/checkout/success?order=${result.orderNumber}&method=PayOnDelivery&total=${total}`,
         );
         return;
       }
@@ -375,7 +366,7 @@ export default function CheckoutPage() {
       });
       clearCart();
       router.push(
-        `/store/checkout/confirmation?orderNumber=${order.orderNumber}`,
+        `/store/checkout/success?order=${order.orderNumber}&method=Card&total=${flwConfig?.amount ?? ""}`,
       );
     } catch (error) {
       toast.error(

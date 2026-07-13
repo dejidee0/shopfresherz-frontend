@@ -23,6 +23,7 @@
 // }
 
 
+import Script from 'next/script'
 import { TopBar } from '@/components/layout/TopBar'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
@@ -36,6 +37,11 @@ import { ChatWidget } from '@/features/chat/components/ChatWidget'
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
+      <Script
+        id="flutterwave-v4"
+        src="https://checkout.flutterwave.com/v3.js"
+        strategy="beforeInteractive"
+      />
       <TopBar />
       <Navbar />
       <main className="flex-1">{children}</main>
