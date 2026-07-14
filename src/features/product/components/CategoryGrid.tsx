@@ -180,11 +180,7 @@ function CategoryItem({ category, index }: { category: CategoryWithImage; index:
           alt={category.name}
           width={56}
           height={56}
-          className={
-            imgSrc.startsWith("/")
-              ? "w-full h-full object-contain p-2"
-              : "w-full h-full object-cover"
-          }
+          className="w-full h-full object-cover"
           onError={(e) => {
             e.currentTarget.src = fallbackSrc;
           }}

@@ -427,7 +427,7 @@ function PromoCompactCard({
             alt={promo.title ?? "Promo product"}
             fill
             sizes="56px"
-            className="object-contain p-1.5"
+            className="object-cover"
           />
         ) : (
           <span className="flex h-full w-full items-center justify-center text-2xl">📱</span>

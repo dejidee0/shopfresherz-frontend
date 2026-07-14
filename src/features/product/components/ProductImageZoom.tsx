@@ -449,7 +449,7 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
                 alt={`${productName} thumbnail ${i + 1}`}
                 fill
                 sizes="64px"
-                className="object-contain p-1"
+                className="object-cover"
               />
             </button>
           ))}
@@ -568,7 +568,7 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
                   alt={`Thumbnail ${i + 1}`}
                   fill
                   sizes="48px"
-                  className="object-contain p-0.5"
+                  className="object-cover"
                 />
               </button>
             ))}

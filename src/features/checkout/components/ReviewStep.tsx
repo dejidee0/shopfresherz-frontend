@@ -123,7 +123,7 @@ export function ReviewStep({
                 alt={item.name}
                 width={56}
                 height={56}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover"
               />
             </div>
             <div className="flex-1 min-w-0">

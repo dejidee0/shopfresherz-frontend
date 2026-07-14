@@ -106,7 +106,7 @@ function FlashDealCard({ deal }: { deal: FlashDeal }) {
           alt={deal.productName}
           fill
           sizes="200px"
-          className="object-contain p-2 sm:p-3 transition-transform duration-300 group-hover:scale-105"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
       </div>
 

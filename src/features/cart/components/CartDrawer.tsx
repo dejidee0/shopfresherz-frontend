@@ -105,7 +105,7 @@ export function CartDrawer() {
                       alt={item.name}
                       width={72}
                       height={72}
-                      className="w-full h-full object-contain p-2"
+                      className="w-full h-full object-cover"
                     />
                   </Link>
 

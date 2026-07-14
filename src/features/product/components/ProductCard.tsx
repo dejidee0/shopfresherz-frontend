@@ -134,15 +134,15 @@ export function ProductCard({
       </button>
 
       {/* Image */}
-      <div className="overflow-hidden bg-[#F8F8F8] h-[190px] sm:h-[200px] flex items-center justify-center transition-shadow group-hover:shadow-[inset_0_0_30px_rgba(249,115,22,0.05)]">
+      <div className="relative overflow-hidden bg-[#F8F8F8] h-[190px] sm:h-[200px] rounded-t-[10px] transition-shadow group-hover:shadow-[inset_0_0_30px_rgba(249,115,22,0.05)]">
         {imageSrc ? (
           <Image
             src={imageSrc}
             alt={product.name}
-            width={200}
-            height={200}
+            fill
+            style={{ objectFit: "cover", objectPosition: "center" }}
             className={cn(
-              "w-full h-full object-contain transition-transform duration-300 p-5 drop-shadow-[0_12px_24px_rgba(0,0,0,0.45)]",
+              "transition-transform duration-300",
               !isOutOfStock && "group-hover:scale-110",
             )}
             onError={() => setImgError(true)}

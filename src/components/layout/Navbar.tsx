@@ -157,7 +157,7 @@ export function Navbar() {
                     alt={product.name}
                     width={40}
                     height={40}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="flex-1 min-w-0">

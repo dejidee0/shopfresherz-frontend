@@ -27,7 +27,7 @@ const LINE_ITEM_COLUMNS: ColumnDef<OrderLineItem>[] = [
             alt={row.productName}
             width={48}
             height={48}
-            className="w-full h-full object-contain p-1"
+            className="w-full h-full object-cover"
           />
         </div>
         <div className="min-w-0">

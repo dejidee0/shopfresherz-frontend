@@ -149,14 +149,14 @@ function ProductCard({ product }: { product: HomeProduct }) {
       </button>
 
       <Link href={`/store/product/${product.slug}`} className="flex flex-col flex-1 z-10">
-        <div className="product-image h-[190px] sm:h-[200px] bg-[#F5F2ED] overflow-hidden flex items-center justify-center">
+        <div className="product-image relative h-[190px] sm:h-[200px] bg-[#F5F2ED] overflow-hidden">
           {imageSrc ? (
             <Image
               src={imageSrc}
               alt={product.name}
-              width={200}
-              height={200}
-              className="w-full h-full object-contain p-5 transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_12px_24px_rgba(0,0,0,0.15)]"
+              fill
+              style={{ objectFit: "cover", objectPosition: "center" }}
+              className="transition-transform duration-300 group-hover:scale-110"
               unoptimized
             />
           ) : (

@@ -251,7 +251,7 @@ export function OrderSummary({
                   alt={item.name}
                   width={48}
                   height={48}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-cover"
                 />
               </div>
               <div className="flex-1 min-w-0">

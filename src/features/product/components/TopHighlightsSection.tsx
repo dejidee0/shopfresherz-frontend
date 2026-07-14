@@ -65,15 +65,13 @@ const ProductRow: React.FC<{ product: Product }> = ({ product }) => {
         }}
       >
         {product.imageUrl ? (
-          <div className="h-full w-full p-1.5">
-            <Image
-              src={product.imageUrl}
-              alt={product.title}
-              width={60}
-              height={60}
-              className="h-full w-full object-contain transition-transform duration-200 group-hover:scale-105"
-            />
-          </div>
+          <Image
+            src={product.imageUrl}
+            alt={product.title}
+            width={60}
+            height={60}
+            className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+          />
         ) : (
           <div className="h-full w-full bg-black/[0.06]" />
         )}
