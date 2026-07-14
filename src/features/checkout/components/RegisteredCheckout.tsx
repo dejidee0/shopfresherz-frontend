@@ -9,8 +9,9 @@ import {
   FiTruck,
   FiCreditCard,
   FiPlus,
+  FiPhone,
 } from "react-icons/fi";
-import { OrderSummary, CheckoutLayout } from "./CheckoutShared";
+import { Field, OrderSummary, CheckoutLayout } from "./CheckoutShared";
 import type {
   CouponState,
   DeliveryMethod,
@@ -106,6 +107,10 @@ interface Props {
   onSelectCard: (id: string) => void;
   selectedPayment: PaymentMethod | null;
   onSelectPayment: (m: PaymentMethod) => void;
+  // Contact
+  phone: string;
+  onPhoneChange: (v: string) => void;
+  phoneError?: string;
   // Navigation
   onEditDelivery: () => void;
   onEditPayment: () => void;
@@ -130,6 +135,9 @@ export function RegisteredCheckout({
   onSelectCard,
   selectedPayment,
   onSelectPayment,
+  phone,
+  onPhoneChange,
+  phoneError,
   onEditDelivery,
   onEditPayment,
   onPlaceOrder,
@@ -155,7 +163,8 @@ export function RegisteredCheckout({
   //     selectedPayment !== "card" &&
   //     selectedAddressId !== null);
 
-  const paymentReady = selectedAddressId !== null;
+  const isPhoneValid = phone.replace(/\D/g, "").length >= 10;
+  const paymentReady = selectedAddressId !== null && isPhoneValid;
 
   const PAYMENT_METHOD_LABELS: Record<string, string> = {
     card: "Card",
@@ -282,6 +291,24 @@ export function RegisteredCheckout({
                 Add a new address
               </button>
             </div>
+          </div>
+
+          {/* ── Contact / Phone ──────────────────────────────────────────────── */}
+          <div className="bg-white border border-[rgba(0,0,0,0.07)] rounded-[16px] p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+            <div className="flex items-center gap-2 mb-3">
+              <FiPhone size={15} className="text-[#F97316] shrink-0" />
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-[#888888]">
+                CONTACT
+              </p>
+            </div>
+            <Field
+              label="Phone Number"
+              type="tel"
+              placeholder="+234 800 000 0000"
+              value={phone}
+              onChange={onPhoneChange}
+              error={phoneError}
+            />
           </div>
 
           {/* ── Delivery Details ─────────────────────────────────────────────── */}

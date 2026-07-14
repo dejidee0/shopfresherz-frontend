@@ -28,7 +28,6 @@ import {
 import { checkoutApi } from "@/lib/api/checkout";
 import { productsApi } from "@/lib/api/products";
 import { toast } from "@/store/toast";
-import { FlutterwavePaymentTrigger } from "@/features/payment/components/FlutterwavePaymentTrigger";
 import {
   CHECKOUT_ADDRESSES_QUERY_KEY,
   SAVED_CARDS_QUERY_KEY,
@@ -128,7 +127,24 @@ export default function CheckoutPage() {
     code: couponCode ?? "",
     applied: !!couponCode,
   });
-  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+
+  // ── Phone number ──────────────────────────────────────────────────────────
+  const user = useAuthStore((s) => s.user);
+  const [phone, setPhone] = useState("");
+  const [phoneTouched, setPhoneTouched] = useState(false);
+
+  // Pre-fill from the user's saved profile phone once it becomes available.
+  useEffect(() => {
+    if (user?.phone && !phone) setPhone(user.phone);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.phone]);
+
+  const phoneDigits = phone.replace(/\D/g, "");
+  const phoneError =
+    phoneTouched && phoneDigits.length < 10
+      ? "Enter a valid phone number (at least 10 digits)."
+      : undefined;
+  const isPhoneValid = phoneDigits.length >= 10;
 
   const deliveryFee = useMemo(() => {
     if (delivery === "pickup") return 0;
@@ -270,11 +286,9 @@ export default function CheckoutPage() {
   //   }
   // };
 
-  const [flwConfig, setFlwConfig] = useState<any>(null);
-  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [isInitiating, setIsInitiating] = useState(false);
 
-  // Step A: Called when user clicks "Place Order" in ReviewStep
+  // Called when user clicks "Place Order" in ReviewStep
   const handleInitiatePayment = async () => {
     if (!token || !isAuthenticated) {
       toast.error(
@@ -287,6 +301,14 @@ export default function CheckoutPage() {
       toast.error(
         "Select a delivery address",
         "Choose where you want this order delivered.",
+      );
+      return;
+    }
+    if (!isPhoneValid) {
+      setPhoneTouched(true);
+      toast.error(
+        "Enter a valid phone number",
+        "We need a phone number to reach you about your order.",
       );
       return;
     }
@@ -322,6 +344,7 @@ export default function CheckoutPage() {
         couponCode: coupon.applied
           ? coupon.code.trim().toUpperCase()
           : undefined,
+        guestPhone: phone.trim(),
       });
 
       if (result.paymentMethod === "BankTransfer" && result.bankDetails) {
@@ -340,9 +363,25 @@ export default function CheckoutPage() {
         return;
       }
 
-      // Card: hand off to the Flutterwave inline popup (triggered in the effect below).
-      setPendingOrderId(result.pendingOrderId);
-      setFlwConfig(result.flutterwaveConfig);
+      // Card: hand off to Flutterwave's hosted checkout page.
+      if (result.paymentMethod === "Card" && result.paymentLink) {
+        sessionStorage.setItem(
+          "pendingFlwOrder",
+          JSON.stringify({
+            pendingOrderId: result.pendingOrderId,
+            orderNumber: result.orderNumber,
+            txRef: result.flutterwaveConfig?.tx_ref,
+            amount: result.flutterwaveConfig?.amount ?? total,
+          }),
+        );
+        window.location.href = result.paymentLink;
+        return;
+      }
+
+      toast.error(
+        "Payment initiation failed",
+        "Unable to start payment. Please try again.",
+      );
     } catch (error) {
       toast.error(
         "Payment initiation failed",
@@ -350,31 +389,6 @@ export default function CheckoutPage() {
       );
     } finally {
       setIsInitiating(false);
-    }
-  };
-
-  // Step B: Called after Flutterwave popup closes with success
-  const handleConfirmOrder = async (transactionId: string, txRef: string) => {
-    if (!pendingOrderId) return;
-    setIsPlacingOrder(true);
-    try {
-      const order = await checkoutApi.confirmOrder(token!, {
-        pendingOrderId,
-        transactionId,
-        txRef,
-        status: "successful",
-      });
-      clearCart();
-      router.push(
-        `/store/checkout/success?order=${order.orderNumber}&method=Card&total=${flwConfig?.amount ?? ""}`,
-      );
-    } catch (error) {
-      toast.error(
-        "Order confirmation failed",
-        "Payment was received but order could not be confirmed. Contact support.",
-      );
-    } finally {
-      setIsPlacingOrder(false);
     }
   };
 
@@ -424,6 +438,12 @@ export default function CheckoutPage() {
           }}
           selectedPayment={payment}
           onSelectPayment={setPayment}
+          phone={phone}
+          onPhoneChange={(v) => {
+            setPhone(v);
+            setPhoneTouched(true);
+          }}
+          phoneError={phoneError}
           onEditDelivery={() => setStep(2)}
           onEditPayment={() => setStep(3)}
           onPlaceOrder={() => setStep(4)}
@@ -472,25 +492,11 @@ export default function CheckoutPage() {
           selectedAddress={selectedAddress}
           delivery={delivery}
           payment={payment ?? "card"}
-          isPlacingOrder={isInitiating || isPlacingOrder}  // covers both phases
+          phone={phone}
+          isPlacingOrder={isInitiating}
           onBack={() => setStep(1)}
           onPlaceOrder={handleInitiatePayment}
           {...sidebarProps}
-        />
-      )}
-
-      {flwConfig && (
-        <FlutterwavePaymentTrigger
-          config={flwConfig}
-          onSuccess={(txId, txRef) => {
-            setFlwConfig(null);
-            handleConfirmOrder(txId, txRef);
-          }}
-          onClose={() => {
-            setFlwConfig(null);
-            setPendingOrderId(null);
-            toast.error("Payment cancelled", "Your payment was not completed.");
-          }}
         />
       )}
       </div>

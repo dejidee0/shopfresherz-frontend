@@ -30,6 +30,7 @@ interface Props {
   selectedAddress: Address | null
   delivery: DeliveryMethod
   payment: PaymentMethod
+  phone: string
   coupon: CouponState
   onCouponChange: (v: string) => void
   onApplyCoupon: () => void
@@ -44,6 +45,7 @@ export function ReviewStep({
   selectedAddress,
   delivery,
   payment,
+  phone,
   coupon,
   onCouponChange,
   onApplyCoupon,
@@ -142,7 +144,7 @@ export function ReviewStep({
         <p className="text-sm font-bold text-[#111111] mb-2">Delivery Details</p>
         <DetailRow label="Name"     value={fullName} />
         <DetailRow label="Email"    value={user?.email    || '—'} />
-        <DetailRow label="Phone"    value={user?.phone    || '—'} />
+        <DetailRow label="Phone"    value={phone || user?.phone || '—'} />
         <DetailRow label="Address"  value={addressLine} />
         <DetailRow label="Delivery" value={deliveryDetail} />
         <DetailRow label="Payment"  value={paymentLabel[payment]} />

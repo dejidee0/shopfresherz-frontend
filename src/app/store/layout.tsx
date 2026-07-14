@@ -23,7 +23,6 @@
 // }
 
 
-import Script from 'next/script'
 import { TopBar } from '@/components/layout/TopBar'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
@@ -33,15 +32,13 @@ import { ChatWidget } from '@/features/chat/components/ChatWidget'
 // Wraps every customer-facing page:
 // / · /category/* · /product/* · /search · /cart · /checkout · /auth/* · /account/*
 // Route group (store) is invisible in URLs.
+//
+// Card payments redirect to Flutterwave's hosted checkout page (see
+// checkout/verify), so the inline Flutterwave v3 SDK script is not loaded here.
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <Script
-        id="flutterwave-v4"
-        src="https://checkout.flutterwave.com/v3.js"
-        strategy="beforeInteractive"
-      />
       <TopBar />
       <Navbar />
       <main className="flex-1">{children}</main>

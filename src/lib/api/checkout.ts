@@ -108,6 +108,8 @@ export interface InitiatePaymentResponse {
   paymentMethod: string;
   bankDetails?: BankDetails;
   flutterwaveConfig?: FlutterWaveConfig;
+  /** Flutterwave hosted checkout page — redirect the browser here for Card payments. */
+  paymentLink?: string;
   message?: string;
 }
 
