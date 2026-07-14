@@ -11,21 +11,13 @@ import {
   FiPlus,
   FiPhone,
 } from "react-icons/fi";
-import { Field, OrderSummary, CheckoutLayout } from "./CheckoutShared";
-import type {
-  CouponState,
-  DeliveryMethod,
-  PaymentMethod,
-} from "../types/checkout";
+import { Field, OrderSummary, CheckoutLayout, PaymentOptionCard } from "./CheckoutShared";
+import { PAYMENT_OPTIONS, type CouponState, type DeliveryMethod, type PaymentMethod } from "../types/checkout";
 import { useAuthStore } from "@/store/auth";
 import { useCartStore } from "@/store/cart";
 import { toast } from "@/store/toast";
 import { formatPrice } from "@/lib/utils/format";
-import type {
-  Address,
-  CreateAddressRequest,
-  PaymentMethod as SavedCard,
-} from "@/lib/api/account";
+import type { Address, CreateAddressRequest } from "@/lib/api/account";
 import AddAddressModal from "@/components/account/AddAddressModal";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -35,19 +27,6 @@ const DELIVERY_LABELS: Record<string, string> = {
   express: "Express Delivery",
   pickup: "Store Pickup",
 };
-
-// Infer card brand from first digit
-function cardBrandLabel(card: SavedCard): string {
-  if (card.cardType) return card.cardType;
-  // const first = card.last4?.[0] ?? ''
-  // if (first === '4') return 'Visa'
-  // if (first === '5') return 'Mastercard'
-  return "Card";
-}
-
-function maskNumber(last4?: string) {
-  return last4 ? `•••• •••• •••• ${last4}` : "•••• •••• •••• ••••";
-}
 
 // ─── SummarySection ───────────────────────────────────────────────────────────
 
@@ -102,9 +81,6 @@ interface Props {
   onSelectAddress: (id: string) => void;
   onAddAddress: (data: CreateAddressRequest) => Promise<void>;
   // Payment
-  savedCards: SavedCard[];
-  selectedCardId: string | null;
-  onSelectCard: (id: string) => void;
   selectedPayment: PaymentMethod | null;
   onSelectPayment: (m: PaymentMethod) => void;
   // Contact
@@ -130,9 +106,6 @@ export function RegisteredCheckout({
   selectedAddressId,
   onSelectAddress,
   onAddAddress,
-  savedCards,
-  selectedCardId,
-  onSelectCard,
   selectedPayment,
   onSelectPayment,
   phone,
@@ -154,23 +127,10 @@ export function RegisteredCheckout({
 
   const visibleAddresses = showAllAddresses ? addresses : addresses.slice(0, 2);
 
-  // Payment is ready if: a saved card is selected, or a non-card method is chosen
-  // const paymentReady =
-  //   (selectedPayment === "card" &&
-  //     !!selectedCardId &&
-  //     selectedAddressId !== null) ||
-  //   (selectedPayment !== null &&
-  //     selectedPayment !== "card" &&
-  //     selectedAddressId !== null);
-
   const isPhoneValid = phone.replace(/\D/g, "").length >= 10;
   const paymentReady = selectedAddressId !== null && isPhoneValid;
 
-  const PAYMENT_METHOD_LABELS: Record<string, string> = {
-    card: "Card",
-    bank_transfer: "Bank Transfer",
-    pay_on_delivery: "Pay on Delivery",
-  };
+  const selectedPaymentOption = PAYMENT_OPTIONS.find((o) => o.id === selectedPayment);
 
   const handleAddAddress = async (data: CreateAddressRequest) => {
     setIsAddingAddress(true);
@@ -344,68 +304,36 @@ export function RegisteredCheckout({
               </button>
             </div>
 
-            <div className="grid gap-2">
-              {savedCards.length > 0 ? (
-                savedCards.map((card) => {
-                  const isSelected = selectedPayment === "card" && selectedCardId === card.id;
-                  return (
-                    <button
-                      key={card.id}
-                      onClick={() => onSelectCard(card.id)}
-                      className={`w-full flex items-center gap-3 rounded-[8px] border px-4 py-3 text-left transition-colors ${
-                        isSelected
-                          ? "border-[1.5px] border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_2px_rgba(249,115,22,0.15)]"
-                          : "border-[rgba(0,0,0,0.08)] bg-[#F8F8F8] hover:border-[#F97316]/40 hover:bg-[#F2F2F2]"
-                      }`}
-                    >
-                       <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${isSelected ? "border-[#F97316]" : "border-[rgba(0,0,0,0.15)]"}`}>
-                        {isSelected && <span className="w-2 h-2 rounded-full bg-[#F97316]" />}
-                      </span>
-                      <FiCreditCard size={16} className="text-[#F97316]" />
-                      <span className="flex flex-col">
-                         <span className="text-sm font-medium text-[#111111]">{cardBrandLabel(card)}</span>
-                        <span className="text-xs text-[#888888]">{maskNumber(card.cardNumber?.slice(-4))}</span>
-                      </span>
-                    </button>
-                  );
-                })
-              ) : (
-                <button
-                  onClick={() => onSelectPayment("card")}
-                  className={`w-full flex items-center gap-3 rounded-[8px] border px-4 py-3 text-left transition-colors ${
-                    selectedPayment === "card"
-                      ? "border-[1.5px] border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_2px_rgba(249,115,22,0.15)]"
-                      : "border-[rgba(0,0,0,0.08)] bg-[#F8F8F8] hover:border-[#F97316]/40 hover:bg-[#F2F2F2]"
-                  }`}
-                >
-                  <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedPayment === "card" ? "border-[#F97316]" : "border-[rgba(0,0,0,0.15)]"}`}>
-                    {selectedPayment === "card" && <span className="w-2 h-2 rounded-full bg-[#F97316]" />}
-                  </span>
-                  <FiCreditCard size={16} className="text-[#F97316]" />
-                  <span className="text-sm font-medium text-[#111111]">Card</span>
-                </button>
-              )}
-
-              {(["bank_transfer", "pay_on_delivery"] as PaymentMethod[]).map((method) => (
-                <button
-                  key={method}
-                  onClick={() => onSelectPayment(method)}
-                  className={`w-full flex items-center gap-3 rounded-[8px] border px-4 py-3 text-left transition-colors ${
-                    selectedPayment === method
-                      ? "border-[1.5px] border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_2px_rgba(249,115,22,0.15)]"
-                      : "border-[rgba(0,0,0,0.08)] bg-[#F8F8F8] hover:border-[#F97316]/40 hover:bg-[#F2F2F2]"
-                  }`}
-                >
-                  <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedPayment === method ? "border-[#F97316]" : "border-[rgba(0,0,0,0.15)]"}`}>
-                    {selectedPayment === method && <span className="w-2 h-2 rounded-full bg-[#F97316]" />}
-                  </span>
-                  <FiCreditCard size={16} className="text-[#F97316]" />
-                  <span className="text-sm font-medium text-[#111111]">
-                    {PAYMENT_METHOD_LABELS[method]}
-                  </span>
-                </button>
+            <div className="grid gap-2.5">
+              {PAYMENT_OPTIONS.map((opt) => (
+                <PaymentOptionCard
+                  key={opt.id}
+                  icon={
+                    opt.icon === "card" ? (
+                      <FiCreditCard size={18} />
+                    ) : (
+                      <span className="text-lg leading-none">🚚</span>
+                    )
+                  }
+                  label={opt.label}
+                  sublabel={opt.subtitle}
+                  badge={opt.badge}
+                  selected={selectedPayment === opt.id}
+                  onSelect={() => onSelectPayment(opt.id)}
+                />
               ))}
             </div>
+
+            {selectedPaymentOption && (
+              <p className="text-xs text-[#888888] mt-3 leading-relaxed">
+                {selectedPaymentOption.description}
+                {selectedPaymentOption.note && (
+                  <span className="block mt-1 text-[#F97316] font-medium">
+                    {selectedPaymentOption.note}
+                  </span>
+                )}
+              </p>
+            )}
           </div>
 
           {/* ── Place Order ──────────────────────────────────────────────────── */}

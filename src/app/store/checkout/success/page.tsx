@@ -1,40 +1,16 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { FiArrowRight, FiCheck, FiCopy, FiTruck } from "react-icons/fi";
+import { FiArrowRight, FiCheck, FiTruck } from "react-icons/fi";
 import { formatPrice } from "@/lib/utils/format";
-import { toast } from "@/store/toast";
-
-const BANK_DETAILS = {
-  bank: "Kuda Bank",
-  accountNumber: "3002733251",
-  accountName: "FRESHERZ GADGETS HUB LTD",
-};
 
 function SuccessContent() {
   const params = useSearchParams();
   const order = params.get("order") ?? "";
   const method = params.get("method") ?? "Card";
   const total = Number(params.get("total") ?? 0);
-
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(BANK_DETAILS.accountNumber);
-      setCopied(true);
-      toast.success("Account number copied");
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      toast.error("Couldn't copy", "Please copy the account number manually.");
-    }
-  };
-
-  const whatsappMessage = encodeURIComponent(
-    `Hi, I just made a bank transfer for Order ${order}. Amount: ${formatPrice(total)}. Please confirm my order.`,
-  );
 
   return (
     <div className="bg-[#F5F2ED] min-h-screen px-4 py-10 sm:py-16">
@@ -81,75 +57,6 @@ function SuccessContent() {
             >
               Track Order
             </Link>
-          </div>
-        )}
-
-        {method === "BankTransfer" && (
-          <div className="bg-white rounded-[16px] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)] mt-6">
-            <h2 className="text-base font-bold text-[#F97316] flex items-center gap-2">
-              🏦 Complete Your Payment
-            </h2>
-
-            <div className="mt-4 rounded-[12px] border border-[#F97316] bg-[#FFF8F3] p-4">
-              <div className="flex flex-col gap-3">
-                <div>
-                  <p className="text-xs text-[#888888]">Bank</p>
-                  <p className="text-sm font-semibold text-[#111111]">
-                    {BANK_DETAILS.bank}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-[#888888]">Account</p>
-                  <div className="flex items-center justify-between gap-3 mt-0.5">
-                    <p className="text-2xl font-extrabold tracking-wide text-[#111111]">
-                      {BANK_DETAILS.accountNumber}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={handleCopy}
-                      className={`shrink-0 inline-flex items-center gap-1.5 h-9 px-3 rounded-[8px] text-xs font-semibold transition-colors ${
-                        copied
-                          ? "bg-green-100 text-green-700"
-                          : "bg-[#F97316] text-white hover:bg-[#EA580C]"
-                      }`}
-                    >
-                      {copied ? <FiCheck size={14} /> : <FiCopy size={14} />}
-                      {copied ? "Copied" : "Copy"}
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs text-[#888888]">Name</p>
-                  <p className="text-sm font-semibold text-[#111111]">
-                    {BANK_DETAILS.accountName}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <p className="text-xs text-[#666666] mt-3">
-              Reference: Use order number as payment reference
-            </p>
-
-            <div className="mt-4">
-              <p className="text-xs text-[#888888]">Total to transfer</p>
-              <p className="text-2xl font-extrabold text-[#F97316]">
-                {formatPrice(total)}
-              </p>
-            </div>
-
-            <a
-              href={`https://wa.me/2349075308722?text=${whatsappMessage}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full mt-5 h-12 rounded-[10px] bg-[#25D366] hover:bg-[#20BD5A] text-white text-sm font-semibold flex items-center justify-center gap-2 transition-colors"
-            >
-              Send Payment Proof
-            </a>
-
-            <p className="text-xs text-[#666666] mt-3 text-center">
-              Your order will be confirmed within 2 hours of payment
-            </p>
           </div>
         )}
 

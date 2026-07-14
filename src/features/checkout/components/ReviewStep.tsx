@@ -63,8 +63,7 @@ export function ReviewStep({
   const total          = taxable + deliveryFee + taxable * 0.075
 
   const paymentLabel: Record<PaymentMethod, string> = {
-    card:            'Debit / Credit Card',
-    bank_transfer:   'Bank Transfer',
+    card:            'Pay Now (Flutterwave)',
     pay_on_delivery: 'Pay on Delivery',
   }
 

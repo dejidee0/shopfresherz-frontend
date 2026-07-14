@@ -135,6 +135,54 @@ export function RadioOption({
   )
 }
 
+export function PaymentOptionCard({
+  icon,
+  label,
+  sublabel,
+  badge,
+  selected,
+  onSelect,
+}: {
+  icon: React.ReactNode
+  label: string
+  sublabel: string
+  badge?: string
+  selected: boolean
+  onSelect: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={cn(
+        'w-full flex items-center gap-3.5 rounded-[12px] text-left px-5 py-4 transition-all',
+        selected
+          ? 'border-2 border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_3px_rgba(249,115,22,0.1)]'
+          : 'border-[1.5px] border-[#E5E7EB] bg-white hover:border-[#F97316]/40'
+      )}
+    >
+      <span
+        className={cn(
+          'w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors',
+          selected ? 'border-[#F97316]' : 'border-[#D1D5DB]'
+        )}
+      >
+        {selected && <span className="w-2.5 h-2.5 rounded-full bg-[#F97316]" />}
+      </span>
+      <span className="shrink-0 text-[#F97316] flex items-center justify-center w-[18px]">{icon}</span>
+      <span className="flex-1 min-w-0">
+        <span className="block text-[15px] font-bold text-[#111111]">{label}</span>
+        <span className="block text-[12px] text-[#888888] mt-0.5">{sublabel}</span>
+      </span>
+      {badge && (
+        <span className="shrink-0 text-[10px] font-bold uppercase tracking-wide text-white bg-[#F97316] rounded-full px-2.5 py-1">
+          {badge}
+        </span>
+      )}
+    </button>
+  )
+}
+
 // Progress steps shown at the top of checkout: Delivery -> Payment -> Review.
 // CheckoutStep 1 (address selection) and 2 (delivery method) both map to "Delivery".
 const PROGRESS_STEPS: { n: CheckoutStep; label: string }[] = [

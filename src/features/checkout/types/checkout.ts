@@ -13,7 +13,7 @@ export interface BillingForm {
 }
 
 export type DeliveryMethod = "standard" | "express" | "pickup";
-export type PaymentMethod = "card" | "bank_transfer" | "pay_on_delivery";
+export type PaymentMethod = "card" | "pay_on_delivery";
 export type CheckoutStep = 1 | 2 | 3 | 4; // 1: Billing · 2: Delivery · 3: Payment · 4: Review
 
 export interface CardForm {
@@ -69,23 +69,29 @@ export interface PaymentOption {
   id: PaymentMethod;
   label: string;
   subtitle: string;
+  description: string;
+  icon: "card" | "truck";
+  badge?: string;
+  note?: string;
 }
 
 export const PAYMENT_OPTIONS: PaymentOption[] = [
   {
     id: "card",
-    label: "Debit/Credit Card",
-    subtitle: "Visa, Mastercard, Verve accepted",
-  },
-  {
-    id: "bank_transfer",
-    label: "Bank Transfer",
-    subtitle: "Pay directly from your bank app",
+    label: "PAY NOW",
+    subtitle: "Card · Bank Transfer · USSD · OPay & more",
+    description:
+      "Secure payment via Flutterwave — pay with card, bank transfer, USSD and more",
+    icon: "card",
+    badge: "RECOMMENDED",
   },
   {
     id: "pay_on_delivery",
     label: "Pay on Delivery",
-    subtitle: "Cash or POS on delivery (Standard only)",
+    subtitle: "Cash payment when your order arrives",
+    description: "Pay with cash when your order is delivered to your doorstep.",
+    icon: "truck",
+    note: "Available within Lagos only",
   },
 ];
 
@@ -158,12 +164,4 @@ export const EMPTY_CARD: CardForm = {
   cardNumber: "",
   expireDate: "",
   cvc: "",
-};
-
-// ─── Bank details (static — replace with API response) ───────────────────────
-
-export const BANK_DETAILS = {
-  bank: "GTBank",
-  accountName: "fresherzstore LTD",
-  accountNumber: "012344333784",
 };

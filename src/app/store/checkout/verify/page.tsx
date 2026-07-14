@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FiX } from "react-icons/fi";
+import { FiCheck, FiX } from "react-icons/fi";
 import { useAuthStore } from "@/store/auth";
 import { useCartStore } from "@/store/cart";
 import { checkoutApi } from "@/lib/api/checkout";
@@ -14,7 +14,7 @@ interface PendingFlwOrder {
   amount?: number;
 }
 
-type VerifyState = "verifying" | "failed";
+type VerifyState = "verifying" | "failed" | "success";
 
 function VerifyContent() {
   const router = useRouter();
@@ -62,9 +62,12 @@ function VerifyContent() {
 
         sessionStorage.removeItem("pendingFlwOrder");
         clearCart();
-        router.push(
-          `/store/checkout/success?order=${result.orderNumber}&method=Card&total=${pending.amount ?? ""}`,
-        );
+        setState("success");
+        setTimeout(() => {
+          router.push(
+            `/store/checkout/success?order=${result.orderNumber}&method=Card&total=${pending.amount ?? ""}`,
+          );
+        }, 900);
       } catch {
         setState("failed");
         setErrorMessage(
@@ -97,10 +100,24 @@ function VerifyContent() {
               style={{ width: 56, height: 56 }}
             />
             <p className="mt-5 text-[15px] font-medium text-[#111111]">
-              Verifying payment...
+              Verifying your payment...
             </p>
             <p className="mt-1.5 text-sm text-[#666666]">
               Please don&apos;t close this page.
+            </p>
+          </>
+        )}
+
+        {state === "success" && (
+          <>
+            <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
+              <FiCheck size={28} className="text-green-600" strokeWidth={2.5} />
+            </div>
+            <p className="mt-5 text-[15px] font-medium text-[#111111]">
+              Payment verified
+            </p>
+            <p className="mt-1.5 text-sm text-[#666666]">
+              Redirecting to your order confirmation…
             </p>
           </>
         )}

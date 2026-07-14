@@ -64,7 +64,7 @@ export interface InitiatePaymentRequest {
   inlineAddress?: CheckoutInlineAddress;
   deliveryMethod: "Standard" | "Express" | "Pickup" | string;
   // delivery: CheckoutDelivery;
-  paymentMethod: "Card" | "Transfer" | "POD" | string;
+  paymentMethod: "Card" | "PayOnDelivery" | string;
   // payment: CheckoutPayment;
   pricing: CheckoutPricing;
   couponCode?: string;
@@ -73,13 +73,6 @@ export interface InitiatePaymentRequest {
   guestEmail?: string;
   guestName?: string;
   guestPhone?: string;
-}
-
-export interface BankDetails {
-  bankName: string;
-  accountNumber: string;
-  accountName: string;
-  instructions: string;
 }
 
 export interface FlutterWaveConfig {
@@ -106,7 +99,6 @@ export interface InitiatePaymentResponse {
   pendingOrderId: string;
   orderNumber: string;
   paymentMethod: string;
-  bankDetails?: BankDetails;
   flutterwaveConfig?: FlutterWaveConfig;
   /** Flutterwave hosted checkout page — redirect the browser here for Card payments. */
   paymentLink?: string;

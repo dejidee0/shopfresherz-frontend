@@ -13,25 +13,19 @@ import { RegisteredCheckout } from "@/features/checkout/components/RegisteredChe
 import { StepIndicator } from "@/features/checkout/components/CheckoutShared";
 
 import {
-  EMPTY_CARD,
   type DeliveryMethod,
   type PaymentMethod,
-  type CardForm,
   type CouponState,
 } from "@/features/checkout/types/checkout";
 import {
   accountApi,
   type Address,
   type CreateAddressRequest,
-  type PaymentMethod as SavedCard,
 } from "@/lib/api/account";
 import { checkoutApi } from "@/lib/api/checkout";
 import { productsApi } from "@/lib/api/products";
 import { toast } from "@/store/toast";
-import {
-  CHECKOUT_ADDRESSES_QUERY_KEY,
-  SAVED_CARDS_QUERY_KEY,
-} from "@/features/checkout/queryKeys";
+import { CHECKOUT_ADDRESSES_QUERY_KEY } from "@/features/checkout/queryKeys";
 
 type CheckoutStep = 1 | 2 | 3 | 4;
 
@@ -100,29 +94,11 @@ export default function CheckoutPage() {
     if (def) setSelectedAddressId(def.id);
   }, [addresses]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Saved cards ───────────────────────────────────────────────────────────
-  const { data: savedCards = [] } = useQuery<SavedCard[]>({
-    queryKey: SAVED_CARDS_QUERY_KEY(token),
-    queryFn: () => accountApi.getPaymentMethods(token!),
-    enabled: !!token,
-  });
-
-  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [payment, setPayment] = useState<PaymentMethod | null>(null);
-
-  useMemo(() => {
-    if (savedCards.length === 0 || selectedCardId) return;
-    const def = savedCards.find((c) => c.isDefault) ?? null;
-    if (def) {
-      setSelectedCardId(def.id);
-      setPayment("card");
-    }
-  }, [savedCards]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Step + form state ─────────────────────────────────────────────────────
   const [step, setStep] = useState<CheckoutStep>(1);
   const [delivery, setDelivery] = useState<DeliveryMethod>("standard");
-  const [cardForm, setCardForm] = useState<CardForm>(EMPTY_CARD);
   const [coupon, setCoupon] = useState<CouponState>({
     code: couponCode ?? "",
     applied: !!couponCode,
@@ -205,87 +181,6 @@ export default function CheckoutPage() {
   const selectedAddress =
     addresses.find((a) => a.id === selectedAddressId) ?? addresses[0] ?? null;
 
-  // const handlePlaceOrder = async () => {
-  //   if (!token || !isAuthenticated) {
-  //     toast.error("Please sign in", "You need to sign in before placing an order.");
-  //     return;
-  //   }
-
-  //   if (!selectedAddressId || !selectedAddress) {
-  //     toast.error("Select a delivery address", "Choose where you want this order delivered.");
-  //     return;
-  //   }
-
-  //   if (isPlacingOrder) return;
-
-  //   const taxable = Math.max(0, subtotal - discountAmount);
-  //   const tax = taxable * 0.075;
-  //   const total = taxable + deliveryFee + tax;
-  //   const deliveryMethod = delivery === "express" ? "Express" : delivery === "pickup" ? "Pickup" : "Standard";
-  //   const paymentMethod =
-  //     payment === "bank_transfer" ? "BankTransfer" : payment === "pay_on_delivery" ? "POD" : "Card";
-  //   const appliedCouponCode = coupon.applied ? coupon.code.trim().toUpperCase() : undefined;
-
-  //   setIsPlacingOrder(true);
-
-  //   try {
-  //     const order = await checkoutApi.placeOrder(token, {
-  //       items: items.map((item) => ({
-  //         productId: item.productId,
-  //         name: item.name,
-  //         quantity: item.quantity,
-  //         price: item.price,
-  //         image: item.image,
-  //       })),
-  //       addressId: selectedAddressId,
-  //       shippingAddressId: selectedAddressId,
-  //       inlineAddress: {
-  //         label: selectedAddress.label,
-  //         line1: selectedAddress.line1,
-  //         line2: selectedAddress.line2,
-  //         city: selectedAddress.city,
-  //         state: selectedAddress.state,
-  //         postalCode: selectedAddress.postalCode,
-  //       },
-  //       deliveryMethod,
-  //       delivery: {
-  //         method: deliveryMethod,
-  //         fee: deliveryFee,
-  //       },
-  //       paymentMethod,
-  //       payment: {
-  //         method: paymentMethod,
-  //         savedCardId: selectedCardId ?? undefined,
-  //       },
-  //       pricing: {
-  //         subtotal,
-  //         discountAmount,
-  //         deliveryFee,
-  //         tax,
-  //         total,
-  //       },
-  //       couponCode: appliedCouponCode,
-  //       coupon: appliedCouponCode
-  //         ? {
-  //             code: appliedCouponCode,
-  //             discountAmount,
-  //           }
-  //         : undefined,
-  //     });
-
-  //     clearCart();
-  //     router.push(`/store/checkout/confirmation?orderNumber=${order.orderNumber}`);
-  //   } catch (error) {
-  //     const message =
-  //       error && typeof error === "object" && "message" in error && typeof error.message === "string"
-  //         ? error.message
-  //         : "Unable to place your order. Please try again.";
-  //     toast.error("Order failed", message);
-  //   } finally {
-  //     setIsPlacingOrder(false);
-  //   }
-  // };
-
   const [isInitiating, setIsInitiating] = useState(false);
 
   // Called when user clicks "Place Order" in ReviewStep
@@ -334,26 +229,13 @@ export default function CheckoutPage() {
             : delivery === "pickup"
               ? "Pickup"
               : "Standard",
-        paymentMethod:
-          payment === "bank_transfer"
-            ? "BankTransfer"
-            : payment === "pay_on_delivery"
-              ? "PayOnDelivery"
-              : "Card",
+        paymentMethod: payment === "pay_on_delivery" ? "PayOnDelivery" : "Card",
         pricing: { subtotal, discountAmount, deliveryFee, tax, total },
         couponCode: coupon.applied
           ? coupon.code.trim().toUpperCase()
           : undefined,
         guestPhone: phone.trim(),
       });
-
-      if (result.paymentMethod === "BankTransfer" && result.bankDetails) {
-        clearCart();
-        router.push(
-          `/store/checkout/success?order=${result.orderNumber}&method=BankTransfer&total=${total}`,
-        );
-        return;
-      }
 
       if (result.paymentMethod === "PayOnDelivery") {
         clearCart();
@@ -430,12 +312,6 @@ export default function CheckoutPage() {
           onAddAddress={handleAddAddress}
           delivery={delivery}
           deliveryFee={deliveryFee}
-          savedCards={savedCards}
-          selectedCardId={selectedCardId}
-          onSelectCard={(id) => {
-            setSelectedCardId(id);
-            setPayment("card");
-          }}
           selectedPayment={payment}
           onSelectPayment={setPayment}
           phone={phone}
@@ -463,29 +339,12 @@ export default function CheckoutPage() {
       {step === 3 && (
         <PaymentStep
           selected={payment ?? "card"}
-          onSelect={(m) => {
-            setPayment(m);
-            if (m !== "card") setSelectedCardId(null);
-          }}
-          cardForm={cardForm}
-          setCardForm={setCardForm}
+          onSelect={setPayment}
           onBack={() => setStep(1)}
           onContinue={() => setStep(1)}
           {...sidebarProps}
         />
       )}
-
-      {/* {step === 4 && (
-        <ReviewStep
-          selectedAddress={selectedAddress}
-          delivery={delivery}
-          payment={payment ?? "card"}
-          isPlacingOrder={isPlacingOrder}
-          onBack={() => setStep(1)}
-          onPlaceOrder={handlePlaceOrder}
-          {...sidebarProps}
-        />
-      )} */}
 
       {step === 4 && (
         <ReviewStep
