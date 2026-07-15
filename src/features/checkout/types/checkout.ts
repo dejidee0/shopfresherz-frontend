@@ -13,7 +13,7 @@ export interface BillingForm {
 }
 
 export type DeliveryMethod = "standard" | "express" | "pickup";
-export type PaymentMethod = "card" | "pay_on_delivery";
+export type PaymentMethod = "card" | "bank_transfer" | "pay_on_delivery";
 export type CheckoutStep = 1 | 2 | 3 | 4; // 1: Billing · 2: Delivery · 3: Payment · 4: Review
 
 export interface CardForm {
@@ -70,7 +70,7 @@ export interface PaymentOption {
   label: string;
   subtitle: string;
   description: string;
-  icon: "card" | "truck";
+  icon: "card" | "truck" | "bank";
   badge?: string;
   note?: string;
 }
@@ -84,6 +84,14 @@ export const PAYMENT_OPTIONS: PaymentOption[] = [
       "Secure payment via Flutterwave — pay with card, bank transfer, USSD and more",
     icon: "card",
     badge: "RECOMMENDED",
+  },
+  {
+    id: "bank_transfer",
+    label: "Bank Transfer",
+    subtitle: "Transfer directly to our bank account",
+    description:
+      "Send payment to our bank account, then share your proof of payment on WhatsApp. Your order is confirmed once we verify the transfer.",
+    icon: "bank",
   },
   {
     id: "pay_on_delivery",

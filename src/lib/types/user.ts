@@ -30,7 +30,7 @@ export interface Order {
   orderNumber: string
   status: OrderStatus
   paymentStatus: 'Unpaid' | 'Paid' | 'Refunded'
-  paymentMethod: 'Card' | 'Transfer' | 'USSD' | 'POD'
+  paymentMethod: 'Card' | 'Transfer' | 'BankTransfer' | 'USSD' | 'POD'
   subtotal: number
   discountAmount: number
   deliveryFee: number

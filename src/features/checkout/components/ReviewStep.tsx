@@ -64,6 +64,7 @@ export function ReviewStep({
 
   const paymentLabel: Record<PaymentMethod, string> = {
     card:            'Pay Now (Flutterwave)',
+    bank_transfer:   'Bank Transfer',
     pay_on_delivery: 'Pay on Delivery',
   }
 

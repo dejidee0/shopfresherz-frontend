@@ -229,7 +229,12 @@ export default function CheckoutPage() {
             : delivery === "pickup"
               ? "Pickup"
               : "Standard",
-        paymentMethod: payment === "pay_on_delivery" ? "PayOnDelivery" : "Card",
+        paymentMethod:
+          payment === "pay_on_delivery"
+            ? "PayOnDelivery"
+            : payment === "bank_transfer"
+              ? "BankTransfer"
+              : "Card",
         pricing: { subtotal, discountAmount, deliveryFee, tax, total },
         couponCode: coupon.applied
           ? coupon.code.trim().toUpperCase()
@@ -242,6 +247,21 @@ export default function CheckoutPage() {
         router.push(
           `/store/checkout/success?order=${result.orderNumber}&method=PayOnDelivery&total=${total}`,
         );
+        return;
+      }
+
+      // Bank Transfer: show our bank details + WhatsApp proof-of-payment CTA.
+      if (result.paymentMethod === "BankTransfer" && result.bankDetails) {
+        clearCart();
+        const params = new URLSearchParams({
+          orderNumber: result.orderNumber,
+          bankName: result.bankDetails.bankName,
+          accountNumber: result.bankDetails.accountNumber,
+          accountName: result.bankDetails.accountName,
+          instructions: result.bankDetails.instructions,
+          total: String(total),
+        });
+        router.push(`/store/checkout/bank-transfer?${params.toString()}`);
         return;
       }
 

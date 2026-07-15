@@ -311,6 +311,8 @@ export function RegisteredCheckout({
                   icon={
                     opt.icon === "card" ? (
                       <FiCreditCard size={18} />
+                    ) : opt.icon === "bank" ? (
+                      <span className="text-lg leading-none">🏦</span>
                     ) : (
                       <span className="text-lg leading-none">🚚</span>
                     )
