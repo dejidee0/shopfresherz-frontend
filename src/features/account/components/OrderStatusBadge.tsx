@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils/format'
-import type { OrderStatus } from '@/lib/types/order'
+import type { OrderStatus } from '@/lib/types/user'
 
 const STATUS_CONFIG: Record<
   string,

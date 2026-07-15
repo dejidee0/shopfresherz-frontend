@@ -6,7 +6,7 @@ import {
 } from 'react-icons/fi'
 import { cn } from '@/lib/utils/format'
 import type { OrderStep } from '@/lib/api/account'
-import type { OrderStatus } from '@/lib/types/order'
+import type { OrderStatus } from '@/lib/types/user'
 
 const STEP_ICONS = [FiShoppingBag, FiPackage, FiTruck, FiCheckCircle]
 const STEP_LABELS = ['Order Placed', 'Processing', 'Shipped', 'Delivered']

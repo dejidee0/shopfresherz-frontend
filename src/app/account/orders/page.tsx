@@ -7,11 +7,10 @@ import { OrderStatusBadge } from "@/features/account/components/OrderStatusBadge
 import { DataTable, type ColumnDef } from "@/components/ui/DataTable";
 import { Pagination } from "@/components/ui/Pagination";
 import { useAuthStore } from "@/store/auth";
-import { accountApi } from "@/lib/api/account";
+import { accountApi, type AccountOrder } from "@/lib/api/account";
 import { formatPrice, formatDate } from "@/lib/utils/format";
-import type { Order } from "@/lib/types/order";
 
-const COLUMNS: ColumnDef<Order>[] = [
+const COLUMNS: ColumnDef<AccountOrder>[] = [
   {
     key: "orderNumber",
     header: "Order ID",
@@ -62,7 +61,7 @@ const LIMIT = 12;
 
 export default function OrderHistoryPage() {
   const { accessToken } = useAuthStore();
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<AccountOrder[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
