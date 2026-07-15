@@ -9,6 +9,7 @@ import {
 } from './CheckoutShared'
 import {
   PAYMENT_OPTIONS,
+  isPayOnDeliveryAvailable,
   type PaymentMethod,
   type CouponState,
 } from '../types/checkout'
@@ -19,6 +20,7 @@ import { FiCreditCard } from 'react-icons/fi'
 interface Props {
   selected: PaymentMethod
   onSelect: (m: PaymentMethod) => void
+  deliveryState?: string | null
   coupon: CouponState
   onCouponChange: (v: string) => void
   onApplyCoupon: () => void
@@ -31,6 +33,7 @@ interface Props {
 export function PaymentStep({
   selected,
   onSelect,
+  deliveryState,
   coupon,
   onCouponChange,
   onApplyCoupon,
@@ -40,6 +43,7 @@ export function PaymentStep({
   onContinue,
 }: Props) {
   const selectedOption = PAYMENT_OPTIONS.find((o) => o.id === selected)
+  const podAvailable = isPayOnDeliveryAvailable(deliveryState)
 
   return (
     <CheckoutLayout
@@ -57,25 +61,33 @@ export function PaymentStep({
       <h2 className="text-lg font-bold text-[#111111] mb-5">Payment Method</h2>
 
       <div className="flex flex-col gap-2.5">
-        {PAYMENT_OPTIONS.map((opt) => (
-          <PaymentOptionCard
-            key={opt.id}
-            icon={
-              opt.icon === 'card' ? (
-                <FiCreditCard size={18} />
-              ) : opt.icon === 'bank' ? (
-                <span className="text-lg leading-none">🏦</span>
-              ) : (
-                <span className="text-lg leading-none">🚚</span>
-              )
-            }
-            label={opt.label}
-            sublabel={opt.subtitle}
-            badge={opt.badge}
-            selected={selected === opt.id}
-            onSelect={() => onSelect(opt.id)}
-          />
-        ))}
+        {PAYMENT_OPTIONS.map((opt) => {
+          const isPodDisabled = opt.id === 'pay_on_delivery' && !podAvailable
+          return (
+            <PaymentOptionCard
+              key={opt.id}
+              icon={
+                opt.icon === 'card' ? (
+                  <FiCreditCard size={18} />
+                ) : opt.icon === 'bank' ? (
+                  <span className="text-lg leading-none">🏦</span>
+                ) : (
+                  <span className="text-lg leading-none">🚚</span>
+                )
+              }
+              label={opt.label}
+              sublabel={opt.subtitle}
+              badge={opt.badge}
+              selected={selected === opt.id}
+              disabled={isPodDisabled}
+              disabledReason={isPodDisabled ? opt.note : undefined}
+              onSelect={() => {
+                if (isPodDisabled) return
+                onSelect(opt.id)
+              }}
+            />
+          )
+        })}
       </div>
 
       {selectedOption && (

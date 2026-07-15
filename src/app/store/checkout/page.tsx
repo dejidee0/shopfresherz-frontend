@@ -16,6 +16,7 @@ import {
   type DeliveryMethod,
   type PaymentMethod,
   type CouponState,
+  isPayOnDeliveryAvailable,
 } from "@/features/checkout/types/checkout";
 import {
   accountApi,
@@ -94,7 +95,20 @@ export default function CheckoutPage() {
     if (def) setSelectedAddressId(def.id);
   }, [addresses]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const selectedAddress =
+    addresses.find((a) => a.id === selectedAddressId) ?? addresses[0] ?? null;
+
   const [payment, setPayment] = useState<PaymentMethod | null>(null);
+
+  // Pay on Delivery is only available for Osun State addresses — if the
+  // customer switches to a non-Osun address while POD is selected, clear it
+  // so they can't place an order the backend would reject.
+  useEffect(() => {
+    if (payment === "pay_on_delivery" && !isPayOnDeliveryAvailable(selectedAddress?.state)) {
+      setPayment(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedAddress?.state]);
 
   // ── Step + form state ─────────────────────────────────────────────────────
   const [step, setStep] = useState<CheckoutStep>(1);
@@ -176,10 +190,6 @@ export default function CheckoutPage() {
     await refetchAddresses();
     setSelectedAddressId(addressId);
   };
-
-  // Resolve selected address object for ReviewStep
-  const selectedAddress =
-    addresses.find((a) => a.id === selectedAddressId) ?? addresses[0] ?? null;
 
   const [isInitiating, setIsInitiating] = useState(false);
 
@@ -334,6 +344,7 @@ export default function CheckoutPage() {
           deliveryFee={deliveryFee}
           selectedPayment={payment}
           onSelectPayment={setPayment}
+          deliveryState={selectedAddress?.state ?? null}
           phone={phone}
           onPhoneChange={(v) => {
             setPhone(v);
@@ -360,6 +371,7 @@ export default function CheckoutPage() {
         <PaymentStep
           selected={payment ?? "card"}
           onSelect={setPayment}
+          deliveryState={selectedAddress?.state ?? null}
           onBack={() => setStep(1)}
           onContinue={() => setStep(1)}
           {...sidebarProps}

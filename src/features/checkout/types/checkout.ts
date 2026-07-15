@@ -99,9 +99,17 @@ export const PAYMENT_OPTIONS: PaymentOption[] = [
     subtitle: "Cash payment when your order arrives",
     description: "Pay with cash when your order is delivered to your doorstep.",
     icon: "truck",
-    note: "Available within Lagos only",
+    note: "Available for Osun State addresses only",
   },
 ];
+
+// ─── Pay on Delivery state restriction ────────────────────────────────────────
+
+export const POD_AVAILABLE_STATE = "Osun";
+
+export function isPayOnDeliveryAvailable(state?: string | null): boolean {
+  return (state ?? "").trim().toLowerCase() === POD_AVAILABLE_STATE.toLowerCase();
+}
 
 // ─── Address / form seeds ─────────────────────────────────────────────────────
 

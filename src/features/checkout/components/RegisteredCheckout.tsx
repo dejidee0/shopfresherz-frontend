@@ -12,7 +12,13 @@ import {
   FiPhone,
 } from "react-icons/fi";
 import { Field, OrderSummary, CheckoutLayout, PaymentOptionCard } from "./CheckoutShared";
-import { PAYMENT_OPTIONS, type CouponState, type DeliveryMethod, type PaymentMethod } from "../types/checkout";
+import {
+  PAYMENT_OPTIONS,
+  isPayOnDeliveryAvailable,
+  type CouponState,
+  type DeliveryMethod,
+  type PaymentMethod,
+} from "../types/checkout";
 import { useAuthStore } from "@/store/auth";
 import { useCartStore } from "@/store/cart";
 import { toast } from "@/store/toast";
@@ -83,6 +89,7 @@ interface Props {
   // Payment
   selectedPayment: PaymentMethod | null;
   onSelectPayment: (m: PaymentMethod) => void;
+  deliveryState?: string | null;
   // Contact
   phone: string;
   onPhoneChange: (v: string) => void;
@@ -108,6 +115,7 @@ export function RegisteredCheckout({
   onAddAddress,
   selectedPayment,
   onSelectPayment,
+  deliveryState,
   phone,
   onPhoneChange,
   phoneError,
@@ -131,6 +139,7 @@ export function RegisteredCheckout({
   const paymentReady = selectedAddressId !== null && isPhoneValid;
 
   const selectedPaymentOption = PAYMENT_OPTIONS.find((o) => o.id === selectedPayment);
+  const podAvailable = isPayOnDeliveryAvailable(deliveryState);
 
   const handleAddAddress = async (data: CreateAddressRequest) => {
     setIsAddingAddress(true);
@@ -305,25 +314,33 @@ export function RegisteredCheckout({
             </div>
 
             <div className="grid gap-2.5">
-              {PAYMENT_OPTIONS.map((opt) => (
-                <PaymentOptionCard
-                  key={opt.id}
-                  icon={
-                    opt.icon === "card" ? (
-                      <FiCreditCard size={18} />
-                    ) : opt.icon === "bank" ? (
-                      <span className="text-lg leading-none">🏦</span>
-                    ) : (
-                      <span className="text-lg leading-none">🚚</span>
-                    )
-                  }
-                  label={opt.label}
-                  sublabel={opt.subtitle}
-                  badge={opt.badge}
-                  selected={selectedPayment === opt.id}
-                  onSelect={() => onSelectPayment(opt.id)}
-                />
-              ))}
+              {PAYMENT_OPTIONS.map((opt) => {
+                const isPodDisabled = opt.id === "pay_on_delivery" && !podAvailable;
+                return (
+                  <PaymentOptionCard
+                    key={opt.id}
+                    icon={
+                      opt.icon === "card" ? (
+                        <FiCreditCard size={18} />
+                      ) : opt.icon === "bank" ? (
+                        <span className="text-lg leading-none">🏦</span>
+                      ) : (
+                        <span className="text-lg leading-none">🚚</span>
+                      )
+                    }
+                    label={opt.label}
+                    sublabel={opt.subtitle}
+                    badge={opt.badge}
+                    selected={selectedPayment === opt.id}
+                    disabled={isPodDisabled}
+                    disabledReason={isPodDisabled ? opt.note : undefined}
+                    onSelect={() => {
+                      if (isPodDisabled) return;
+                      onSelectPayment(opt.id);
+                    }}
+                  />
+                );
+              })}
             </div>
 
             {selectedPaymentOption && (

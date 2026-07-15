@@ -142,6 +142,8 @@ export function PaymentOptionCard({
   badge,
   selected,
   onSelect,
+  disabled = false,
+  disabledReason,
 }: {
   icon: React.ReactNode
   label: string
@@ -149,32 +151,40 @@ export function PaymentOptionCard({
   badge?: string
   selected: boolean
   onSelect: () => void
+  disabled?: boolean
+  disabledReason?: string
 }) {
   return (
     <button
       type="button"
-      onClick={onSelect}
+      disabled={disabled}
+      onClick={disabled ? undefined : onSelect}
       className={cn(
         'w-full flex items-center gap-3.5 rounded-[12px] text-left px-5 py-4 transition-all',
-        selected
-          ? 'border-2 border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_3px_rgba(249,115,22,0.1)]'
-          : 'border-[1.5px] border-[#E5E7EB] bg-white hover:border-[#F97316]/40'
+        disabled
+          ? 'border-[1.5px] border-[#E5E7EB] bg-[#F7F7F7] opacity-60 cursor-not-allowed'
+          : selected
+            ? 'border-2 border-[#F97316] bg-[#FFF8F3] shadow-[0_0_0_3px_rgba(249,115,22,0.1)]'
+            : 'border-[1.5px] border-[#E5E7EB] bg-white hover:border-[#F97316]/40'
       )}
     >
       <span
         className={cn(
           'w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors',
-          selected ? 'border-[#F97316]' : 'border-[#D1D5DB]'
+          selected && !disabled ? 'border-[#F97316]' : 'border-[#D1D5DB]'
         )}
       >
-        {selected && <span className="w-2.5 h-2.5 rounded-full bg-[#F97316]" />}
+        {selected && !disabled && <span className="w-2.5 h-2.5 rounded-full bg-[#F97316]" />}
       </span>
       <span className="shrink-0 text-[#F97316] flex items-center justify-center w-[18px]">{icon}</span>
       <span className="flex-1 min-w-0">
         <span className="block text-[15px] font-bold text-[#111111]">{label}</span>
         <span className="block text-[12px] text-[#888888] mt-0.5">{sublabel}</span>
+        {disabled && disabledReason && (
+          <span className="block text-[11px] text-[#F97316] font-medium mt-1">{disabledReason}</span>
+        )}
       </span>
-      {badge && (
+      {badge && !disabled && (
         <span className="shrink-0 text-[10px] font-bold uppercase tracking-wide text-white bg-[#F97316] rounded-full px-2.5 py-1">
           {badge}
         </span>
