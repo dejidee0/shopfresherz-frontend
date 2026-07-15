@@ -338,7 +338,7 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
               alt={`${productName} — image ${activeIndex + 1}`}
               fill
               sizes="540px"
-              className="object-contain p-8 transition-transform duration-300 select-none hover:scale-[1.04]"
+              className="object-contain transition-transform duration-300 select-none hover:scale-[1.04]"
               style={{
                 transform: `scale(${Math.max(scrollZoom, mobileZoom)}) translate(${
                   scrollZoom > 1
