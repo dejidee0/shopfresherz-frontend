@@ -6,8 +6,8 @@ import Image from 'next/image'
 import { FiX, FiTrash2, FiMinus, FiPlus, FiShoppingBag } from 'react-icons/fi'
 import { useCartStore } from '@/store/cart'
 import { cn, formatPrice } from '@/lib/utils/format'
+import { DELIVERY_FEES } from '@/features/checkout/types/checkout'
 
-const DELIVERY_THRESHOLD = 100_000  // ₦100k = free delivery
 const VAT_RATE = 0.075              // 7.5%
 
 export function CartDrawer() {
@@ -18,7 +18,9 @@ export function CartDrawer() {
   const sub = subtotal()
   const discount = discountAmount
   const afterDiscount = sub - discount
-  const deliveryFee = afterDiscount >= DELIVERY_THRESHOLD ? 0 : 1_500
+  // Cart preview always estimates Standard delivery — the actual method is
+  // chosen later in checkout.
+  const deliveryFee = DELIVERY_FEES.standard
   const vat = afterDiscount * VAT_RATE
   const total = afterDiscount + deliveryFee + vat
 
@@ -173,21 +175,6 @@ export function CartDrawer() {
         {/* Order summary + actions */}
         {items.length > 0 && (
           <div className="border-t border-black/[0.06] px-6 pt-4 pb-5 space-y-4 bg-[#FFFFFF]">
-            {/* Free delivery progress */}
-            <div>
-              <p className={cn('text-[12px]', afterDiscount >= DELIVERY_THRESHOLD ? 'text-[#16A34A]' : 'text-[#888888]')}>
-                {afterDiscount >= DELIVERY_THRESHOLD
-                  ? "You've unlocked free delivery!"
-                  : <>Add <span className="font-semibold text-[#F97316]">{formatPrice(DELIVERY_THRESHOLD - afterDiscount)}</span> more for free delivery</>}
-              </p>
-                <div className="mt-2 h-1 bg-[#F0F0F0] rounded-[20px] overflow-hidden">
-                <div
-                  className="h-full bg-linear-to-r from-[#F97316] to-[#FBBF24] rounded-[20px] transition-all duration-500 shadow-[0_0_8px_rgba(249,115,22,0.4)]"
-                  style={{ width: `${Math.min(100, (afterDiscount / DELIVERY_THRESHOLD) * 100)}%` }}
-                />
-              </div>
-            </div>
-
             {/* Summary lines */}
             <div className="space-y-2 text-[14px]">
               <div className="flex justify-between text-[#666666]">

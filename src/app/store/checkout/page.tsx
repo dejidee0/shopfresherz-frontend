@@ -17,6 +17,7 @@ import {
   type PaymentMethod,
   type CouponState,
   isPayOnDeliveryAvailable,
+  DELIVERY_FEES,
 } from "@/features/checkout/types/checkout";
 import {
   accountApi,
@@ -136,11 +137,7 @@ export default function CheckoutPage() {
       : undefined;
   const isPhoneValid = phoneDigits.length >= 10;
 
-  const deliveryFee = useMemo(() => {
-    if (delivery === "pickup") return 0;
-    if (delivery === "express") return 3500;
-    return subtotal >= 50000 ? 0 : 1500;
-  }, [delivery, subtotal]);
+  const deliveryFee = useMemo(() => DELIVERY_FEES[delivery], [delivery]);
 
   const handleCouponChange = (value: string) => {
     removeCartCoupon();
@@ -295,10 +292,15 @@ export default function CheckoutPage() {
         "Unable to start payment. Please try again.",
       );
     } catch (error) {
-      toast.error(
-        "Payment initiation failed",
-        "Unable to start payment. Please try again.",
-      );
+      // TEMP diagnostic logging — the toast below is intentionally generic for
+      // customers, but this surfaces the real cause (network/CORS failure vs.
+      // an actual backend rejection) in the console for debugging.
+      console.error("[checkout] initiate-payment failed:", error);
+      const message =
+        error && typeof error === "object" && "message" in error && typeof error.message === "string"
+          ? error.message
+          : "Unable to start payment. Please try again.";
+      toast.error("Payment initiation failed", message);
     } finally {
       setIsInitiating(false);
     }

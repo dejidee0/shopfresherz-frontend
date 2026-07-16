@@ -31,6 +31,19 @@ export interface CouponState {
 
 // ─── Delivery options ─────────────────────────────────────────────────────────
 
+/**
+ * Single source of truth for delivery fees — confirmed against the live
+ * backend's /checkout/initiate-payment validation (which rejects any
+ * mismatched total and does not currently waive fees above any subtotal).
+ * Every consumer (checkout page, cart drawer preview, delivery step display)
+ * must read from here rather than hardcoding its own copy.
+ */
+export const DELIVERY_FEES: Record<DeliveryMethod, number> = {
+  standard: 3500,
+  express: 1500,
+  pickup: 0,
+};
+
 export interface DeliveryOption {
   id: DeliveryMethod;
   label: string;
@@ -44,22 +57,22 @@ export const DELIVERY_OPTIONS: DeliveryOption[] = [
     id: "standard",
     label: "Standard Delivery",
     subtitle: "3-5 business days",
-    price: null,
-    note: "Free on order above ₦50,000 otherwise ₦2,00",
+    price: DELIVERY_FEES.standard,
+    note: "",
   },
   {
     id: "express",
     label: "Express Delivery",
     subtitle: "1-2 business days",
-    price: 3500,
-    note: "Free on order above ₦50,000 otherwise ₦2,00",
+    price: DELIVERY_FEES.express,
+    note: "",
   },
   {
     id: "pickup",
     label: "Store Pickup",
     subtitle: "Ready in 24 hours",
     price: null,
-    note: "Free on order above ₦50,000 otherwise ₦2,00",
+    note: "Always free — pick up in-store",
   },
 ];
 
