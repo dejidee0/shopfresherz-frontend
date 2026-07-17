@@ -4,7 +4,7 @@ import { IoEyeOutline, IoWarningOutline } from "react-icons/io5";
 import { Button } from "@/components/ui/Button";
 import { ColumnDef, DataTable } from "@/components/ui/DataTable";
 import { HiMagnifyingGlass } from "react-icons/hi2";
-import { useOrders, useUpdateOrderStatus } from "@/lib/hooks/useAdmin";
+import { useOrders, useUpdateOrderStatus, useCancelOrder } from "@/lib/hooks/useAdmin";
 import { useState, useMemo } from "react";
 import type { AdminOrdersFilters } from "@/lib/api/admin";
 import OrderDetailsModal from "@/components/admin/OrderDetailsModal";
@@ -26,6 +26,7 @@ const AdminOrderPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { data: ordersData, isLoading } = useOrders(filters);
   const updateOrderStatusMutation = useUpdateOrderStatus();
+  const cancelOrderMutation = useCancelOrder();
 
   const orders = useMemo(() => {
     if (!ordersData?.items) return [];
@@ -73,10 +74,7 @@ const AdminOrderPage = () => {
   };
 
   const handleCancelOrder = (orderId: string) => {
-    updateOrderStatusMutation.mutate({
-      orderNumber: orderId,
-      payload: { status: 'Cancelled' }
-    });
+    cancelOrderMutation.mutate(orderId);
   };
 
   const orderColumns: ColumnDef<any>[] = [

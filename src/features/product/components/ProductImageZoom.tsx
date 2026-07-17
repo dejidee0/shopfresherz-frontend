@@ -305,7 +305,7 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
             ref={mainRef}
             className={cn(
               'relative rounded-[20px] overflow-hidden bg-[#FFFFFF] border border-black/[0.07] shrink-0 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]',
-              'w-full h-[360px] sm:h-[440px] p-8',
+              'w-full aspect-square',
               isOutOfStock || !hasProvidedImages ? 'grayscale cursor-default' : 'cursor-crosshair'
             )}
             onMouseEnter={handleMouseEnter}
@@ -338,7 +338,7 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
               alt={`${productName} — image ${activeIndex + 1}`}
               fill
               sizes="540px"
-              className="object-contain transition-transform duration-300 select-none hover:scale-[1.04]"
+              className="object-cover transition-transform duration-300 select-none hover:scale-[1.04]"
               style={{
                 transform: `scale(${Math.max(scrollZoom, mobileZoom)}) translate(${
                   scrollZoom > 1

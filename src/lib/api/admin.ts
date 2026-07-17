@@ -167,6 +167,10 @@ export interface CreateProductRequest {
   isFeatured?: boolean;
   metaTitle?: string;
   metaDescription?: string;
+  /** Seed rating (0-5) shown before real reviews exist. */
+  initialRating?: number;
+  /** Seed review count shown alongside initialRating. */
+  initialReviewCount?: number;
 }
 
 export interface UpdateProductRequest extends Partial<CreateProductRequest> {
@@ -503,6 +507,14 @@ export const adminApi = {
     api.put<void>(
       `/admin/orders/${encodeURIComponent(orderNumber)}/status`,
       payload,
+      { token },
+    ),
+
+  /** Dedicated cancel action — self-contained, no status body required. */
+  cancelOrder: (token: string, orderNumber: string) =>
+    api.post<void>(
+      `/admin/orders/${encodeURIComponent(orderNumber)}/cancel`,
+      null,
       { token },
     ),
 

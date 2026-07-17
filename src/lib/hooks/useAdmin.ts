@@ -277,7 +277,29 @@ export function useUpdateOrderStatus() {
     onError: (error: { message?: string }) => {
       toast.error('Failed to update order status', error.message ?? 'Please try again')
     },
-  }) 
+  })
+}
+
+// ─── useCancelOrder ────────────────────────────────────────────────────────────
+
+export function useCancelOrder() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (orderNumber: string) =>
+      adminApi.cancelOrder(accessToken!, orderNumber),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'orders'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'dashboard'] })
+      toast.success('Order cancelled successfully')
+    },
+
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to cancel order', error.message ?? 'Please try again')
+    },
+  })
 }
 
 // ─── useAdjustUserLoyalty ──────────────────────────────────────────────────────
@@ -417,6 +439,8 @@ export function useCreateProduct() {
         metaTitle: payload.metaTitle,
         metaDescription: payload.metaDescription,
         imageUrls: payload.imageUrls,
+        initialRating: payload.initialRating,
+        initialReviewCount: payload.initialReviewCount,
       }
       return adminApi.createProduct(accessToken!, apiPayload)
     },

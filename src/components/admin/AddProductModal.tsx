@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { HiXMark, HiArrowUpTray, HiChevronDown } from "react-icons/hi2";
+import { HiXMark, HiArrowUpTray, HiChevronDown, HiStar, HiOutlineStar } from "react-icons/hi2";
 import { useCreateProduct, useUpdateProduct } from "@/lib/hooks/useAdmin";
 import { deleteFromCloudinary, uploadToCloudinary } from "@/lib/utils/cloudinary";
 
@@ -28,6 +28,8 @@ export interface ProductFormData {
   isActive: boolean;
   isFeatured: boolean;
   imageUrls: string[];
+  initialRating: string;
+  initialReviewCount: string;
 }
 
 // Categories will be passed as props
@@ -54,6 +56,39 @@ const Toggle = ({
   </button>
 );
 
+const StarRatingPicker = ({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange: (v: number) => void;
+}) => {
+  const [hovered, setHovered] = useState<number | null>(null);
+  const active = hovered ?? value;
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className="flex items-center gap-0.5" onMouseLeave={() => setHovered(null)}>
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type="button"
+            onClick={() => onChange(star === value ? 0 : star)}
+            onMouseEnter={() => setHovered(star)}
+            className="text-[#F97316] hover:scale-110 transition-transform"
+            aria-label={`Set rating to ${star} star${star > 1 ? "s" : ""}`}
+          >
+            {star <= active ? <HiStar size={24} /> : <HiOutlineStar size={24} className="text-gray-300" />}
+          </button>
+        ))}
+      </div>
+      <span className="text-sm text-gray-500 min-w-[70px]">
+        {value > 0 ? `${value} of 5` : "No rating"}
+      </span>
+    </div>
+  );
+};
+
 export default function AddProductModal({
   isOpen,
   onClose,
@@ -77,6 +112,8 @@ export default function AddProductModal({
     isActive: true,
     isFeatured: false,
     imageUrls: [],
+    initialRating: "",
+    initialReviewCount: "",
   });
 
   const [isUploading, setIsUploading] = useState(false);
@@ -104,6 +141,14 @@ export default function AddProductModal({
           editingProduct.images?.map(
             (img: any) => img.original || img.display,
           ) || [],
+        initialRating:
+          editingProduct.averageRating != null
+            ? String(editingProduct.averageRating)
+            : "",
+        initialReviewCount:
+          editingProduct.reviewCount != null
+            ? String(editingProduct.reviewCount)
+            : "",
       });
     } else {
       // Reset form for new product
@@ -122,6 +167,8 @@ export default function AddProductModal({
         isActive: true,
         isFeatured: false,
         imageUrls: [],
+        initialRating: "",
+        initialReviewCount: "",
       });
     }
   }, [editingProduct]);
@@ -206,6 +253,12 @@ export default function AddProductModal({
         isActive: form.isActive,
         isFeatured: form.isFeatured,
         imageUrls: form.imageUrls,
+        initialRating: form.initialRating
+          ? parseFloat(form.initialRating)
+          : undefined,
+        initialReviewCount: form.initialReviewCount
+          ? parseInt(form.initialReviewCount)
+          : undefined,
       };
 
       console.log(
@@ -395,6 +448,38 @@ export default function AddProductModal({
                 </button>
               </div>
             </div>
+          </div>
+
+          {/* Initial Rating (seed rating shown before real reviews exist) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Initial Rating
+            </label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <StarRatingPicker
+                value={form.initialRating ? Number(form.initialRating) : 0}
+                onChange={(v) => set("initialRating", v ? String(v) : "")}
+              />
+              <div className="flex items-center gap-2 sm:ml-4">
+                <label className="text-sm text-gray-500 whitespace-nowrap">
+                  Seed with
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  value={form.initialReviewCount}
+                  onChange={(e) => set("initialReviewCount", e.target.value)}
+                  placeholder="0"
+                  className="w-24 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
+                />
+                <span className="text-sm text-gray-500 whitespace-nowrap">
+                  review{form.initialReviewCount === "1" ? "" : "s"}
+                </span>
+              </div>
+            </div>
+            <p className="text-xs text-gray-400 mt-1.5">
+              Shown on the storefront until real customer reviews come in.
+            </p>
           </div>
 
           {/* Images */}
