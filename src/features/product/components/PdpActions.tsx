@@ -18,9 +18,11 @@ import {
   RiPinterestFill,
 } from 'react-icons/ri'
 import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa'
+import { motion } from 'framer-motion'
 import { useCartStore } from '@/store/cart'
 import { ColorSwatches, VariantDropdown } from './VariantSelector'
 import { cn, formatPrice, clampQty } from '@/lib/utils/format'
+import { useMagnetic } from '@/lib/hooks/useMagnetic'
 import type { Product } from '@/lib/types/product'
 import { getDiscountPercent, getStockStatus } from '@/lib/utils/productService'
 
@@ -31,6 +33,8 @@ interface PDPActionsProps {
 export function PDPActions({ product }: PDPActionsProps) {
   const addItem = useCartStore((s) => s.addItem)
   const openCart = useCartStore((s) => s.openCart)
+  const addToCartMagnetic = useMagnetic(0.2)
+  const buyNowMagnetic = useMagnetic(0.2)
 
   // Group variants by type (from attributesJson if available)
   const colorVariants = product.variants?.filter((v) => 
@@ -208,7 +212,7 @@ export function PDPActions({ product }: PDPActionsProps) {
         </div>
 
         {/* Add to Cart */}
-        <button
+        <motion.button
           onClick={handleAddToCart}
           disabled={isOutOfStock}
           className={cn(
@@ -217,19 +221,27 @@ export function PDPActions({ product }: PDPActionsProps) {
               ? 'bg-[#F0F0F0] text-[#AAAAAA] cursor-not-allowed'
               : 'sf-btn-primary text-white'
           )}
+          {...(!isOutOfStock
+            ? { style: addToCartMagnetic.style, onMouseMove: addToCartMagnetic.onMouseMove, onMouseLeave: addToCartMagnetic.onMouseLeave }
+            : {})}
+          whileTap={!isOutOfStock ? { scale: 0.96 } : undefined}
         >
           <FiShoppingCart size={17} />
           ADD TO CART
-        </button>
+        </motion.button>
 
         {/* Buy Now */}
-        <button
+        <motion.button
           onClick={handleBuyNow}
           disabled={isOutOfStock}
-          className="shrink-0 w-[140px] h-12 bg-[#111111] text-white border border-[#111111] font-bold rounded-[10px] text-[15px] hover:bg-[#333333] hover:border-[#333333] transition-all disabled:opacity-40"
+          className="shrink-0 w-[140px] h-12 bg-[#111111] text-white border border-[#111111] font-bold rounded-[10px] text-[15px] hover:bg-[#333333] hover:border-[#333333] transition-colors disabled:opacity-40"
+          {...(!isOutOfStock
+            ? { style: buyNowMagnetic.style, onMouseMove: buyNowMagnetic.onMouseMove, onMouseLeave: buyNowMagnetic.onMouseLeave }
+            : {})}
+          whileTap={!isOutOfStock ? { scale: 0.96 } : undefined}
         >
           BUY NOW
-        </button>
+        </motion.button>
       </div>
 
       {/* ── Wishlist + Share ── */}

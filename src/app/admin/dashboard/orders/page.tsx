@@ -8,7 +8,7 @@ import { useOrders, useUpdateOrderStatus, useCancelOrder } from "@/lib/hooks/use
 import { useState, useMemo } from "react";
 import type { AdminOrdersFilters } from "@/lib/api/admin";
 import OrderDetailsModal from "@/components/admin/OrderDetailsModal";
-import { Spinner } from "@/components/ui/Spinner";
+import { TableRowsSkeleton } from "@/components/ui/Skeleton";
 
 const paymentAndStatusColors: Record<string, string> = {
   Paid: "bg-green-100 text-green-700",
@@ -203,7 +203,7 @@ const AdminOrderPage = () => {
 
       {/* Table */}
       {isLoading ? (
-        <div className="text-center py-8"><Spinner/></div>
+        <TableRowsSkeleton rows={8} columns={6} />
       ) : (
         <DataTable
           title=""

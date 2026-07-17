@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { formatPrice } from '@/lib/utils/format'
+import { Reveal } from '@/components/motion/Reveal'
 import type { Product, FlashDeal } from '@/lib/types/product'
 
 interface MiniProductListProps {
@@ -24,10 +25,10 @@ export function PDPBottomProducts({
   ]
 
   return (
-    <div className="mt-12 border-t border-black/[0.08] pt-10">
+    <Reveal className="mt-12 border-t border-black/[0.08] pt-10">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {sections.map(({ title, products, isFlashDeal }) => (
-          <div key={title}>
+        {sections.map(({ title, products, isFlashDeal }, i) => (
+          <Reveal key={title} delay={i * 0.08} duration={0.3}>
             <h3 className="text-sm font-bold text-[#111111] uppercase tracking-wide mb-4 pb-2 border-b border-black/[0.08]">
               {title}
             </h3>
@@ -86,9 +87,9 @@ export function PDPBottomProducts({
                 )
               })}
             </ul>
-          </div>
+          </Reveal>
         ))}
       </div>
-    </div>
+    </Reveal>
   )
 }

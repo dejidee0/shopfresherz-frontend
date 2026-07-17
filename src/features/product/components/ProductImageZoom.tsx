@@ -10,6 +10,7 @@ import {
   type WheelEvent,
 } from 'react'
 import Image from 'next/image'
+import { AnimatePresence, motion } from 'framer-motion'
 import { FiCamera, FiMaximize2, FiX, FiZoomIn, FiZoomOut, FiRefreshCw, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { cn } from '@/lib/utils/format'
 
@@ -327,29 +328,40 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
               </div>
             )}
 
-            {/* Main image with scroll/mobile zoom */}
+            {/* Main image with scroll/mobile zoom — crossfades between thumbnail switches */}
             {hasProvidedImages ? (
-            <Image
-              src={
-                (scrollZoom > 1 || mobileZoom > 1) && zoomImageLoaded[activeIndex]
-                  ? activeImage.zoom
-                  : activeImage.display
-              }
-              alt={`${productName} — image ${activeIndex + 1}`}
-              fill
-              sizes="540px"
-              className="object-cover transition-transform duration-300 select-none hover:scale-[1.04]"
-              style={{
-                transform: `scale(${Math.max(scrollZoom, mobileZoom)}) translate(${
-                  scrollZoom > 1
-                    ? `${scrollPanOffset.x / scrollZoom}px, ${scrollPanOffset.y / scrollZoom}px`
-                    : `${mobilePan.x / mobileZoom}px, ${mobilePan.y / mobileZoom}px`
-                })`,
-                cursor: scrollZoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'crosshair',
-              }}
-              priority
-              draggable={false}
-            />
+            <AnimatePresence mode="sync" initial={false}>
+              <motion.div
+                key={activeIndex}
+                className="absolute inset-0"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25, ease: 'easeInOut' }}
+              >
+                <Image
+                  src={
+                    (scrollZoom > 1 || mobileZoom > 1) && zoomImageLoaded[activeIndex]
+                      ? activeImage.zoom
+                      : activeImage.display
+                  }
+                  alt={`${productName} — image ${activeIndex + 1}`}
+                  fill
+                  sizes="540px"
+                  className="object-cover transition-transform duration-300 select-none hover:scale-[1.04]"
+                  style={{
+                    transform: `scale(${Math.max(scrollZoom, mobileZoom)}) translate(${
+                      scrollZoom > 1
+                        ? `${scrollPanOffset.x / scrollZoom}px, ${scrollPanOffset.y / scrollZoom}px`
+                        : `${mobilePan.x / mobileZoom}px, ${mobilePan.y / mobileZoom}px`
+                    })`,
+                    cursor: scrollZoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'crosshair',
+                  }}
+                  priority
+                  draggable={false}
+                />
+              </motion.div>
+            </AnimatePresence>
             ) : (
               <div className="absolute inset-6 rounded-[10px] bg-[#F5F5F5] flex flex-col items-center justify-center gap-2 text-[#999999]">
                 <FiCamera size={28} />
@@ -520,14 +532,24 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
                 maxHeight: '90vh',
               }}
             >
-              <Image
-                src={activeImage.original}
-                alt={`${productName} — full view`}
-                width={900}
-                height={900}
-                className="object-contain max-w-[90vw] max-h-[80vh] select-none"
-                draggable={false}
-              />
+              <AnimatePresence mode="sync" initial={false}>
+                <motion.div
+                  key={activeIndex}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2, ease: 'easeInOut' }}
+                >
+                  <Image
+                    src={activeImage.original}
+                    alt={`${productName} — full view`}
+                    width={900}
+                    height={900}
+                    className="object-contain max-w-[90vw] max-h-[80vh] select-none"
+                    draggable={false}
+                  />
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
 

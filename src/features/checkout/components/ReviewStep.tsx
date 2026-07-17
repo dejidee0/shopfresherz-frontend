@@ -1,10 +1,12 @@
 'use client'
 
 import Image from 'next/image'
+import { motion } from 'framer-motion'
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi'
 import { useCartStore } from '@/store/cart'
 import { useAuthStore } from '@/store/auth'
 import { cn, formatPrice } from '@/lib/utils/format'
+import { useMagnetic } from '@/lib/hooks/useMagnetic'
 import { OrderSummary, CheckoutLayout, StepIndicator } from './CheckoutShared'
 import {
   type DeliveryMethod,
@@ -56,6 +58,7 @@ export function ReviewStep({
   onPlaceOrder,
 }: Props) {
   const { user } = useAuthStore()
+  const placeOrderMagnetic = useMagnetic(0.15)
   const items          = useCartStore((s) => s.items)
   const subtotal       = useCartStore((s) => s.subtotal())
   const discountAmount = useCartStore((s) => s.discountAmount)
@@ -158,13 +161,17 @@ export function ReviewStep({
         >
           <FiArrowLeft size={15} /> BACK
         </button>
-        <button
+        <motion.button
           onClick={onPlaceOrder}
           disabled={items.length === 0 || isPlacingOrder}
           className="flex-1 text-xs md:text-base h-12 rounded sf-btn-primary text-white font-bold flex items-center justify-center gap-2 disabled:bg-none disabled:bg-[#E0E0E0] disabled:text-[#AAAAAA] disabled:cursor-not-allowed"
+          {...(items.length > 0 && !isPlacingOrder
+            ? { style: placeOrderMagnetic.style, onMouseMove: placeOrderMagnetic.onMouseMove, onMouseLeave: placeOrderMagnetic.onMouseLeave }
+            : {})}
+          whileTap={items.length > 0 && !isPlacingOrder ? { scale: 0.97 } : undefined}
         >
           {isPlacingOrder ? 'PLACING ORDER...' : `PLACE ORDER — ${formatPrice(total)}`} <FiArrowRight className="hidden md:flex" size={15} />
-        </button>
+        </motion.button>
       </div>
     </CheckoutLayout>
   )

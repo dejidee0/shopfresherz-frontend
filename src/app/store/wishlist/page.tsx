@@ -8,6 +8,7 @@ import { FiHeart, FiShoppingCart, FiTrash2, FiAlertCircle, FiLoader } from 'reac
 import { useAuthStore } from '@/store/auth'
 import { useCartStore } from '@/store/cart'
 import { getFavorites, removeFromFavorites, type FavoriteProduct } from '@/lib/api/favorites'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 /* ─── Helpers ────────────────────────────────────────────────────────────── */
 
@@ -27,13 +28,13 @@ function getStockLabel(item: FavoriteProduct) {
 function SkeletonCard() {
   return (
     <div
-      className="bg-white border border-black/[0.07] rounded-xl p-4 flex gap-4 animate-pulse shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]"
+      className="bg-white border border-black/[0.07] rounded-xl p-4 flex gap-4 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]"
     >
-      <div className="w-20 h-20 rounded-lg bg-[#EEEAE3] shrink-0" />
+      <Skeleton className="w-20 h-20 rounded-lg shrink-0" />
       <div className="flex-1 space-y-2 py-1">
-        <div className="h-3 bg-black/[0.06] rounded w-3/4" />
-        <div className="h-3 bg-black/[0.06] rounded w-1/2" />
-        <div className="h-3 bg-black/[0.06] rounded w-1/4" />
+        <Skeleton className="h-3 w-3/4" />
+        <Skeleton className="h-3 w-1/2" />
+        <Skeleton className="h-3 w-1/4" />
       </div>
     </div>
   )

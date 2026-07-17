@@ -28,6 +28,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { CartDrawer } from '@/features/cart/components/CartDrawer'
 import { ChatWidget } from '@/features/chat/components/ChatWidget'
+import { PageTransition } from '@/components/motion/PageTransition'
 
 // Wraps every customer-facing page:
 // / · /category/* · /product/* · /search · /cart · /checkout · /auth/* · /account/*
@@ -41,7 +42,9 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
     <>
       <TopBar />
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        <PageTransition>{children}</PageTransition>
+      </main>
       <Footer />
 
       {/* Overlays — rendered at root so they sit above all page content */}

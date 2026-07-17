@@ -422,3 +422,30 @@ body {
 .trust-icon:hover {
   transform: scale(1.1) rotate(5deg);
 }
+
+/* ── Skeleton shimmer (brand cream/white tones, not generic gray) ──── */
+@keyframes sf-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.sf-skeleton {
+  background: linear-gradient(90deg, var(--bg-surface) 25%, #FBFAF7 50%, var(--bg-surface) 75%);
+  background-size: 200% 100%;
+  animation: sf-shimmer 1.6s ease-in-out infinite;
+}
+
+/* ── Reduced motion: disable custom motion utilities site-wide ─────── */
+@media (prefers-reduced-motion: reduce) {
+  .float,
+  .animate-fade-in-up,
+  .hero-title, .hero-subtitle, .hero-price, .hero-buttons, .hero-badge,
+  .sf-skeleton {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  .trust-icon:hover,
+  .side-card:hover,
+  .sf-card-3d:hover {
+    transform: none !important;
+  }
+}

@@ -9,6 +9,7 @@ import {
   FiLock,
 } from 'react-icons/fi'
 import { cn } from '@/lib/utils/format'
+import { Reveal } from '@/components/motion/Reveal'
 import type { Product } from '@/lib/types/product'
 
 const TABS = [
@@ -43,7 +44,7 @@ export function ProductTabs({ product }: ProductTabsProps) {
   const [activeTab, setActiveTab] = useState<TabKey>('description')
 
   return (
-    <div className="mt-10">
+    <Reveal className="mt-10">
       {/* Tab bar */}
       <div className="flex gap-1 rounded-[10px] bg-[#F5F5F5] p-1 overflow-x-auto scrollbar-hide">
         {TABS.map((tab) => (
@@ -77,7 +78,7 @@ export function ProductTabs({ product }: ProductTabsProps) {
           <ReviewsTab product={product} />
         )}
       </div>
-    </div>
+    </Reveal>
   )
 }
 

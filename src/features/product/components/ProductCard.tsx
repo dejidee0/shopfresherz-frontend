@@ -3,11 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion, useMotionTemplate } from "framer-motion";
 import { FiHeart, FiShoppingCart } from "react-icons/fi";
 import { cn, formatPrice } from "@/lib/utils/format";
 import { Badge } from "@/components/ui/Badge";
 import { useCartStore } from "@/store/cart";
 import { useAddToFavorites } from "@/lib/hooks/useAddToFavorites";
+import { useTilt } from "@/lib/hooks/useTilt";
+import { useMagnetic } from "@/lib/hooks/useMagnetic";
+import { useHasHover } from "@/lib/hooks/useHasHover";
 import { type Product } from "@/lib/types/product";
 import { getDiscountPercent, getStockStatus } from "@/lib/utils/productService";
 import { toast } from "@/store/toast";
@@ -28,6 +32,11 @@ export function ProductCard({
   onQuickView,
 }: ProductCardProps) {
   const [imgError, setImgError] = useState(false);
+
+  const hasHover = useHasHover();
+  const tilt = useTilt(6);
+  const magnetic = useMagnetic(0.3);
+  const glowBackground = useMotionTemplate`radial-gradient(180px circle at ${tilt.glowX}% ${tilt.glowY}%, rgba(249,115,22,0.18), transparent 70%)`;
 
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartStore((s) => s.openCart);
@@ -101,7 +110,19 @@ export function ProductCard({
         isOutOfStock && "opacity-80",
         className,
       )}
+      style={{ perspective: 800 }}
+      onMouseMove={hasHover ? tilt.onMouseMove : undefined}
+      onMouseLeave={hasHover ? tilt.onMouseLeave : undefined}
     >
+      {/* Cursor-tracking glow — desktop/hover-capable only */}
+      {hasHover && (
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-[14px] z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          style={{ background: glowBackground }}
+        />
+      )}
+
       {/* Badge */}
       {(discountPercent || isNew) && !isOutOfStock && (
         <div className="absolute top-2 left-2 z-10">
@@ -133,7 +154,15 @@ export function ProductCard({
         <FiHeart size={14} className={favorited ? "fill-current" : ""} />
       </button>
 
-      {/* Image */}
+      {/* Image + info — tilts together as one 3D plane */}
+      <motion.div
+        className="flex flex-col flex-1"
+        style={
+          hasHover
+            ? { rotateX: tilt.rotateX, rotateY: tilt.rotateY, transformStyle: "preserve-3d" }
+            : undefined
+        }
+      >
       <div className="relative overflow-hidden bg-[#F8F8F8] h-[190px] sm:h-[200px] rounded-t-[10px] transition-shadow group-hover:shadow-[inset_0_0_30px_rgba(249,115,22,0.05)]">
         {imageSrc ? (
           <Image
@@ -194,19 +223,24 @@ export function ProductCard({
             )}
           </div>
 
-          <button
+          <motion.button
             onClick={handleAddToCart}
             disabled={isOutOfStock}
             className={cn(
-              "w-9 h-9 rounded-[10px] bg-linear-to-br from-[#F97316] to-[#EA580C] text-white flex items-center justify-center shrink-0 transition-all shadow-[0_4px_12px_rgba(249,115,22,0.3)]",
-              isOutOfStock ? "opacity-50 cursor-not-allowed" : "hover:scale-105 hover:shadow-[0_8px_20px_rgba(249,115,22,0.4)]",
+              "w-9 h-9 rounded-[10px] bg-linear-to-br from-[#F97316] to-[#EA580C] text-white flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(249,115,22,0.3)]",
+              isOutOfStock ? "opacity-50 cursor-not-allowed" : "hover:shadow-[0_8px_20px_rgba(249,115,22,0.4)]",
             )}
             aria-label="Add to cart"
+            {...(!isOutOfStock
+              ? { style: magnetic.style, onMouseMove: magnetic.onMouseMove, onMouseLeave: magnetic.onMouseLeave }
+              : {})}
+            whileTap={!isOutOfStock ? { scale: 0.9 } : undefined}
           >
             <FiShoppingCart size={16} />
-          </button>
+          </motion.button>
         </div>
       </div>
+      </motion.div>
     </Link>
   );
 }

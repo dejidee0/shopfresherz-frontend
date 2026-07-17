@@ -126,6 +126,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils/format'
 import { ProductCard } from './ProductCard'
+import { ProductCardSkeleton } from '@/components/ui/Skeleton'
+import { Reveal } from '@/components/motion/Reveal'
 import type { Product } from '@/lib/types/product'
 
 interface Tab {
@@ -145,20 +147,9 @@ interface ProductGridSectionProps {
   promoCard?: React.ReactNode
 }
 
-function SkeletonCard() {
-  return (
-    <div className="bg-[#FFFFFF] border border-black/[0.08] rounded-card overflow-hidden animate-pulse">
-      <div className="aspect-square bg-[#F5F5F5]" />
-      <div className="p-3 space-y-2">
-        <div className="h-3 bg-black/[0.06] rounded w-1/3" />
-        <div className="h-4 bg-black/[0.06] rounded w-full" />
-        <div className="h-4 bg-black/[0.06] rounded w-4/5" />
-        <div className="h-5 bg-black/[0.06] rounded w-1/2" />
-        <div className="h-9 bg-black/[0.06] rounded w-full" />
-      </div>
-    </div>
-  )
-}
+// Cap the stagger delay so long grids don't leave late cards waiting ages.
+const MAX_STAGGER_DELAY = 0.4
+const staggerDelay = (index: number) => Math.min(index * 0.05, MAX_STAGGER_DELAY)
 
 export function ProductGridSection({
   title,
@@ -191,7 +182,7 @@ export function ProductGridSection({
       <div className="max-w-content mx-auto lg:mx-40 px-2 md:px-4 lg:px-10">
 
         {/* Header row */}
-        <div className="flex items-cen\ter justify-between mb-5 flex-wrap gap-3">
+        <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
               <div className="w-1 h-7 bg-[#F97316] rounded-full shrink-0" />
@@ -239,10 +230,12 @@ export function ProductGridSection({
 
           {isLoading
             ? Array.from({ length: cols === 5 ? 10 : 8 }).map((_, i) => (
-              <SkeletonCard key={i} />
+              <ProductCardSkeleton key={i} />
             ))
-            : products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            : products.map((product, i) => (
+              <Reveal key={product.id} delay={staggerDelay(i)} duration={0.3} className="h-full">
+                <ProductCard product={product} className="h-full" />
+              </Reveal>
             ))}
         </div>
       </div>

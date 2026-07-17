@@ -17,6 +17,7 @@ import type { CategoryWithImage, FlashDeal } from "@/lib/types/product";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import { FiShoppingCart, FiHeart } from "react-icons/fi";
 import { useAddToFavorites } from "@/lib/hooks/useAddToFavorites";
+import { Reveal } from "@/components/motion/Reveal";
 
 type HomeProduct = {
   id: string;
@@ -425,8 +426,10 @@ export default function HomePage() {
           />
 
           <div className="hidden sm:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {bestSellers.slice(0, 8).map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {bestSellers.slice(0, 8).map((product, i) => (
+              <Reveal key={product.id} delay={Math.min(i * 0.05, 0.4)} duration={0.3}>
+                <ProductCard product={product} />
+              </Reveal>
             ))}
           </div>
           {/* Mobile Layout: fallback unchanged 2-column view */}
@@ -441,7 +444,9 @@ export default function HomePage() {
       </div>
 
       {/* 5. Shop by category */}
-      <CategoryGrid />
+      <Reveal>
+        <CategoryGrid />
+      </Reveal>
 
 
 
@@ -489,8 +494,10 @@ export default function HomePage() {
           </div>
 
           <div className="hidden sm:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredNewArrivals.slice(0, 8).map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {filteredNewArrivals.slice(0, 8).map((product, i) => (
+              <Reveal key={product.id} delay={Math.min(i * 0.05, 0.4)} duration={0.3}>
+                <ProductCard product={product} />
+              </Reveal>
             ))}
           </div>
 
@@ -505,10 +512,10 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-      <StorePromoSection />
-      <ComputerAccessoriesSection />
-      <LaptopPromoSection />
-      <TopHighlightsSection />
+      <Reveal><StorePromoSection /></Reveal>
+      <Reveal><ComputerAccessoriesSection /></Reveal>
+      <Reveal><LaptopPromoSection /></Reveal>
+      <Reveal><TopHighlightsSection /></Reveal>
 
       {/* Spacer */}
       <div className="h-8" />
