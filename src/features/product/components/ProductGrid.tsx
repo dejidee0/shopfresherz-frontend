@@ -127,7 +127,6 @@ import Link from 'next/link'
 import { cn } from '@/lib/utils/format'
 import { ProductCard } from './ProductCard'
 import { ProductCardSkeleton } from '@/components/ui/Skeleton'
-import { Reveal } from '@/components/motion/Reveal'
 import type { Product } from '@/lib/types/product'
 
 interface Tab {
@@ -233,9 +232,7 @@ export function ProductGridSection({
               <ProductCardSkeleton key={i} />
             ))
             : products.map((product, i) => (
-              <Reveal key={product.id} delay={staggerDelay(i)} duration={0.3} className="h-full">
-                <ProductCard product={product} className="h-full" />
-              </Reveal>
+              <ProductCard key={product.id} product={product} className="h-full" revealDelay={staggerDelay(i)} />
             ))}
         </div>
       </div>

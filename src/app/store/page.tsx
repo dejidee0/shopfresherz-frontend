@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion, useReducedMotion } from "framer-motion";
 import { HeroBanner } from "@/components/ui/HeroBanner";
 import { TrustSignals } from "@/components/layout/TrustSignals";
 import { FlashDealsStrip } from "@/features/product/components/FlashDealsStrip";
@@ -15,9 +16,14 @@ import { MarqueeBanner } from "@/components/layout/MarqueeBanner";
 import { productsApi } from "@/lib/api/products";
 import type { CategoryWithImage, FlashDeal } from "@/lib/types/product";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
-import { FiShoppingCart, FiHeart } from "react-icons/fi";
+import { FiShoppingCart, FiHeart, FiCheck } from "react-icons/fi";
 import { useAddToFavorites } from "@/lib/hooks/useAddToFavorites";
 import { Reveal } from "@/components/motion/Reveal";
+import { useCardTilt3D } from "@/lib/hooks/useCardTilt3D";
+import { useMagnetic } from "@/lib/hooks/useMagnetic";
+import { spawnRipple } from "@/lib/utils/ripple";
+import { useCartStore } from "@/store/cart";
+import { toast } from "@/store/toast";
 
 type HomeProduct = {
   id: string;
@@ -103,8 +109,18 @@ function StarRating({ rating }: { rating: number }) {
 
 // ─── BADGE ────────────────────────────────────────────────────────────────────
 // ─── PRODUCT CARD ─────────────────────────────────────────────────────────────
-function ProductCard({ product }: { product: HomeProduct }) {
+const CARD_ENTER_TRANSITION = { duration: 0.7, ease: [0.34, 1.56, 0.64, 1] as const };
+
+function ProductCard({ product, revealDelay = 0 }: { product: HomeProduct; revealDelay?: number }) {
   const { handleAddToFavorites, isLoading, isFavorited } = useAddToFavorites();
+  const { outerRef, innerRef } = useCardTilt3D<HTMLDivElement>();
+  const magnetic = useMagnetic(0.3);
+  const shouldReduceMotion = useReducedMotion();
+  const addItem = useCartStore((s) => s.addItem);
+  const openCart = useCartStore((s) => s.openCart);
+  const [added, setAdded] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const imageSrc =
     product.image ??
     product.primaryImageUrl ??
@@ -115,91 +131,144 @@ function ProductCard({ product }: { product: HomeProduct }) {
       ? Math.round(((originalPrice - product.price) / originalPrice) * 100)
       : null;
 
+  function handleAddToCart(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+    spawnRipple(e);
+
+    addItem({
+      productId: product.id,
+      name: product.name,
+      slug: product.slug,
+      image: imageSrc ?? "",
+      price: product.price,
+      quantity: 1,
+      // Homepage quick-add doesn't carry authoritative stock data the way
+      // the category/PDP flows do; cap generously rather than block adding.
+      stockQty: 99,
+    });
+    toast.success("Product added to cart");
+    openCart();
+
+    setAdded(true);
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 1000);
+    setTimeout(() => setAdded(false), 1800);
+  }
+
   return (
-    <div
-      className={`sf-product-card group relative block ${
-        isFavorited(product.id) ? "border-2 border-[#F97316]" : "border border-transparent"
-      }`}
+    <motion.div
+      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 40, rotateX: 15 }}
+      whileInView={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, rotateX: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={shouldReduceMotion ? { duration: 0.3, delay: revealDelay } : { ...CARD_ENTER_TRANSITION, delay: revealDelay }}
+      style={{ transformPerspective: 1000 }}
     >
-      {Boolean(discountPercent || product.badge) && (
-        <div className="absolute top-2 left-2 z-10">
-          <span className="badge badge-orange">
-            {discountPercent ? `-${discountPercent}%` : product.badge}
-          </span>
-        </div>
-      )}
-
-      <button
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          handleAddToFavorites(product.id);
-        }}
-        disabled={isLoading(product.id)}
-        aria-label={isFavorited(product.id) ? "Added to favorites" : "Add to favorites"}
-        className={`absolute top-3 right-3 z-20 w-8 h-8 bg-white/90 rounded-full border border-black/[0.08] shadow-sm flex items-center justify-center transition-colors ${
-          isFavorited(product.id)
-            ? "text-[#F97316]"
-            : "text-[#666666] hover:text-[#111111]"
-        } ${isLoading(product.id) ? "opacity-50 cursor-wait" : ""}`}
+      <div
+        ref={outerRef}
+        className={`sf-product-card sf-tilt-card sf-tilt-glow group relative block ${
+          isFavorited(product.id) ? "border-2 border-[#F97316]" : "border border-transparent"
+        }`}
       >
-        <FiHeart
-          size={14}
-          className={isFavorited(product.id) ? "fill-current" : ""}
-        />
-      </button>
-
-      <Link href={`/store/product/${product.slug}`} className="flex flex-col flex-1 z-10">
-        <div className="product-image relative h-[190px] sm:h-[200px] bg-[#F5F2ED] overflow-hidden">
-          {imageSrc ? (
-            <Image
-              src={imageSrc}
-              alt={product.name}
-              fill
-              style={{ objectFit: "cover", objectPosition: "center" }}
-              className="transition-transform duration-300 group-hover:scale-110"
-              unoptimized
-            />
-          ) : (
-            <div className="w-full h-full bg-[#EEEAE3] flex items-center justify-center text-[#888888] text-[11px]">
-              No image
-            </div>
-          )}
-        </div>
-
-        <div className="p-4 flex flex-col gap-2 flex-1">
-          <p className="text-[10px] text-[#888888] uppercase tracking-[0.8px] leading-none">
-            {product.categoryName ?? product.category?.name ?? "ShopFresherz"}
-          </p>
-
-          <p className="text-[13px] text-[#111111] font-medium leading-[1.45] line-clamp-2 min-h-[38px] group-hover:text-[#F97316] transition-colors">
-            {product.name}
-          </p>
-
-          <div className="flex items-center gap-1.5">
-            <StarRating rating={product.rating} />
-            <span className="text-[11px] text-[#888888]">(0)</span>
+        {Boolean(discountPercent || product.badge) && (
+          <div className="absolute top-2 left-2 z-10">
+            <span className="badge badge-orange">
+              {discountPercent ? `-${discountPercent}%` : product.badge}
+            </span>
           </div>
+        )}
 
-          <div className="mt-auto flex items-end justify-between gap-2">
-            <div className="flex flex-col">
-              <span className="text-[16px] font-bold text-[#F97316] leading-tight">
-                ₦{product.price.toLocaleString()}
-              </span>
-              {originalPrice != null && (
-                <span className="text-[11px] text-[#888888] line-through">
-                  ₦{originalPrice.toLocaleString()}
-                </span>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleAddToFavorites(product.id);
+          }}
+          disabled={isLoading(product.id)}
+          aria-label={isFavorited(product.id) ? "Added to favorites" : "Add to favorites"}
+          className={`absolute top-3 right-3 z-20 w-8 h-8 bg-white/90 rounded-full border border-black/[0.08] shadow-sm flex items-center justify-center transition-colors ${
+            isFavorited(product.id)
+              ? "text-[#F97316]"
+              : "text-[#666666] hover:text-[#111111]"
+          } ${isLoading(product.id) ? "opacity-50 cursor-wait" : ""}`}
+        >
+          <FiHeart
+            size={14}
+            className={isFavorited(product.id) ? "fill-current" : ""}
+          />
+        </button>
+
+        <div ref={innerRef} className="sf-tilt-card-inner flex flex-col flex-1">
+          <Link href={`/store/product/${product.slug}`} className="flex flex-col flex-1 z-10">
+            <div className="product-image relative h-[190px] sm:h-[200px] bg-[#F5F2ED] overflow-hidden">
+              {imageSrc ? (
+                <Image
+                  src={imageSrc}
+                  alt={product.name}
+                  fill
+                  style={{ objectFit: "cover", objectPosition: "center" }}
+                  className="transition-transform duration-300 group-hover:scale-110"
+                  unoptimized
+                />
+              ) : (
+                <div className="w-full h-full bg-[#EEEAE3] flex items-center justify-center text-[#888888] text-[11px]">
+                  No image
+                </div>
               )}
             </div>
 
-            <span className="w-9 h-9 rounded-[10px] bg-linear-to-br from-[#F97316] to-[#EA580C] text-white flex items-center justify-center shrink-0 transition-all shadow-[0_4px_12px_rgba(249,115,22,0.3)] group-hover:scale-105">
-              <FiShoppingCart size={16} />
-            </span>
-          </div>
+            <div className="p-4 flex flex-col gap-2 flex-1">
+              <p className="text-[10px] text-[#888888] uppercase tracking-[0.8px] leading-none">
+                {product.categoryName ?? product.category?.name ?? "ShopFresherz"}
+              </p>
+
+              <p className="text-[13px] text-[#111111] font-medium leading-[1.45] line-clamp-2 min-h-[38px] group-hover:text-[#F97316] transition-colors">
+                {product.name}
+              </p>
+
+              <div className="flex items-center gap-1.5">
+                <StarRating rating={product.rating} />
+                <span className="text-[11px] text-[#888888]">(0)</span>
+              </div>
+
+              <div className="mt-auto flex items-end justify-between gap-2">
+                <div className="flex flex-col">
+                  <span className="text-[16px] font-bold text-[#F97316] leading-tight">
+                    ₦{product.price.toLocaleString()}
+                  </span>
+                  {originalPrice != null && (
+                    <span className="text-[11px] text-[#888888] line-through">
+                      ₦{originalPrice.toLocaleString()}
+                    </span>
+                  )}
+                </div>
+
+                <motion.button
+                  onClick={handleAddToCart}
+                  className="relative overflow-hidden w-9 h-9 rounded-[10px] bg-linear-to-br from-[#F97316] to-[#EA580C] text-white flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(249,115,22,0.3)] hover:shadow-[0_8px_20px_rgba(249,115,22,0.4)]"
+                  aria-label="Add to cart"
+                  style={magnetic.style}
+                  onMouseMove={magnetic.onMouseMove}
+                  onMouseLeave={magnetic.onMouseLeave}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  {added ? <FiCheck size={16} /> : <FiShoppingCart size={16} />}
+                </motion.button>
+              </div>
+            </div>
+          </Link>
         </div>
-      </Link>
-    </div>
+
+        {showSuccess && (
+          <div
+            aria-hidden="true"
+            className="sf-add-success absolute top-1/2 left-1/2 w-14 h-14 rounded-full bg-[#F97316] flex items-center justify-center text-white z-30 shadow-[0_8px_24px_rgba(249,115,22,0.4)]"
+          >
+            <FiCheck size={28} />
+          </div>
+        )}
+      </div>
+    </motion.div>
   );
 }
 // ─── BEST DEALS PROMO CARD ────────────────────────────────────────────────────
@@ -427,9 +496,7 @@ export default function HomePage() {
 
           <div className="hidden sm:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {bestSellers.slice(0, 8).map((product, i) => (
-              <Reveal key={product.id} delay={Math.min(i * 0.05, 0.4)} duration={0.3}>
-                <ProductCard product={product} />
-              </Reveal>
+              <ProductCard key={product.id} product={product} revealDelay={Math.min(i * 0.05, 0.4)} />
             ))}
           </div>
           {/* Mobile Layout: fallback unchanged 2-column view */}
@@ -495,9 +562,7 @@ export default function HomePage() {
 
           <div className="hidden sm:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredNewArrivals.slice(0, 8).map((product, i) => (
-              <Reveal key={product.id} delay={Math.min(i * 0.05, 0.4)} duration={0.3}>
-                <ProductCard product={product} />
-              </Reveal>
+              <ProductCard key={product.id} product={product} revealDelay={Math.min(i * 0.05, 0.4)} />
             ))}
           </div>
 

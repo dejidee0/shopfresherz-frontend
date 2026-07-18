@@ -434,6 +434,64 @@ body {
   animation: sf-shimmer 1.6s ease-in-out infinite;
 }
 
+/* ── Dramatic 3D product card (tilt + cursor glow + ripple) ─────────
+   Mechanism intentionally mirrors a plain-CSS reference (ref-driven
+   inline transform + CSS transition) rather than Framer Motion springs
+   for the tilt itself — this keeps the exact 0.15s ease-out "snap to
+   cursor" feel and avoids per-mousemove React re-renders. Framer Motion
+   is still used for the whileInView entrance (see ProductCard.tsx). */
+.sf-tilt-card {
+  perspective: 1000px;
+}
+.sf-tilt-card-inner {
+  transition: transform 0.15s ease-out;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.sf-tilt-glow {
+  position: relative;
+}
+.sf-tilt-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    600px circle at var(--gx, 50%) var(--gy, 50%),
+    rgba(249, 115, 22, 0.1),
+    transparent 40%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 5;
+}
+.sf-tilt-glow:hover::after,
+.sf-tilt-glow.sf-tilt-active::after {
+  opacity: 1;
+}
+
+/* Add to Cart ripple + success pulse */
+.sf-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  transform: scale(0);
+  animation: sf-ripple 0.6s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes sf-ripple {
+  to { transform: scale(4); opacity: 0; }
+}
+@keyframes sf-add-success-pop {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  70% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+.sf-add-success {
+  animation: sf-add-success-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
 /* ── Reduced motion: disable custom motion utilities site-wide ─────── */
 @media (prefers-reduced-motion: reduce) {
   .float,
@@ -447,5 +505,12 @@ body {
   .side-card:hover,
   .sf-card-3d:hover {
     transform: none !important;
+  }
+  .sf-tilt-card-inner {
+    transition: none !important;
+    transform: none !important;
+  }
+  .sf-tilt-glow::after {
+    transition: none !important;
   }
 }
