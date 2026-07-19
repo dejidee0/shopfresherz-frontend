@@ -13,6 +13,8 @@ import Image from 'next/image'
 import { AnimatePresence, motion } from 'framer-motion'
 import { FiCamera, FiMaximize2, FiX, FiZoomIn, FiZoomOut, FiRefreshCw, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { cn } from '@/lib/utils/format'
+import { useParallaxTilt } from '@/lib/hooks/useParallaxTilt'
+import { useHasHover } from '@/lib/hooks/useHasHover'
 
 interface ZoomImage {
   thumb: string
@@ -80,6 +82,14 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
 
   const mainRef = useRef<HTMLDivElement>(null)
   const lightboxRef = useRef<HTMLDivElement>(null)
+
+  // ── Parallax tilt (desktop cursor / mobile gyroscope) ────────────────────
+  // Suspended while any zoom or the lightbox is active so the tilt never
+  // fights the zoom/pan transforms.
+  const hasHover = useHasHover()
+  const tiltDisabledRef = useRef(false)
+  tiltDisabledRef.current = scrollZoom > 1 || mobileZoom > 1 || isLightboxOpen
+  const tilt = useParallaxTilt<HTMLDivElement>({ maxTiltMouse: 5, maxTiltGyro: 6, disabledRef: tiltDisabledRef })
 
   const activeImage = productImages[activeIndex] ?? productImages[0]
 
@@ -303,9 +313,12 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
         {/* ── Main image + hover lens ── */}
         <div className="flex gap-5">
           <div
-            ref={mainRef}
+            ref={(el) => {
+              mainRef.current = el
+              tilt.outerRef.current = el
+            }}
             className={cn(
-              'relative rounded-[20px] overflow-hidden bg-[#FFFFFF] border border-black/[0.07] shrink-0 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]',
+              'sf-tilt-card relative rounded-[20px] overflow-hidden bg-[#FFFFFF] border border-black/[0.07] shrink-0 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]',
               'w-full aspect-square',
               isOutOfStock || !hasProvidedImages ? 'grayscale cursor-default' : 'cursor-crosshair'
             )}
@@ -328,8 +341,11 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
               </div>
             )}
 
-            {/* Main image with scroll/mobile zoom — crossfades between thumbnail switches */}
+            {/* Main image with scroll/mobile zoom — crossfades between thumbnail switches.
+                The sf-tilt-card-inner wrapper carries the parallax tilt transform;
+                the zoom/pan transform lives on the <Image> itself, so they never conflict. */}
             {hasProvidedImages ? (
+            <div ref={tilt.innerRef} className="sf-tilt-card-inner absolute inset-0">
             <AnimatePresence mode="sync" initial={false}>
               <motion.div
                 key={activeIndex}
@@ -362,6 +378,7 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
                 />
               </motion.div>
             </AnimatePresence>
+            </div>
             ) : (
               <div className="absolute inset-6 rounded-[10px] bg-[#F5F5F5] flex flex-col items-center justify-center gap-2 text-[#999999]">
                 <FiCamera size={28} />
@@ -468,7 +485,7 @@ export function ProductImageZoom({ images, productName, isOutOfStock = false }: 
         </div>
         <p className="flex items-center gap-1 text-[11px] text-[#888888]">
           <FiZoomIn size={12} />
-          Hover to zoom
+          {hasHover ? 'Hover to zoom' : 'Pinch to zoom'}
         </p>
       </div>
 
