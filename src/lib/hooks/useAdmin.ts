@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { adminApi, type DashboardStatsDto, type PagedResult, type OrderDto, type AdminUserDto, type LowStockDto, type BannerDto, type AdminOrdersFilters, type AdminUsersFilters, type UpdateOrderStatusRequest, type AdjustLoyaltyRequest, type CreateBannerRequest, type UpdateBannerRequest, type AdminProductsFilters, type CreateProductRequest, type UpdateProductRequest, type ProductDto, type FlashDealDto, type CreateFlashDealRequest, type UpdateFlashDealRequest, type CouponDto, type CreateCouponRequest, type UpdateCouponRequest, CategoryDto, CreatePromoRequest } from '@/lib/api/admin'
+import { adminApi, type DashboardStatsDto, type PagedResult, type OrderDto, type AdminUserDto, type LowStockDto, type BannerDto, type AdminOrdersFilters, type AdminUsersFilters, type UpdateOrderStatusRequest, type AdjustLoyaltyRequest, type CreateBannerRequest, type UpdateBannerRequest, type AdminProductsFilters, type CreateProductRequest, type UpdateProductRequest, type ProductDto, type FlashDealDto, type CreateFlashDealRequest, type UpdateFlashDealRequest, type CouponDto, type CreateCouponRequest, type UpdateCouponRequest, CategoryDto, CreatePromoRequest, type PromoPlacement, PROMO_MULTI_ITEM_PLACEMENTS } from '@/lib/api/admin'
 import { productsApi } from '@/lib/api/products'
 import { useAuthStore } from '@/store/auth'
 import { toast } from '@/store/toast'
@@ -66,190 +66,111 @@ export function useBanners() {
   })
 }
 
-export function useHeroPromo() {
+// ─── Promo Cards (unified across all 6 placements) ────────────────────────────
+
+/** Admin list with real ids — only meaningful for PROMO_MULTI_ITEM_PLACEMENTS. */
+export function usePromoAdminList(placement: PromoPlacement) {
   const { accessToken } = useAuthStore()
 
   return useQuery({
-    queryKey: ['admin', 'promotions', 'hero'],
-    queryFn: () => adminApi.getHeroPromos(accessToken!),
+    queryKey: ['admin', 'promotions', placement, 'admin-list'],
+    queryFn: () => adminApi.getPromoAdminList(accessToken!, placement),
+    enabled: !!accessToken && PROMO_MULTI_ITEM_PLACEMENTS.includes(placement),
+  })
+}
+
+/** Public read — the display source for singleton placements (no admin list exists). */
+export function usePromoPublic(placement: PromoPlacement) {
+  const { accessToken } = useAuthStore()
+
+  return useQuery({
+    queryKey: ['admin', 'promotions', placement, 'public'],
+    queryFn: () => adminApi.getPromoPublic(accessToken!, placement),
     enabled: !!accessToken,
   })
 }
 
-export function useBestDealPromo() {
-  const { accessToken } = useAuthStore()
-
-  return useQuery({
-    queryKey: ['admin', 'promotions', 'best-deal'],
-    queryFn: () => adminApi.getBestDealPromo(accessToken!),
-    enabled: !!accessToken,
-  })
-}
-
-export function useAccessoriesPromo() {
-  const { accessToken } = useAuthStore()
-
-  return useQuery({
-    queryKey: ['admin', 'promotions', 'accessories-promo'],
-    queryFn: () => adminApi.getAccessoriesPromo(accessToken!),
-    enabled: !!accessToken,
-  })
-}
-
-export function useLaptopPromo() {
-  const { accessToken } = useAuthStore()
-
-  return useQuery({
-    queryKey: ['admin', 'promotions', 'laptop-promo'],
-    queryFn: () => adminApi.getLaptopPromo(accessToken!),
-    enabled: !!accessToken,
-  })
-}
-
-export function useCreateHeroPromo(){
+export function useCreatePromo() {
   const { accessToken } = useAuthStore()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: CreatePromoRequest) =>
-      adminApi.createHeroPromo(accessToken!, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'promotions', 'hero'] })
-      toast.success('Hero promo created successfully')
+    mutationFn: ({ placement, payload }: { placement: PromoPlacement; payload: CreatePromoRequest }) =>
+      adminApi.createPromo(accessToken!, placement, payload),
+    onSuccess: (_data, { placement }) => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'promotions', placement] })
+      toast.success('Promo saved successfully')
     },
     onError: (error: { message?: string }) => {
-      toast.error('Failed to create hero promo', error.message ?? 'Please try again')
+      toast.error('Failed to save promo', error.message ?? 'Please try again')
     },
   })
 }
 
-export function useCreateBestDealPromo(){
+export function useUpdatePromo() {
   const { accessToken } = useAuthStore()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: CreatePromoRequest) =>
-      adminApi.createBestDealPromo(accessToken!, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'promotions', 'best-deal'] })
-      toast.success('Best deal promo created successfully')
+    mutationFn: ({
+      placement,
+      id,
+      payload,
+    }: {
+      placement: PromoPlacement
+      id: string
+      payload: CreatePromoRequest
+    }) => adminApi.updatePromo(accessToken!, placement, id, payload),
+    onSuccess: (_data, { placement }) => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'promotions', placement] })
+      toast.success('Promo updated successfully')
     },
     onError: (error: { message?: string }) => {
-      toast.error('Failed to create best deal promo', error.message ?? 'Please try again')
+      toast.error('Failed to update promo', error.message ?? 'Please try again')
     },
   })
 }
 
-export function useCreateAccessoriesPromo(){
-  const { accessToken } = useAuthStore()
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (payload: CreatePromoRequest) =>
-      adminApi.createAccessoriesPromo(accessToken!, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'promotions', 'accessories-promo'] })
-      toast.success('Accessories promo created successfully')
-    },
-    onError: (error: { message?: string }) => {
-      toast.error('Failed to create accessories promo', error.message ?? 'Please try again')
-    },
-  })
-}
-
-export function useCreateLaptopPromo(){
-  const { accessToken } = useAuthStore()
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (payload: CreatePromoRequest) =>
-      adminApi.createLaptopPromo(accessToken!, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'promotions', 'laptop-promo'] })
-      toast.success('Laptop promo created successfully')
-    },
-    onError: (error: { message?: string }) => {
-      toast.error('Failed to create laptop promo', error.message ?? 'Please try again')
-    },
-  })
-}
-
-export function useUpdateHeroPromo() {
-  const { accessToken } = useAuthStore()
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: CreatePromoRequest }) =>
-      adminApi.updateHeroPromo(accessToken!, id, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'promotions', 'hero'] })
-      toast.success('Hero promo updated successfully')
-    },
-    onError: (error: { message?: string }) => {
-      toast.error('Failed to update hero promo', error.message ?? 'Please try again')
-    },
-  })
-}
-
-export function useUpdateBestDealPromo() {
-  const { accessToken } = useAuthStore()
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: CreatePromoRequest }) =>
-      adminApi.updateBestDealPromo(accessToken!, id, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'promotions', 'best-deal'] })
-      toast.success('Best deal promo updated successfully')
-    },
-    onError: (error: { message?: string }) => {
-      toast.error('Failed to update best deal promo', error.message ?? 'Please try again')
-    },
-  })
-}
-
-export function useUpdateAccessoriesPromo() {
-  const { accessToken } = useAuthStore()
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: CreatePromoRequest }) =>
-      adminApi.updateAccessoriesPromo(accessToken!, id, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'promotions', 'accessories-promo'] })
-      toast.success('Accessories promo updated successfully')
-    },
-    onError: (error: { message?: string }) => {
-      toast.error('Failed to update accessories promo', error.message ?? 'Please try again')
-    },
-  })
-}
-
-export function useUpdateLaptopPromo() {
-  const { accessToken } = useAuthStore()
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: CreatePromoRequest }) =>
-      adminApi.updateLaptopPromo(accessToken!, id, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'promotions', 'laptop-promo'] })
-      toast.success('Laptop promo updated successfully')
-    },
-    onError: (error: { message?: string }) => {
-      toast.error('Failed to update laptop promo', error.message ?? 'Please try again')
-    },
-  })
-}
-
+/** Works for hero/flash-sale rows, which already carry a real id. */
 export function useDeletePromo() {
   const { accessToken } = useAuthStore()
   const queryClient = useQueryClient()
- 
+
   return useMutation({
     mutationFn: (id: string) => adminApi.deletePromo(accessToken!, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'promotions'] })
+      toast.success('Promo deleted successfully')
+    },
+    onError: (error: { message?: string }) => {
+      toast.error('Failed to delete promo', error.message ?? 'Please try again')
+    },
+  })
+}
+
+/**
+ * Singleton placements never expose a real database id via the public read
+ * endpoint (only a display slug). To delete one, first resolve its real id
+ * by re-submitting the same productId (a safe no-op upsert onto the same
+ * row), then delete using the id that comes back.
+ */
+export function useDeleteSingletonPromo() {
+  const { accessToken } = useAuthStore()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      placement,
+      productId,
+    }: {
+      placement: PromoPlacement
+      productId: string
+    }) => {
+      const resolved = await adminApi.createPromo(accessToken!, placement, { productId })
+      await adminApi.deletePromo(accessToken!, resolved.id)
+    },
+    onSuccess: (_data, { placement }) => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'promotions', placement] })
       toast.success('Promo deleted successfully')
     },
     onError: (error: { message?: string }) => {

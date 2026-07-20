@@ -244,4 +244,32 @@ export const productsApi = {
       sortOrder: number
       slug?: string
     }>>("/promotions/hero"),
+
+  /** Flash Sale promo cards — list, sorted by sortOrder like hero promos */
+  getFlashSalePromos: () =>
+    api.get<Array<{
+      id: string
+      title: string
+      tag?: string
+      badge?: string
+      ctaText: string
+      imageUrl: string
+      price?: string
+      sortOrder: number
+      slug?: string
+    }>>("/promotions/flash-sale"),
+
+  /** Store Promo Banner — single featured card */
+  getStorePromoBanner: () =>
+    api.get<{
+      id: string
+      title: string
+      subtitle: string
+      ctaText: string
+      imageUrl: string
+      imageAlt?: string
+      badge?: string
+      tag?: string
+      slug?: string
+    }>("/promotions/store-promo-banner"),
 };

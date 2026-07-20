@@ -120,7 +120,50 @@ export interface CreatePromoRequest {
   productId?: string;
   tag?: string;
   ctaText?: string;
+  imageUrl?: string;
+  /**
+   * Sent for forward-compatibility — as of this writing the backend always
+   * derives the promo description from the linked product and silently
+   * ignores this field on create/update. Kept here so the UI is ready the
+   * moment the backend supports it, without pretending it works today.
+   */
+  description?: string;
 }
+
+/**
+ * Every placement a promo card can appear in. These map 1:1 to backend route
+ * segments — /promotions/{placement} (public read) and
+ * /promotions/admin/{placement} (create/update) — confirmed by direct testing
+ * against the live API rather than assumed from existing frontend code.
+ */
+export type PromoPlacement =
+  | "hero"
+  | "best-deal"
+  | "accessories-promo"
+  | "laptop-promo"
+  | "flash-sale"
+  | "store-promo-banner";
+
+export const PROMO_PLACEMENTS: { value: PromoPlacement; label: string }[] = [
+  { value: "hero", label: "Hero Side" },
+  { value: "best-deal", label: "Best Deals Section" },
+  { value: "accessories-promo", label: "Accessories Sidebar" },
+  { value: "laptop-promo", label: "Laptop Sidebar" },
+  { value: "flash-sale", label: "Flash Sale" },
+  { value: "store-promo-banner", label: "Store Promo Banner" },
+];
+
+/**
+ * "hero" and "flash-sale" support multiple concurrent promo cards and expose
+ * a real admin list endpoint (GET /promotions/admin/{placement}) returning
+ * genuine database ids. The other 4 placements are singleton — only one
+ * active entry at a time, no admin list endpoint (confirmed 405), and the
+ * public read endpoint never exposes a real id (only a display slug) even
+ * for a freshly-created entry. For those, create/update is a safe upsert
+ * keyed on productId, and delete resolves the real id on demand by
+ * re-submitting the known productId (see useDeleteSingletonPromo).
+ */
+export const PROMO_MULTI_ITEM_PLACEMENTS: PromoPlacement[] = ["hero", "flash-sale"];
 
 export interface CreateBannerRequest {
   title?: string;
@@ -549,51 +592,28 @@ export const adminApi = {
   deleteBanner: (token: string, id: string) =>
     api.delete<void>(`/admin/banners/${encodeURIComponent(id)}`, { token }),
 
-  getHeroPromos: (token: string) =>
-    api.get<PromoDto[]>("/promotions/hero", { token }),
+  /** Admin list with real ids — only valid for PROMO_MULTI_ITEM_PLACEMENTS. */
+  getPromoAdminList: (token: string, placement: PromoPlacement) =>
+    api.get<PromoDto[]>(`/promotions/admin/${placement}`, { token }),
 
-  getBestDealPromo: (token: string) =>
-    api.get<PromoDto[]>("/promotions/best-deal", { token }),
+  /** Public read — the only display source for singleton placements (no real id exposed). */
+  getPromoPublic: (token: string, placement: PromoPlacement) =>
+    api.get<PromoDto | PromoDto[] | null>(`/promotions/${placement}`, { token }),
 
-  getAccessoriesPromo: (token: string) =>
-    api.get<PromoDto[]>("/promotions/accessories-promo", { token }),
+  createPromo: (token: string, placement: PromoPlacement, payload: CreatePromoRequest) =>
+    api.post<PromoDto>(`/promotions/admin/${placement}`, payload, { token }),
 
-  getLaptopPromo: (token: string) =>
-    api.get<PromoDto[]>("/promotions/laptop-promo", { token }),
-
-  createHeroPromo: (token: string, payload: CreatePromoRequest) =>
-    api.post<unknown>("/promotions/admin/hero", payload, { token }),
-
-  updateHeroPromo: (token: string, id: string, payload: CreatePromoRequest) =>
-    api.put<void>(`/promotions/admin/hero/${encodeURIComponent(id)}`, payload, {
-      token,
-    }),
-
-  createBestDealPromo: (token: string, payload: CreatePromoRequest) =>
-    api.post<unknown>("/promotions/admin/best-deal", payload, { token }),
-
-  updateBestDealPromo: (token: string, id: string, payload: CreatePromoRequest) =>
-    api.put<void>(`/promotions/admin/best-deal/${encodeURIComponent(id)}`, payload, {
-      token,
-    }),
-
-  createAccessoriesPromo: (token: string, payload: CreatePromoRequest) =>
-    api.post<unknown>("/promotions/admin/accessories-promo", payload, {
-      token,
-    }),
-
-    updateAccessoriesPromo: (token: string, id: string, payload: CreatePromoRequest) =>
-    api.put<void>(`/promotions/admin/accessories-promo/${encodeURIComponent(id)}`, payload, {
-      token,
-    }),
-
-  createLaptopPromo: (token: string, payload: CreatePromoRequest) =>
-    api.post<unknown>("/promotions/admin/laptop-promo", payload, { token }),
-
-  updateLaptopPromo: (token: string, id: string, payload: CreatePromoRequest) =>
-    api.put<void>(`/promotions/admin/laptop-promo/${encodeURIComponent(id)}`, payload, {
-      token,
-    }),
+  updatePromo: (
+    token: string,
+    placement: PromoPlacement,
+    id: string,
+    payload: CreatePromoRequest,
+  ) =>
+    api.put<PromoDto>(
+      `/promotions/admin/${placement}/${encodeURIComponent(id)}`,
+      payload,
+      { token },
+    ),
 
   deletePromo: (token: string, id: string) =>
     api.delete<void>(`/promotions/admin/${encodeURIComponent(id)}`, { token }),

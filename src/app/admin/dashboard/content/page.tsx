@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { LuImage, LuPencil } from "react-icons/lu";
 import { RiDeleteBinLine } from "react-icons/ri";
 import AddContentModal from "@/components/admin/AddContentModal";
@@ -8,14 +8,20 @@ import AddPromoModal from "@/components/admin/AddPromoModal";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import {
-  useAccessoriesPromo,
   useBanners,
-  useBestDealPromo,
   useDeleteBanner,
-  useHeroPromo,
-  useLaptopPromo,
+  usePromoAdminList,
+  usePromoPublic,
+  useDeletePromo,
+  useDeleteSingletonPromo,
 } from "@/lib/hooks/useAdmin";
-import { PromoDto } from "@/lib/api/admin";
+import {
+  PROMO_PLACEMENTS,
+  PROMO_MULTI_ITEM_PLACEMENTS,
+  type PromoDto,
+  type PromoPlacement,
+} from "@/lib/api/admin";
+import { productsApi } from "@/lib/api/products";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -31,7 +37,12 @@ interface ContentRow {
 }
 
 export interface PromoRow {
+  /** Real database id for hero/flash-sale rows; a display slug for singleton
+   *  placements (best-deal, accessories-promo, laptop-promo, store-promo-banner) —
+   *  those never expose a real id via the public read endpoint, so it's
+   *  resolved on demand (see resolveProductId) when editing/deleting. */
   id: string;
+  placement: PromoPlacement;
   title: string;
   productId?: string;
   productName?: string;
@@ -39,11 +50,10 @@ export interface PromoRow {
   ctaText?: string;
   imageUrl?: string;
   tag?: string;
+  description?: string;
   slug?: string;
-  raw: PromoDto; // keep original for edit prefill
+  raw: PromoDto;
 }
-
-type SectionKey = "banner" | "hero" | "bestDeal" | "accessories" | "laptop";
 
 interface BannerModalState {
   type: "banner";
@@ -52,16 +62,15 @@ interface BannerModalState {
 
 interface PromoModalState {
   type: "promo";
-  section: Exclude<SectionKey, "banner">;
+  placement: PromoPlacement;
   data: PromoRow | null;
 }
 
 type ModalState = BannerModalState | PromoModalState | null;
 
-interface DeleteState {
-  section: SectionKey;
-  item: ContentRow | PromoRow;
-}
+type DeleteState =
+  | { kind: "banner"; item: ContentRow }
+  | { kind: "promo"; item: PromoRow };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -73,33 +82,41 @@ function toArray<T>(data: T[] | { items: T[] } | T | null | undefined): T[] {
     const items = (data as { items: T[] }).items;
     if (Array.isArray(items)) return items;
   }
-  // Some endpoints return a single object — wrap it
   if (typeof data === "object" && "id" in (data as object)) {
     return [data as T];
   }
   return [];
 }
 
-function promoToRow(p: PromoDto): PromoRow {
+function promoToRow(p: PromoDto, placement: PromoPlacement): PromoRow {
   return {
     id: p.id,
+    placement,
     title: p.title ?? p.name ?? "Untitled",
+    productId: p.productId,
+    productName: p.title ?? p.name,
     subtitle: p.subtitle,
     ctaText: p.ctaText ?? p.buttonText,
     imageUrl: p.imageUrl,
     tag: p.tag,
+    description: p.description,
     slug: p.slug,
     raw: p,
   };
 }
 
-const SECTION_LABELS: Record<SectionKey, string> = {
-  banner: "Hero Banners",
-  hero: "Hero Promos",
-  bestDeal: "Best Deals Promo",
-  accessories: "Accessories Promo",
-  laptop: "Laptop Promo",
-};
+/** Resolves the real productId behind a promo row — already known for
+ *  multi-item placements, otherwise looked up via the product's slug. */
+async function resolveProductId(row: PromoRow): Promise<string | null> {
+  if (row.productId) return row.productId;
+  if (!row.slug) return null;
+  try {
+    const product = await productsApi.getBySlug(row.slug);
+    return product.id;
+  } catch {
+    return null;
+  }
+}
 
 // ─── Delete confirm dialog ────────────────────────────────────────────────────
 
@@ -122,7 +139,7 @@ function DeleteConfirmDialog({
           <p className="font-bold text-gray-900 text-base">Delete Item</p>
           <p className="text-sm text-gray-500 mt-1">
             Are you sure you want to delete{" "}
-            <span className="font-semibold text-gray-700">"{title}"</span>? This
+            <span className="font-semibold text-gray-700">&quot;{title}&quot;</span>? This
             action cannot be undone.
           </p>
         </div>
@@ -190,7 +207,41 @@ function BannerCard({
   );
 }
 
-// ─── Promo card ───────────────────────────────────────────────────────────────
+// ─── Promo card (live-style storefront preview + placement label) ────────────
+
+function PromoPreviewThumb({ promo }: { promo: PromoRow }) {
+  return (
+    <div className="relative w-full h-32 rounded-lg overflow-hidden bg-[#1A1A2E] flex items-end">
+      {promo.imageUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={promo.imageUrl}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover opacity-60"
+        />
+      )}
+      <div className="relative z-10 p-2.5 w-full bg-gradient-to-t from-black/80 via-black/20 to-transparent">
+        {promo.tag && (
+          <span className="inline-block text-[9px] font-bold uppercase tracking-wide text-white bg-[#F97316] rounded-full px-2 py-0.5 mb-1">
+            {promo.tag}
+          </span>
+        )}
+        <p className="text-white text-xs font-bold truncate">{promo.title}</p>
+        {promo.ctaText && (
+          <span className="inline-block mt-1 text-[10px] font-semibold text-[#F97316] bg-white rounded px-2 py-0.5">
+            {promo.ctaText}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+const PLACEMENT_LABEL: Record<PromoPlacement, string> =
+  Object.fromEntries(PROMO_PLACEMENTS.map((p) => [p.value, p.label])) as Record<
+    PromoPlacement,
+    string
+  >;
 
 function PromoCard({
   promo,
@@ -205,22 +256,15 @@ function PromoCard({
 }) {
   return (
     <div className="flex flex-col min-w-55 lg:w-full rounded-md bg-white border border-border shrink-0">
-      {promo.imageUrl ? (
-        <img src={promo.imageUrl} alt={promo.title} className="object-cover h-48 w-full rounded-t-md" />
-      ) : (
-        <div className="flex items-center justify-center h-48 bg-gray-100 rounded-t-md">
-          <LuImage className="text-gray-400 text-2xl" />
-        </div>
-      )}
+      <PromoPreviewThumb promo={promo} />
       <div className="flex flex-col gap-1.5 p-3">
+        <span className="self-start text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
+          {PLACEMENT_LABEL[promo.placement]}
+        </span>
         <p className="font-semibold text-gray-900 truncate text-sm">{promo.title}</p>
-        {promo.subtitle && <p className="text-gray-400 text-xs line-clamp-1">{promo.subtitle}</p>}
-        {promo.tag && (
-          <span className="self-start text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-50 text-orange-500 border border-orange-100">
-            {promo.tag}
-          </span>
+        {promo.description && (
+          <p className="text-gray-400 text-xs line-clamp-2">{promo.description}</p>
         )}
-        {promo.ctaText && <p className="text-gray-400 text-xs">CTA: {promo.ctaText}</p>}
         <div className="flex items-center gap-2 mt-1 pt-2 border-t border-gray-100">
           <button onClick={onEdit} className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-[#F97316] transition-colors px-2 py-1 rounded hover:bg-orange-50">
             <LuPencil size={13} /> Edit
@@ -243,6 +287,7 @@ function Section({
   showAddButton,
   buttonLabel,
   onAdd,
+  headerExtra,
   children,
 }: {
   title: string;
@@ -251,26 +296,30 @@ function Section({
   showAddButton?: boolean;
   buttonLabel?: string;
   onAdd?: () => void;
+  headerExtra?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <p className="md:text-2xl font-bold">{title}</p>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <p className="md:text-2xl font-bold">{title}</p>
+          {headerExtra}
+        </div>
         {showAddButton && onAdd && (
           <Button onClick={onAdd} className="text-xs md:text-sm rounded-md cursor-pointer">
             {buttonLabel ?? "Add"}
           </Button>
         )}
       </div>
-      <div className="flex overflow-x-auto gap-3.5 pb-2 min-h-20">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 min-h-20">
         {isLoading ? (
-          <div className="flex items-center justify-center w-full py-8">
+          <div className="flex items-center justify-center w-full py-8 col-span-full">
             <Spinner />
           </div>
         ) : isEmpty ? (
-          <div className="flex items-center w-full py-8 text-sm text-gray-400">
-            No items found.
+          <div className="flex items-center w-full py-8 text-sm text-gray-400 col-span-full">
+            No promo cards found.
           </div>
         ) : (
           children
@@ -284,15 +333,29 @@ function Section({
 
 const AdminContentPage = () => {
   const { data: banners, isLoading: isLoadingBanners } = useBanners();
-  const { data: heroPromoData, isLoading: isLoadingHeroPromo } = useHeroPromo();
-  const { data: bestDealData, isLoading: isLoadingBestDealPromo } = useBestDealPromo();
-  const { data: laptopData, isLoading: isLoadingLaptopPromo } = useLaptopPromo();
-  const { data: accessoriesData, isLoading: isLoadingAccessoriesPromo } = useAccessoriesPromo();
-
   const deleteBannerMutation = useDeleteBanner();
+
+  // Multi-item placements — real admin list endpoint, real ids.
+  const { data: heroData, isLoading: isLoadingHero } = usePromoAdminList("hero");
+  const { data: flashSaleData, isLoading: isLoadingFlashSale } = usePromoAdminList("flash-sale");
+
+  // Singleton placements — only the public read endpoint exists; real id is
+  // resolved on demand (see resolveProductId) when the admin edits/deletes.
+  const { data: bestDealData, isLoading: isLoadingBestDeal } = usePromoPublic("best-deal");
+  const { data: accessoriesData, isLoading: isLoadingAccessories } = usePromoPublic("accessories-promo");
+  const { data: laptopData, isLoading: isLoadingLaptop } = usePromoPublic("laptop-promo");
+  const { data: storeBannerData, isLoading: isLoadingStoreBanner } = usePromoPublic("store-promo-banner");
+
+  const deletePromoMutation = useDeletePromo();
+  const deleteSingletonPromoMutation = useDeleteSingletonPromo();
 
   const [modalState, setModalState] = useState<ModalState>(null);
   const [deleteState, setDeleteState] = useState<DeleteState | null>(null);
+  const [placementFilter, setPlacementFilter] = useState<PromoPlacement | "all">("all");
+  const [resolvingRowId, setResolvingRowId] = useState<string | null>(null);
+
+  const isLoadingPromos =
+    isLoadingHero || isLoadingFlashSale || isLoadingBestDeal || isLoadingAccessories || isLoadingLaptop || isLoadingStoreBanner;
 
   // ── Data transforms ────────────────────────────────────────────────────────
 
@@ -310,47 +373,81 @@ const AdminContentPage = () => {
     }));
   }, [banners]);
 
-  const heroRows    = useMemo(() => toArray(heroPromoData).map(promoToRow),    [heroPromoData]);
-  const bestDealRows = useMemo(() => toArray(bestDealData).map(promoToRow),    [bestDealData]);
-  const laptopRows   = useMemo(() => toArray(laptopData).map(promoToRow),      [laptopData]);
-  const accessoriesRows = useMemo(() => toArray(accessoriesData).map(promoToRow), [accessoriesData]);
+  const allPromoRows = useMemo<PromoRow[]>(() => {
+    return [
+      ...toArray(heroData).map((p) => promoToRow(p, "hero")),
+      ...toArray(flashSaleData).map((p) => promoToRow(p, "flash-sale")),
+      ...toArray(bestDealData).map((p) => promoToRow(p, "best-deal")),
+      ...toArray(accessoriesData).map((p) => promoToRow(p, "accessories-promo")),
+      ...toArray(laptopData).map((p) => promoToRow(p, "laptop-promo")),
+      ...toArray(storeBannerData).map((p) => promoToRow(p, "store-promo-banner")),
+    ];
+  }, [heroData, flashSaleData, bestDealData, accessoriesData, laptopData, storeBannerData]);
+
+  const visiblePromoRows = useMemo(
+    () =>
+      placementFilter === "all"
+        ? allPromoRows
+        : allPromoRows.filter((r) => r.placement === placementFilter),
+    [allPromoRows, placementFilter],
+  );
 
   // ── Handlers ──────────────────────────────────────────────────────────────
 
   const openAddBanner = () => setModalState({ type: "banner", data: null });
-
-
-  const openAddPromo = (section: Exclude<SectionKey, "banner">) =>
-    setModalState({ type: "promo", section, data: null });
-  const openEditBanner = (item: ContentRow) =>
-    setModalState({ type: "banner", data: item });
-
-  const openEditPromo = (section: Exclude<SectionKey, "banner">, item: PromoRow) =>
-    setModalState({ type: "promo", section, data: item });
-
+  const openEditBanner = (item: ContentRow) => setModalState({ type: "banner", data: item });
   const closeModal = () => setModalState(null);
+
+  const openAddPromo = () =>
+    setModalState({ type: "promo", placement: "hero", data: null });
+
+  const openEditPromo = async (row: PromoRow) => {
+    if (PROMO_MULTI_ITEM_PLACEMENTS.includes(row.placement)) {
+      setModalState({ type: "promo", placement: row.placement, data: row });
+      return;
+    }
+    setResolvingRowId(row.id);
+    const productId = await resolveProductId(row);
+    setResolvingRowId(null);
+    setModalState({
+      type: "promo",
+      placement: row.placement,
+      data: { ...row, productId: productId ?? row.productId },
+    });
+  };
 
   const handleDeleteConfirm = async () => {
     if (!deleteState) return;
-    if (deleteState.section === "banner") {
+    if (deleteState.kind === "banner") {
       await deleteBannerMutation.mutateAsync(deleteState.item.id);
     } else {
-      // TODO: wire per-section delete mutations when backend adds delete endpoints
-      // e.g. deleteHeroPromoMutation.mutateAsync(deleteState.item.id)
-      console.warn(`Delete not yet implemented for: ${deleteState.section}`);
+      const row = deleteState.item;
+      if (PROMO_MULTI_ITEM_PLACEMENTS.includes(row.placement)) {
+        await deletePromoMutation.mutateAsync(row.id);
+      } else {
+        const productId = await resolveProductId(row);
+        if (!productId) {
+          setDeleteState(null);
+          return;
+        }
+        await deleteSingletonPromoMutation.mutateAsync({ placement: row.placement, productId });
+      }
     }
     setDeleteState(null);
   };
+
+  const isDeletePending =
+    deleteBannerMutation.isPending || deletePromoMutation.isPending || deleteSingletonPromoMutation.isPending;
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <div className="flex flex-col p-2 md:p-4 lg:p-6 gap-6">
-      <p className="text-sm text-gray-400">Manage Homepage Banners and Content</p>
+      <p className="text-sm text-gray-400">Manage Homepage Banners and Promo Cards</p>
 
-      {/* Hero Banners */}
+      {/* Hero Banners — separate resource, not a promo card */}
       <Section
-        title={SECTION_LABELS.banner}
+        title="Hero Banners"
         isLoading={isLoadingBanners}
         isEmpty={bannerRows.length === 0}
         showAddButton
@@ -362,60 +459,42 @@ const AdminContentPage = () => {
             key={item.id}
             content={item}
             onEdit={() => openEditBanner(item)}
-            onDelete={() => setDeleteState({ section: "banner", item })}
+            onDelete={() => setDeleteState({ kind: "banner", item })}
             deleteDisabled={deleteBannerMutation.isPending}
           />
         ))}
       </Section>
 
-      {/* Hero Promos */}
-      <Section title={SECTION_LABELS.hero} isLoading={isLoadingHeroPromo} isEmpty={heroRows.length === 0} showAddButton buttonLabel="Add Promo" onAdd={() => openAddPromo("hero")}>
-        {heroRows.map((item) => (
+      {/* Promo Cards — unified across all 6 placements */}
+      <Section
+        title="Promo Cards"
+        isLoading={isLoadingPromos}
+        isEmpty={visiblePromoRows.length === 0}
+        showAddButton
+        buttonLabel="Add Promo"
+        onAdd={openAddPromo}
+        headerExtra={
+          <select
+            value={placementFilter}
+            onChange={(e) => setPlacementFilter(e.target.value as PromoPlacement | "all")}
+            className="text-xs border border-gray-200 rounded-md px-2 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316]"
+          >
+            <option value="all">All placements</option>
+            {PROMO_PLACEMENTS.map((p) => (
+              <option key={p.value} value={p.value}>
+                {p.label}
+              </option>
+            ))}
+          </select>
+        }
+      >
+        {visiblePromoRows.map((row) => (
           <PromoCard
-            key={item.id}
-            promo={item}
-            onEdit={() => openEditPromo("hero", item)}
-            onDelete={() => setDeleteState({ section: "hero", item })}
-            deleteDisabled={false}
-          />
-        ))}
-      </Section>
-
-      {/* Best Deals Promo */}
-      <Section title={SECTION_LABELS.bestDeal} isLoading={isLoadingBestDealPromo} isEmpty={bestDealRows.length === 0} showAddButton buttonLabel="Add Promo" onAdd={() => openAddPromo("bestDeal")}>
-        {bestDealRows.map((item) => (
-          <PromoCard
-            key={item.id}
-            promo={item}
-            onEdit={() => openEditPromo("bestDeal", item)}
-            onDelete={() => setDeleteState({ section: "bestDeal", item })}
-            deleteDisabled={false}
-          />
-        ))}
-      </Section>
-
-      {/* Accessories Promo */}
-      <Section title={SECTION_LABELS.accessories} isLoading={isLoadingAccessoriesPromo} isEmpty={accessoriesRows.length === 0} showAddButton buttonLabel="Add Promo" onAdd={() => openAddPromo("accessories")}>
-        {accessoriesRows.map((item) => (
-          <PromoCard
-            key={item.id}
-            promo={item}
-            onEdit={() => openEditPromo("accessories", item)}
-            onDelete={() => setDeleteState({ section: "accessories", item })}
-            deleteDisabled={false}
-          />
-        ))}
-      </Section>
-
-      {/* Laptop Promo */}
-      <Section title={SECTION_LABELS.laptop} isLoading={isLoadingLaptopPromo} isEmpty={laptopRows.length === 0} showAddButton buttonLabel="Add Promo" onAdd={() => openAddPromo("laptop")}>
-        {laptopRows.map((item) => (
-          <PromoCard
-            key={item.id}
-            promo={item}
-            onEdit={() => openEditPromo("laptop", item)}
-            onDelete={() => setDeleteState({ section: "laptop", item })}
-            deleteDisabled={false}
+            key={`${row.placement}-${row.id}`}
+            promo={row}
+            onEdit={() => openEditPromo(row)}
+            onDelete={() => setDeleteState({ kind: "promo", item: row })}
+            deleteDisabled={isDeletePending || resolvingRowId === row.id}
           />
         ))}
       </Section>
@@ -441,12 +520,12 @@ const AdminContentPage = () => {
         />
       )}
 
-      {/* Promo edit modal */}
+      {/* Promo add/edit modal */}
       {modalState?.type === "promo" && (
         <AddPromoModal
           isOpen
           onClose={closeModal}
-          section={modalState.section}
+          defaultPlacement={modalState.placement}
           initialData={modalState.data ?? undefined}
         />
       )}
@@ -457,7 +536,7 @@ const AdminContentPage = () => {
           title={deleteState.item.title}
           onConfirm={handleDeleteConfirm}
           onCancel={() => setDeleteState(null)}
-          isPending={deleteBannerMutation.isPending}
+          isPending={isDeletePending}
         />
       )}
     </div>

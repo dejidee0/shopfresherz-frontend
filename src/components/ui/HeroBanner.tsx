@@ -3,24 +3,11 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { cn, formatPrice } from "@/lib/utils/format";
+import { cn } from "@/lib/utils/format";
 import { productsApi } from "@/lib/api/products";
-import type { Banner, Product } from "@/lib/types/product";
+import type { Banner } from "@/lib/types/product";
 import { FiArrowRight, FiChevronRight, FiZap } from "react-icons/fi";
 import { CarouselSkeleton, HeroPromoSkeleton } from "./Skeletons";
-
-const FALLBACK_PROMO_IMAGE =
-  "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=600&auto=format&fit=crop";
-
-function productToPromo(p: Product): PromoCard {
-  return {
-    tag: "Featured",
-    title: p.name,
-    price: formatPrice(p.price),
-    imageUrl: p.primaryImageUrl || p.imageUrls?.[0] || FALLBACK_PROMO_IMAGE,
-    slug: p.slug,
-  };
-}
 
 interface HeroSlide {
   id: string;
@@ -115,7 +102,7 @@ export function HeroBanner() {
             tag: p.tag,
             title: p.title,
             badge: p.badge,
-            price: p.price ?? p.subTitle,
+            price: p.price,
             ctaText: p.ctaText,
             linkUrl: p.linkUrl,
             imageUrl: p.imageUrl,
@@ -126,20 +113,9 @@ export function HeroBanner() {
         console.error("[HeroBanner] ❌ Failed to load hero promos:", err);
       }
 
-      // Fall back to featured (best-selling) products when hero promos are
-      // missing or incomplete, so the two side cards are never empty.
-      if (cards.length < 2) {
-        try {
-          const fallbackProducts = await productsApi.bestSellers(2);
-          for (const product of fallbackProducts) {
-            if (cards.length >= 2) break;
-            cards.push(productToPromo(product));
-          }
-        } catch (err) {
-          console.error("[HeroBanner] ❌ Failed to load fallback featured products:", err);
-        }
-      }
-
+      // Render exactly what's configured in admin — no substituting in
+      // random best-sellers when there are fewer than 2 hero promos. If
+      // there's only 1 (or 0), the cards below render accordingly.
       if (cards.length > 0) {
         setPromos(cards);
         setPromoIndex1(0);
@@ -192,7 +168,9 @@ export function HeroBanner() {
   }
 
   const promo1 = promos[promoIndex1];
-  const promo2 = promos[promoIndex2];
+  // Only show a second card when there are genuinely 2+ distinct promos —
+  // otherwise this would render the same single promo twice.
+  const promo2 = promos.length > 1 ? promos[promoIndex2] : undefined;
 
   return (
     <section className="w-full bg-[#F5F2ED] px-4 py-6 md:px-8">

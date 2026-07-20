@@ -13,8 +13,16 @@ interface LaptopPromo {
   ctaText: string
 }
 
+interface FlashSalePromo {
+  slug?: string
+  title: string
+  subtitle?: string
+  ctaText: string
+}
+
 export function LaptopPromoSection() {
   const [promo, setPromo] = useState<LaptopPromo>()
+  const [flashSale, setFlashSale] = useState<FlashSalePromo>()
 
   useEffect(() => {
     productsApi.getLaptopPromo()
@@ -28,16 +36,32 @@ export function LaptopPromoSection() {
             badge: data.badge ?? "",
             ctaText: data.ctaText,
           })
-          console.log("[LaptopPromo] ✅ Loaded promo:", data.title)
         }
       })
       .catch((err) => {
-        console.error("[LaptopPromo] ❌ Failed to load promo:", err)
+        console.error("[LaptopPromo] Failed to load promo:", err)
         // fallback already in state
+      })
+
+    productsApi.getFlashSalePromos()
+      .then((data) => {
+        if (data && data.length > 0) {
+          const top = [...data].sort((a, b) => a.sortOrder - b.sortOrder)[0];
+          setFlashSale({
+            slug: top.slug,
+            title: top.title,
+            subtitle: top.price,
+            ctaText: top.ctaText,
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("[LaptopPromo] Failed to load flash sale promo:", err)
       })
   }, [])
 
   const featuredHref = promo?.slug ? `/store/product/${promo.slug}` : "/store/category/all";
+  const flashSaleHref = flashSale?.slug ? `/store/product/${flashSale.slug}` : "/store/category/all";
 
   return (
     <section className="bg-[#0A0A0A]">
@@ -89,7 +113,7 @@ export function LaptopPromoSection() {
             className="text-white"
             style={{ fontSize: "32px", fontWeight: 700, letterSpacing: "-0.5px", lineHeight: 1.15 }}
           >
-            Up to 40% Off Top Brands
+            {flashSale?.title ?? "Up to 40% Off Top Brands"}
           </h2>
 
           <p
@@ -101,11 +125,11 @@ export function LaptopPromoSection() {
               maxWidth: "340px",
             }}
           >
-            Limited time deals on iPhones, Samsung, Sony and more.
+            {flashSale?.subtitle || "Limited time deals on iPhones, Samsung, Sony and more."}
           </p>
 
           <Link
-            href="/store/category/all"
+            href={flashSaleHref}
             className="inline-flex items-center transition-transform duration-200 hover:scale-[1.03]"
             style={{
               background: "#fff",
@@ -118,7 +142,7 @@ export function LaptopPromoSection() {
               cursor: "pointer",
             }}
           >
-            View All Deals →
+            {flashSale?.ctaText ?? "View All Deals"} →
           </Link>
 
           <span

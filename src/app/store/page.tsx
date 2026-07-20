@@ -359,7 +359,7 @@ export default function HomePage() {
   const [newArrivals, setNewArrivals] = useState<HomeProduct[]>(NEW_ARRIVALS);
   const [featuredCategories, setFeaturedCategories] = useState<CategoryWithImage[]>([]);
   const [activeCategorySlug, setActiveCategorySlug] = useState("all");
-  const [, setPromoProduct] = useState<PromoProduct | null>(null);
+  const [promoProduct, setPromoProduct] = useState<PromoProduct | null>(null);
 
   const filteredNewArrivals =
     activeCategorySlug === "all"
@@ -509,6 +509,57 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* Best Deal promo — the single featured deal fetched from /promotions/best-deal */}
+      {promoProduct && (
+        <div className="bg-[#FFFFFF] pb-10">
+          <div className="px-4 md:px-8">
+            <Reveal>
+              <div className="rounded-2xl bg-[#1A1A2E] overflow-hidden flex flex-col sm:flex-row items-center gap-6 p-6 sm:p-8">
+                <div className="w-full sm:w-40 h-40 shrink-0 rounded-xl overflow-hidden bg-white/5">
+                  {promoProduct.image && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={promoProduct.image}
+                      alt={promoProduct.name}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0 text-center sm:text-left">
+                  {promoProduct.badge && (
+                    <span className="inline-block text-[11px] font-bold uppercase tracking-wide text-white bg-[#F97316] rounded-full px-3 py-1 mb-2">
+                      {promoProduct.badge}
+                    </span>
+                  )}
+                  <h3 className="text-lg sm:text-xl font-bold text-white">{promoProduct.name}</h3>
+                  {promoProduct.description && (
+                    <p className="text-sm text-white/70 mt-1 line-clamp-2">
+                      {promoProduct.description}
+                    </p>
+                  )}
+                  <div className="flex items-center justify-center sm:justify-start gap-2 mt-3">
+                    <span className="text-xl font-bold text-[#F97316]">
+                      {promoProduct.salePrice}
+                    </span>
+                    {promoProduct.originalPrice && (
+                      <span className="text-sm text-white/40 line-through">
+                        {promoProduct.originalPrice}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <Link
+                  href={`/store/product/${promoProduct.slug}`}
+                  className="shrink-0 h-11 px-6 rounded-lg bg-[#F97316] text-white text-sm font-bold flex items-center justify-center hover:bg-[#EA580C] transition-colors"
+                >
+                  Shop Now
+                </Link>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      )}
 
       {/* 5. Shop by category */}
       <Reveal>
