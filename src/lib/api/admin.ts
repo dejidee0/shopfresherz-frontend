@@ -114,6 +114,8 @@ export interface PromoDto {
   priceValue?: string;
   imageAlt?: string;
   priceBadge?: string;
+  /** Not currently returned by the backend — see CreatePromoRequest.videoUrl. */
+  videoUrl?: string;
 }
 
 export interface CreatePromoRequest {
@@ -128,6 +130,14 @@ export interface CreatePromoRequest {
    * moment the backend supports it, without pretending it works today.
    */
   description?: string;
+  /**
+   * Optional looping background video for the Best Deal promo card.
+   * Confirmed via direct testing: the backend accepts this field on create
+   * without erroring, but does not currently persist or return it on
+   * /promotions/best-deal — same forward-compatibility situation as
+   * `description` above. Falls back to imageUrl until the backend stores it.
+   */
+  videoUrl?: string;
 }
 
 /**

@@ -184,6 +184,8 @@ export const productsApi = {
     api.get<{
       id: string
       imageUrl: string
+      /** Not currently returned by the backend — falls back to imageUrl until it is. */
+      videoUrl?: string
       name: string
       slug?: string
       rating: number

@@ -6,7 +6,7 @@ import { useCreatePromo, useUpdatePromo } from "@/lib/hooks/useAdmin";
 import { PROMO_PLACEMENTS, type PromoPlacement } from "@/lib/api/admin";
 import { Product } from "@/lib/types/product";
 import { productsApi } from "@/lib/api/products";
-import { uploadToCloudinary } from "@/lib/utils/cloudinary";
+import { uploadToCloudinary, uploadVideoToCloudinary } from "@/lib/utils/cloudinary";
 import type { PromoRow } from "@/app/admin/dashboard/content/page";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -27,6 +27,8 @@ interface PromoFormData {
   tag: string;
   description: string;
   imageUrl: string;
+  /** Best Deal placement only — optional looping background video, falls back to imageUrl. */
+  videoUrl: string;
 }
 
 const emptyForm = (placement: PromoPlacement): PromoFormData => ({
@@ -36,6 +38,7 @@ const emptyForm = (placement: PromoPlacement): PromoFormData => ({
   tag: "",
   description: "",
   imageUrl: "",
+  videoUrl: "",
 });
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -55,6 +58,7 @@ export default function AddPromoModal({
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
 
   const createPromo = useCreatePromo();
   const updatePromo = useUpdatePromo();
@@ -73,6 +77,7 @@ export default function AddPromoModal({
         tag: initialData.tag ?? "",
         description: initialData.description ?? "",
         imageUrl: initialData.imageUrl ?? "",
+        videoUrl: initialData.videoUrl ?? "",
       });
       // Show existing product name in search box (locked in edit mode)
       setSearchQuery(initialData.productName ?? "");
@@ -156,6 +161,19 @@ export default function AddPromoModal({
     }
   };
 
+  const handleVideoUpload = async (file: File) => {
+    setIsUploadingVideo(true);
+    try {
+      const url = await uploadVideoToCloudinary(file);
+      set("videoUrl", url);
+    } catch (error) {
+      console.error("Failed to upload promo video:", error);
+      alert("Failed to upload video. Please try again.");
+    } finally {
+      setIsUploadingVideo(false);
+    }
+  };
+
   const validate = (): boolean => {
     const e: typeof errors = {};
     if (!form.productId) e.productId = "A product is required";
@@ -176,6 +194,7 @@ export default function AddPromoModal({
       tag: form.tag || undefined,
       imageUrl: form.imageUrl || undefined,
       description: form.description || undefined,
+      videoUrl: form.placement === "best-deal" ? form.videoUrl || undefined : undefined,
     };
 
     try {
@@ -412,6 +431,53 @@ export default function AddPromoModal({
               {isUploading && <p className="text-sm text-gray-500">Uploading...</p>}
             </div>
           </div>
+
+          {/* Video Upload — Best Deal placement only */}
+          {form.placement === "best-deal" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Background Video{" "}
+                <span className="text-gray-400 font-normal">
+                  (optional — plays as a looping background, falls back to the image above)
+                </span>
+              </label>
+              <div className="flex items-center gap-3">
+                {form.videoUrl ? (
+                  <div className="relative">
+                    <video
+                      src={form.videoUrl}
+                      muted
+                      loop
+                      autoPlay
+                      playsInline
+                      className="w-16 h-16 object-cover rounded-lg border"
+                    />
+                    <button
+                      onClick={() => set("videoUrl", "")}
+                      className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <label className="border-2 border-dashed border-gray-200 rounded-lg w-16 h-16 flex items-center justify-center cursor-pointer hover:border-[#F97316] hover:bg-orange-50 transition-all">
+                    <input
+                      type="file"
+                      accept="video/*"
+                      className="hidden"
+                      disabled={isUploadingVideo}
+                      onChange={(e) => e.target.files?.[0] && handleVideoUpload(e.target.files[0])}
+                    />
+                    <HiArrowUpTray size={20} className="text-gray-400" />
+                  </label>
+                )}
+                {isUploadingVideo && <p className="text-sm text-gray-500">Uploading...</p>}
+              </div>
+              <p className="mt-1.5 text-xs text-gray-400">
+                Keep under 5MB for fast loading on mobile data.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Footer */}

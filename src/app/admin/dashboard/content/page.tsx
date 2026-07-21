@@ -49,6 +49,8 @@ export interface PromoRow {
   subtitle?: string;
   ctaText?: string;
   imageUrl?: string;
+  /** Best Deal placement only — not currently returned by the backend, see PromoDto.videoUrl. */
+  videoUrl?: string;
   tag?: string;
   description?: string;
   slug?: string;
@@ -98,6 +100,7 @@ function promoToRow(p: PromoDto, placement: PromoPlacement): PromoRow {
     subtitle: p.subtitle,
     ctaText: p.ctaText ?? p.buttonText,
     imageUrl: p.imageUrl,
+    videoUrl: p.videoUrl,
     tag: p.tag,
     description: p.description,
     slug: p.slug,

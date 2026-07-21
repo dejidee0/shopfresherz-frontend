@@ -12,6 +12,7 @@ import { StorePromoSection } from "@/features/product/components/StorePromoSecti
 import { ComputerAccessoriesSection } from "@/features/product/components/ComputerAccessoriesSection";
 import { LaptopPromoSection } from "@/features/product/components/LaptopPromoSection";
 import { TopHighlightsSection } from "@/features/product/components/TopHighlightsSection";
+import { BestDealPromoCard } from "@/features/product/components/BestDealPromoCard";
 import { MarqueeBanner } from "@/components/layout/MarqueeBanner";
 import { productsApi } from "@/lib/api/products";
 import type { CategoryWithImage, FlashDeal } from "@/lib/types/product";
@@ -276,6 +277,8 @@ interface PromoProduct {
   slug: string
   name: string
   image: string
+  /** Optional looping background video — not currently returned by the backend, falls back to `image`. */
+  videoUrl?: string
   // prices come from the API as formatted strings e.g. "₦7,000"
   originalPrice: string
   salePrice: string
@@ -451,6 +454,7 @@ export default function HomePage() {
               slug: p.slug ?? p.id,
               name: p.name,
               image: p.imageUrl,
+              videoUrl: p.videoUrl,
               originalPrice: p.originalPrice,
               salePrice: p.salePrice,
               rating: p.rating ?? 4,
@@ -515,47 +519,16 @@ export default function HomePage() {
         <div className="bg-[#FFFFFF] pb-10">
           <div className="px-4 md:px-8">
             <Reveal>
-              <div className="rounded-2xl bg-[#1A1A2E] overflow-hidden flex flex-col sm:flex-row items-center gap-6 p-6 sm:p-8">
-                <div className="w-full sm:w-40 h-40 shrink-0 rounded-xl overflow-hidden bg-white/5">
-                  {promoProduct.image && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={promoProduct.image}
-                      alt={promoProduct.name}
-                      className="w-full h-full object-cover"
-                    />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0 text-center sm:text-left">
-                  {promoProduct.badge && (
-                    <span className="inline-block text-[11px] font-bold uppercase tracking-wide text-white bg-[#F97316] rounded-full px-3 py-1 mb-2">
-                      {promoProduct.badge}
-                    </span>
-                  )}
-                  <h3 className="text-lg sm:text-xl font-bold text-white">{promoProduct.name}</h3>
-                  {promoProduct.description && (
-                    <p className="text-sm text-white/70 mt-1 line-clamp-2">
-                      {promoProduct.description}
-                    </p>
-                  )}
-                  <div className="flex items-center justify-center sm:justify-start gap-2 mt-3">
-                    <span className="text-xl font-bold text-[#F97316]">
-                      {promoProduct.salePrice}
-                    </span>
-                    {promoProduct.originalPrice && (
-                      <span className="text-sm text-white/40 line-through">
-                        {promoProduct.originalPrice}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <Link
-                  href={`/store/product/${promoProduct.slug}`}
-                  className="shrink-0 h-11 px-6 rounded-lg bg-[#F97316] text-white text-sm font-bold flex items-center justify-center hover:bg-[#EA580C] transition-colors"
-                >
-                  Shop Now
-                </Link>
-              </div>
+              <BestDealPromoCard
+                slug={promoProduct.slug}
+                name={promoProduct.name}
+                image={promoProduct.image}
+                videoUrl={promoProduct.videoUrl}
+                originalPrice={promoProduct.originalPrice}
+                salePrice={promoProduct.salePrice}
+                description={promoProduct.description}
+                badge={promoProduct.badge}
+              />
             </Reveal>
           </div>
         </div>

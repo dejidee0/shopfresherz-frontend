@@ -29,6 +29,28 @@ export async function uploadToCloudinary(file: File): Promise<string> {
   return data.secure_url
 }
 
+export async function uploadVideoToCloudinary(file: File): Promise<string> {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('upload_preset', 'shopfresherz')
+  formData.append('cloud_name', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!)
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload`,
+    {
+      method: 'POST',
+      body: formData,
+    }
+  )
+
+  if (!response.ok) {
+    throw new Error('Failed to upload video to Cloudinary')
+  }
+
+  const data: CloudinaryUploadResult = await response.json()
+  return data.secure_url
+}
+
 export async function deleteFromCloudinary(imageUrl: string): Promise<void> {
   // Extract public_id from the Cloudinary URL
   // URL format: https://res.cloudinary.com/<cloud>/image/upload/v<version>/<public_id>.<ext>
