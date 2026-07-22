@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { LuImage, LuPencil } from "react-icons/lu";
 import { RiDeleteBinLine } from "react-icons/ri";
 import AddContentModal from "@/components/admin/AddContentModal";
@@ -404,7 +404,14 @@ const AdminContentPage = () => {
   const openAddPromo = () =>
     setModalState({ type: "promo", placement: "hero", data: null });
 
+  // Guards against a slow singleton-placement resolve landing after a
+  // later edit click — without this, an in-flight resolveProductId call
+  // could overwrite whatever modal the admin has since opened.
+  const editRequestRef = useRef(0);
+
   const openEditPromo = async (row: PromoRow) => {
+    const requestId = ++editRequestRef.current;
+
     if (PROMO_MULTI_ITEM_PLACEMENTS.includes(row.placement)) {
       setModalState({ type: "promo", placement: row.placement, data: row });
       return;
@@ -412,6 +419,7 @@ const AdminContentPage = () => {
     setResolvingRowId(row.id);
     const productId = await resolveProductId(row);
     setResolvingRowId(null);
+    if (requestId !== editRequestRef.current) return;
     setModalState({
       type: "promo",
       placement: row.placement,

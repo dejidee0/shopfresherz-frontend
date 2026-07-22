@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { HiXMark, HiArrowUpTray } from "react-icons/hi2";
 import { useCreatePromo, useUpdatePromo } from "@/lib/hooks/useAdmin";
-import { PROMO_PLACEMENTS, type PromoPlacement } from "@/lib/api/admin";
+import { PROMO_PLACEMENTS, PROMO_MULTI_ITEM_PLACEMENTS, type PromoPlacement } from "@/lib/api/admin";
 import { Product } from "@/lib/types/product";
 import { productsApi } from "@/lib/api/products";
 import { uploadToCloudinary, uploadVideoToCloudinary } from "@/lib/utils/cloudinary";
@@ -198,7 +198,15 @@ export default function AddPromoModal({
     };
 
     try {
-      if (isEditMode) {
+      // Singleton placements (best-deal, accessories-promo, laptop-promo,
+      // store-promo-banner) have exactly one row, and the public read that
+      // feeds the admin list never exposes its real database id — only a
+      // display slug (e.g. "deal-airpods-pro"). PUTting to that fake id
+      // 404s. Editing one of these is really just re-upserting the single
+      // row, the same operation as create, so route it through createPromo
+      // instead — mirrors the resolve-by-recreate pattern already used by
+      // useDeleteSingletonPromo.
+      if (isEditMode && PROMO_MULTI_ITEM_PLACEMENTS.includes(form.placement)) {
         await updatePromo.mutateAsync({
           placement: form.placement,
           id: initialData!.id,
