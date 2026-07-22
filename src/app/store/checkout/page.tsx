@@ -218,8 +218,7 @@ export default function CheckoutPage() {
     setIsInitiating(true);
     try {
       const taxable = Math.max(0, subtotal - discountAmount);
-      const tax = taxable * 0.075;
-      const total = taxable + deliveryFee + tax;
+      const total = taxable + deliveryFee;
 
       const result = await checkoutApi.initiatePayment(token, {
         items: items.map((item) => ({
@@ -242,7 +241,7 @@ export default function CheckoutPage() {
             : payment === "bank_transfer"
               ? "BankTransfer"
               : "Card",
-        pricing: { subtotal, discountAmount, deliveryFee, tax, total },
+        pricing: { subtotal, discountAmount, deliveryFee, tax: 0, total },
         couponCode: coupon.applied
           ? coupon.code.trim().toUpperCase()
           : undefined,

@@ -8,8 +8,6 @@ import { useCartStore } from '@/store/cart'
 import { cn, formatPrice } from '@/lib/utils/format'
 import { DELIVERY_FEES } from '@/features/checkout/types/checkout'
 
-const VAT_RATE = 0.075              // 7.5%
-
 export function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQty, subtotal, couponCode, discountAmount } =
     useCartStore()
@@ -21,8 +19,7 @@ export function CartDrawer() {
   // Cart preview always estimates Standard delivery — the actual method is
   // chosen later in checkout.
   const deliveryFee = DELIVERY_FEES.standard
-  const vat = afterDiscount * VAT_RATE
-  const total = afterDiscount + deliveryFee + vat
+  const total = afterDiscount + deliveryFee
 
   // Close on Escape
   useEffect(() => {
@@ -190,10 +187,6 @@ export function CartDrawer() {
               <div className="flex justify-between text-[#666666]">
                 <span>Delivery</span>
                 <span>{deliveryFee === 0 ? <span className="text-[#22C55E] font-medium">FREE</span> : <span className="text-[#111111]">{formatPrice(deliveryFee)}</span>}</span>
-              </div>
-              <div className="flex justify-between text-[#666666]">
-                <span>VAT (7.5%)</span>
-                <span className="text-[#111111]">{formatPrice(vat)}</span>
               </div>
               <div className="flex justify-between font-bold text-[#111111] text-[16px] pt-3 border-t border-black/[0.08]">
                 <span>Total</span>

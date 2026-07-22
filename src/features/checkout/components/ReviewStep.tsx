@@ -63,7 +63,7 @@ export function ReviewStep({
   const subtotal       = useCartStore((s) => s.subtotal())
   const discountAmount = useCartStore((s) => s.discountAmount)
   const taxable        = Math.max(0, subtotal - discountAmount)
-  const total          = taxable + deliveryFee + taxable * 0.075
+  const total          = taxable + deliveryFee
 
   const paymentLabel: Record<PaymentMethod, string> = {
     card:            'Pay Now (Flutterwave)',

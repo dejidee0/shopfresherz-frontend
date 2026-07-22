@@ -13,8 +13,6 @@ import { useCartStore } from '@/store/cart'
 import { cn, formatPrice } from '@/lib/utils/format'
 import type { CheckoutStep, CouponState } from '../types/checkout'
 
-const VAT_RATE = 0.075
-
 export function Field({
   label,
   placeholder,
@@ -288,8 +286,7 @@ export function OrderSummary({
   const discountAmount = useCartStore((s) => s.discountAmount)
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const taxableAmount = Math.max(0, subtotal - discountAmount)
-  const tax = taxableAmount * VAT_RATE
-  const total = taxableAmount + deliveryFee + tax
+  const total = taxableAmount + deliveryFee
 
   return (
     <div className="flex flex-col gap-4">
@@ -334,7 +331,6 @@ export function OrderSummary({
               value: discountAmount > 0 ? `-${formatPrice(discountAmount)}` : formatPrice(0),
               accent: 'text-red-500',
             },
-            { label: 'VAT (7.5%)', value: formatPrice(tax) },
           ].map(({ label, value, accent }) => (
             <div key={label} className="flex justify-between text-[14px]">
               <span className="text-[#666666]">{label}</span>
