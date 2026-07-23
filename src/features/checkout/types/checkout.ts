@@ -39,8 +39,8 @@ export interface CouponState {
  * must read from here rather than hardcoding its own copy.
  */
 export const DELIVERY_FEES: Record<DeliveryMethod, number> = {
-  standard: 3500,
-  express: 1500,
+  standard: 1500,
+  express: 3500,
   pickup: 0,
 };
 
