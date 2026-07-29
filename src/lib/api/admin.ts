@@ -642,8 +642,15 @@ export const adminApi = {
   deletePromo: (token: string, id: string) =>
     api.delete<void>(`/promotions/admin/${encodeURIComponent(id)}`, { token }),
 
+  /**
+   * Admin product list — deliberately NOT /products (the public storefront
+   * endpoint), which hardcodes IsActive-only filtering server-side and has
+   * no sku field. This dedicated admin endpoint takes the same page/pageSize
+   * shape plus a real `status` filter ("active" | "inactive" | "all", or
+   * omitted for all) and `search` (matches product name).
+   */
   getProducts: (token: string, filters: AdminProductsFilters = {}) =>
-    api.get<PagedResult<ProductDto>>("/products", {
+    api.get<PagedResult<ProductDto>>("/admin/products", {
       token,
       params: {
         page: filters.page ?? 1,

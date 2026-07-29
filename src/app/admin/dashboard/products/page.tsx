@@ -62,7 +62,10 @@ const products = [
 const AdminProductsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
-  const [filters, setFilters] = useState<AdminProductsFilters>({});
+  // pageSize is generous rather than paginated — there's no page-through UI
+  // on this table yet, so we ask for enough rows to show the whole catalog
+  // in one response instead of silently truncating to the API's default 20.
+  const [filters, setFilters] = useState<AdminProductsFilters>({ pageSize: 200 });
   const { data: productsData, isLoading } = useProducts(filters);
   const { data: categoriesData } = useCategories();
   const { data: brandsData } = useBrands();
@@ -201,7 +204,7 @@ const AdminProductsPage = () => {
           >
             <option value="">All Statuses</option>
             <option value="active">Active</option>
-            <option value="draft">Draft</option>
+            <option value="inactive">Inactive</option>
           </select>
         </div>
 
