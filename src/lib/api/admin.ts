@@ -175,6 +175,20 @@ export const PROMO_PLACEMENTS: { value: PromoPlacement; label: string }[] = [
  */
 export const PROMO_MULTI_ITEM_PLACEMENTS: PromoPlacement[] = ["hero", "flash-sale"];
 
+/**
+ * Placements whose PUT /promotions/admin/{placement}/{id} endpoint actually
+ * works. Confirmed live: "hero"'s PUT 404s with "Hero banner was not found"
+ * regardless of whether the id/productId are correct (a server-side bug —
+ * it appears to look up a different resource internally), while "flash-sale"'s
+ * PUT works correctly. Everything NOT in this list is edited via the same
+ * upsert-by-productId POST that create uses (safe: confirmed it updates the
+ * existing row in place rather than duplicating, for both "hero" and the
+ * singleton placements — but confirmed UNSAFE for "flash-sale", whose create
+ * endpoint 500s if the productId already exists there, which is why
+ * flash-sale keeps using PUT).
+ */
+export const PROMO_PUT_UPDATE_PLACEMENTS: PromoPlacement[] = ["flash-sale"];
+
 export interface CreateBannerRequest {
   title?: string;
   subtitle?: string;

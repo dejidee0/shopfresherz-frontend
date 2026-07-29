@@ -44,7 +44,21 @@ export async function uploadVideoToCloudinary(file: File): Promise<string> {
   )
 
   if (!response.ok) {
-    throw new Error('Failed to upload video to Cloudinary')
+    // Surface Cloudinary's own message — e.g. "Unsupported video format or
+    // file" is what this unsigned preset returns for EVERY video file right
+    // now (confirmed with a known-valid mp4), because the "shopfresherz"
+    // preset's allowed resource type doesn't include video. That's a
+    // Cloudinary dashboard setting, not something this code can work around
+    // — the preset needs "video" enabled (or a dedicated video preset) before
+    // uploads here can ever succeed.
+    let message = 'Failed to upload video to Cloudinary'
+    try {
+      const body = await response.json()
+      if (body?.error?.message) message = body.error.message
+    } catch {
+      // ignore — fall back to the generic message
+    }
+    throw new Error(message)
   }
 
   const data: CloudinaryUploadResult = await response.json()

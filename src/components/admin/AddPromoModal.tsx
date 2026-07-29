@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { HiXMark, HiArrowUpTray } from "react-icons/hi2";
 import { useCreatePromo, useUpdatePromo } from "@/lib/hooks/useAdmin";
-import { PROMO_PLACEMENTS, PROMO_MULTI_ITEM_PLACEMENTS, type PromoPlacement } from "@/lib/api/admin";
+import { PROMO_PLACEMENTS, PROMO_PUT_UPDATE_PLACEMENTS, type PromoPlacement } from "@/lib/api/admin";
 import { Product } from "@/lib/types/product";
 import { productsApi } from "@/lib/api/products";
 import { uploadToCloudinary, uploadVideoToCloudinary } from "@/lib/utils/cloudinary";
@@ -59,10 +59,20 @@ export default function AddPromoModal({
   const [isSearching, setIsSearching] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadingVideo, setIsUploadingVideo] = useState(false);
+  const [imageLoadFailed, setImageLoadFailed] = useState(false);
+  const [videoLoadFailed, setVideoLoadFailed] = useState(false);
 
   const createPromo = useCreatePromo();
   const updatePromo = useUpdatePromo();
   const isPending = isEditMode ? updatePromo.isPending : createPromo.isPending;
+
+  // Product is only locked in edit mode when we actually have a resolved
+  // productId. Some promo rows are legacy/demo entries with no real product
+  // link at all (confirmed live — no productId, no slug, no matching
+  // catalog product) — for those, locking the field would permanently block
+  // saving, since the backend requires a valid productId to upsert. Instead
+  // we fall back to the normal searchable picker so the admin can link one.
+  const productLocked = isEditMode && !!form.productId;
 
   // ── Sync form on open ──────────────────────────────────────────────────────
 
@@ -92,10 +102,16 @@ export default function AddPromoModal({
     setErrors({});
   }, [isOpen, initialData, defaultPlacement]);
 
-  // ── Product search (add mode only) ────────────────────────────────────────
+  // Reset the "failed to render" flags whenever the underlying URL changes
+  // (new upload, promo swapped, modal reopened) so a stale failure doesn't
+  // stick around after the value it applied to is gone.
+  useEffect(() => setImageLoadFailed(false), [form.imageUrl]);
+  useEffect(() => setVideoLoadFailed(false), [form.videoUrl]);
+
+  // ── Product search (whenever the product field isn't locked) ─────────────
 
   useEffect(() => {
-    if (isEditMode) return;
+    if (productLocked) return;
 
     const query = searchQuery.trim();
 
@@ -130,7 +146,7 @@ export default function AddPromoModal({
       active = false;
       clearTimeout(timer);
     };
-  }, [searchQuery, selectedProduct, isEditMode]);
+  }, [searchQuery, selectedProduct, productLocked]);
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -168,7 +184,8 @@ export default function AddPromoModal({
       set("videoUrl", url);
     } catch (error) {
       console.error("Failed to upload promo video:", error);
-      alert("Failed to upload video. Please try again.");
+      const message = error instanceof Error ? error.message : "Please try again.";
+      alert(`Failed to upload video: ${message}`);
     } finally {
       setIsUploadingVideo(false);
     }
@@ -198,15 +215,11 @@ export default function AddPromoModal({
     };
 
     try {
-      // Singleton placements (best-deal, accessories-promo, laptop-promo,
-      // store-promo-banner) have exactly one row, and the public read that
-      // feeds the admin list never exposes its real database id — only a
-      // display slug (e.g. "deal-airpods-pro"). PUTting to that fake id
-      // 404s. Editing one of these is really just re-upserting the single
-      // row, the same operation as create, so route it through createPromo
-      // instead — mirrors the resolve-by-recreate pattern already used by
-      // useDeleteSingletonPromo.
-      if (isEditMode && PROMO_MULTI_ITEM_PLACEMENTS.includes(form.placement)) {
+      // Most placements are edited via the same upsert-by-productId POST
+      // that create uses — see PROMO_PUT_UPDATE_PLACEMENTS for why (PUT is
+      // either fundamentally broken (hero) or unavailable (singleton
+      // placements never expose a real id to PUT against).
+      if (isEditMode && PROMO_PUT_UPDATE_PLACEMENTS.includes(form.placement)) {
         await updatePromo.mutateAsync({
           placement: form.placement,
           id: initialData!.id,
@@ -283,13 +296,18 @@ export default function AddPromoModal({
               Product <span className="text-red-500">*</span>
             </label>
 
-            {isEditMode ? (
+            {productLocked ? (
               <div className="w-full border border-gray-100 bg-gray-50 rounded-lg px-3 py-2.5 text-sm text-gray-500 select-none">
                 {searchQuery || "—"}
                 <span className="ml-2 text-xs text-gray-400">(cannot change in edit mode)</span>
               </div>
             ) : (
               <>
+                {isEditMode && (
+                  <p className="mb-1.5 text-xs text-amber-600">
+                    This promo isn&apos;t linked to a product yet — search and select one below to fix it.
+                  </p>
+                )}
                 <input
                   type="text"
                   value={searchQuery}
@@ -411,12 +429,19 @@ export default function AddPromoModal({
             <div className="flex items-center gap-3">
               {form.imageUrl ? (
                 <div className="relative">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={form.imageUrl}
-                    alt="Promo"
-                    className="w-16 h-16 object-cover rounded-lg border"
-                  />
+                  {imageLoadFailed ? (
+                    <div className="w-16 h-16 rounded-lg border border-red-200 bg-red-50 flex items-center justify-center px-1 text-center">
+                      <span className="text-[9px] leading-tight text-red-500">Preview unavailable</span>
+                    </div>
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={form.imageUrl}
+                      alt="Promo"
+                      className="w-16 h-16 object-cover rounded-lg border"
+                      onError={() => setImageLoadFailed(true)}
+                    />
+                  )}
                   <button
                     onClick={() => set("imageUrl", "")}
                     className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs"
@@ -437,6 +462,11 @@ export default function AddPromoModal({
                 </label>
               )}
               {isUploading && <p className="text-sm text-gray-500">Uploading...</p>}
+              {imageLoadFailed && (
+                <p className="text-xs text-red-500">
+                  Couldn&apos;t load this image — the URL may be broken. Remove it and re-upload.
+                </p>
+              )}
             </div>
           </div>
 
@@ -452,14 +482,21 @@ export default function AddPromoModal({
               <div className="flex items-center gap-3">
                 {form.videoUrl ? (
                   <div className="relative">
-                    <video
-                      src={form.videoUrl}
-                      muted
-                      loop
-                      autoPlay
-                      playsInline
-                      className="w-16 h-16 object-cover rounded-lg border"
-                    />
+                    {videoLoadFailed ? (
+                      <div className="w-16 h-16 rounded-lg border border-red-200 bg-red-50 flex items-center justify-center px-1 text-center">
+                        <span className="text-[9px] leading-tight text-red-500">Preview unavailable</span>
+                      </div>
+                    ) : (
+                      <video
+                        src={form.videoUrl}
+                        muted
+                        loop
+                        autoPlay
+                        playsInline
+                        className="w-16 h-16 object-cover rounded-lg border"
+                        onError={() => setVideoLoadFailed(true)}
+                      />
+                    )}
                     <button
                       onClick={() => set("videoUrl", "")}
                       className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs"
@@ -481,6 +518,11 @@ export default function AddPromoModal({
                 )}
                 {isUploadingVideo && <p className="text-sm text-gray-500">Uploading...</p>}
               </div>
+              {videoLoadFailed && (
+                <p className="mt-1.5 text-xs text-red-500">
+                  Couldn&apos;t load this video — the URL may be broken. Remove it and re-upload.
+                </p>
+              )}
               <p className="mt-1.5 text-xs text-gray-400">
                 Keep under 5MB for fast loading on mobile data.
               </p>

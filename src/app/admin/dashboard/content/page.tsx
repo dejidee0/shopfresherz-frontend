@@ -108,17 +108,41 @@ function promoToRow(p: PromoDto, placement: PromoPlacement): PromoRow {
   };
 }
 
-/** Resolves the real productId behind a promo row — already known for
- *  multi-item placements, otherwise looked up via the product's slug. */
+/**
+ * Resolves the real productId behind a promo row — already known for rows
+ * that carry one directly, otherwise looked up via the product's slug, with
+ * a name-search fallback for rows whose slug is missing (confirmed live:
+ * some promo reads return `slug: null` even though the row's title matches a
+ * real product). Some promo rows are pure legacy/demo content with no real
+ * product behind them at all (confirmed live: no productId, no slug, and no
+ * catalog match by name) — for those this correctly returns null, and the
+ * edit modal falls back to a searchable product picker instead of blocking.
+ */
 async function resolveProductId(row: PromoRow): Promise<string | null> {
   if (row.productId) return row.productId;
-  if (!row.slug) return null;
-  try {
-    const product = await productsApi.getBySlug(row.slug);
-    return product.id;
-  } catch {
-    return null;
+
+  if (row.slug) {
+    try {
+      const product = await productsApi.getBySlug(row.slug);
+      return product.id;
+    } catch {
+      // fall through to name search
+    }
   }
+
+  if (row.title) {
+    try {
+      const result = await productsApi.search({ q: row.title, page: 1, pageSize: 5 });
+      const exactMatch = result.data?.find(
+        (p) => p.name.toLowerCase() === row.title.toLowerCase(),
+      );
+      return (exactMatch ?? result.data?.[0])?.id ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  return null;
 }
 
 // ─── Delete confirm dialog ────────────────────────────────────────────────────
@@ -180,7 +204,7 @@ function BannerCard({
   deleteDisabled: boolean;
 }) {
   return (
-    <div className="flex flex-col min-w-65 lg:w-full rounded-md bg-white border border-border shrink-0">
+    <div className="flex flex-col w-full rounded-md bg-white border border-border">
       {content.imgUrl ? (
         <img src={content.imgUrl} alt={content.title} className="object-cover h-48 w-full rounded-t-md" />
       ) : (
@@ -188,21 +212,21 @@ function BannerCard({
           <LuImage className="text-gray-400 text-2xl" />
         </div>
       )}
-      <div className="flex flex-col gap-2 p-3">
+      <div className="flex flex-col gap-2 p-3.5">
         <div className="flex items-start justify-between gap-2">
-          <p className="font-semibold text-gray-900 truncate text-sm">{content.title}</p>
+          <p className="font-semibold text-gray-900 break-words text-sm">{content.title}</p>
           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${content.live ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
             {content.live ? "Live" : "Draft"}
           </span>
         </div>
-        {content.subtitle && <p className="text-gray-400 text-xs line-clamp-1">{content.subtitle}</p>}
-        <p className="text-gray-400 text-xs">CTA: {content.cta}</p>
+        {content.subtitle && <p className="text-gray-400 text-xs">{content.subtitle}</p>}
+        <p className="text-gray-400 text-xs break-words">CTA: {content.cta}</p>
         <div className="flex items-center gap-2 mt-1 pt-2 border-t border-gray-100">
-          <button onClick={onEdit} className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-[#F97316] transition-colors px-2 py-1 rounded hover:bg-orange-50">
-            <LuPencil size={13} /> Edit
+          <button onClick={onEdit} className="flex flex-1 items-center justify-center gap-1.5 text-sm font-medium text-gray-600 hover:text-[#F97316] transition-colors px-3 py-2.5 rounded-md hover:bg-orange-50 min-h-11">
+            <LuPencil size={15} /> Edit
           </button>
-          <button onClick={onDelete} disabled={deleteDisabled} className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-red-500 transition-colors px-2 py-1 rounded hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed">
-            <RiDeleteBinLine size={13} /> Delete
+          <button onClick={onDelete} disabled={deleteDisabled} className="flex flex-1 items-center justify-center gap-1.5 text-sm font-medium text-gray-600 hover:text-red-500 transition-colors px-3 py-2.5 rounded-md hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed min-h-11">
+            <RiDeleteBinLine size={15} /> Delete
           </button>
         </div>
       </div>
@@ -214,7 +238,7 @@ function BannerCard({
 
 function PromoPreviewThumb({ promo }: { promo: PromoRow }) {
   return (
-    <div className="relative w-full h-32 rounded-lg overflow-hidden bg-[#1A1A2E] flex items-end">
+    <div className="relative w-full min-h-32 rounded-lg overflow-hidden bg-[#1A1A2E] flex items-end">
       {promo.imageUrl && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -229,9 +253,9 @@ function PromoPreviewThumb({ promo }: { promo: PromoRow }) {
             {promo.tag}
           </span>
         )}
-        <p className="text-white text-xs font-bold truncate">{promo.title}</p>
+        <p className="text-white text-xs font-bold line-clamp-2 break-words">{promo.title}</p>
         {promo.ctaText && (
-          <span className="inline-block mt-1 text-[10px] font-semibold text-[#F97316] bg-white rounded px-2 py-0.5">
+          <span className="inline-block mt-1 text-[10px] font-semibold text-[#F97316] bg-white rounded px-2 py-0.5 break-words">
             {promo.ctaText}
           </span>
         )}
@@ -258,22 +282,22 @@ function PromoCard({
   deleteDisabled: boolean;
 }) {
   return (
-    <div className="flex flex-col min-w-55 lg:w-full rounded-md bg-white border border-border shrink-0">
+    <div className="flex flex-col w-full rounded-md bg-white border border-border">
       <PromoPreviewThumb promo={promo} />
-      <div className="flex flex-col gap-1.5 p-3">
+      <div className="flex flex-col gap-1.5 p-3.5">
         <span className="self-start text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
           {PLACEMENT_LABEL[promo.placement]}
         </span>
-        <p className="font-semibold text-gray-900 truncate text-sm">{promo.title}</p>
+        <p className="font-semibold text-gray-900 break-words text-sm">{promo.title}</p>
         {promo.description && (
-          <p className="text-gray-400 text-xs line-clamp-2">{promo.description}</p>
+          <p className="text-gray-400 text-xs line-clamp-2 break-words">{promo.description}</p>
         )}
         <div className="flex items-center gap-2 mt-1 pt-2 border-t border-gray-100">
-          <button onClick={onEdit} className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-[#F97316] transition-colors px-2 py-1 rounded hover:bg-orange-50">
-            <LuPencil size={13} /> Edit
+          <button onClick={onEdit} className="flex flex-1 items-center justify-center gap-1.5 text-sm font-medium text-gray-600 hover:text-[#F97316] transition-colors px-3 py-2.5 rounded-md hover:bg-orange-50 min-h-11">
+            <LuPencil size={15} /> Edit
           </button>
-          <button onClick={onDelete} disabled={deleteDisabled} className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-red-500 transition-colors px-2 py-1 rounded hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed">
-            <RiDeleteBinLine size={13} /> Delete
+          <button onClick={onDelete} disabled={deleteDisabled} className="flex flex-1 items-center justify-center gap-1.5 text-sm font-medium text-gray-600 hover:text-red-500 transition-colors px-3 py-2.5 rounded-md hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed min-h-11">
+            <RiDeleteBinLine size={15} /> Delete
           </button>
         </div>
       </div>
@@ -304,18 +328,18 @@ function Section({
 }) {
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-3 flex-wrap">
-          <p className="md:text-2xl font-bold">{title}</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+          <p className="text-xl md:text-2xl font-bold">{title}</p>
           {headerExtra}
         </div>
         {showAddButton && onAdd && (
-          <Button onClick={onAdd} className="text-xs md:text-sm rounded-md cursor-pointer">
+          <Button onClick={onAdd} className="text-sm rounded-md cursor-pointer self-start sm:self-auto">
             {buttonLabel ?? "Add"}
           </Button>
         )}
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 min-h-20">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 min-h-20">
         {isLoading ? (
           <div className="flex items-center justify-center w-full py-8 col-span-full">
             <Spinner />
@@ -412,10 +436,10 @@ const AdminContentPage = () => {
   const openEditPromo = async (row: PromoRow) => {
     const requestId = ++editRequestRef.current;
 
-    if (PROMO_MULTI_ITEM_PLACEMENTS.includes(row.placement)) {
-      setModalState({ type: "promo", placement: row.placement, data: row });
-      return;
-    }
+    // resolveProductId returns row.productId immediately (no network call)
+    // when it's already known — the await only does real work for rows that
+    // need a slug/name lookup, which covers both singleton placements and
+    // any multi-item row the backend returned without a productId.
     setResolvingRowId(row.id);
     const productId = await resolveProductId(row);
     setResolvingRowId(null);
@@ -488,7 +512,7 @@ const AdminContentPage = () => {
           <select
             value={placementFilter}
             onChange={(e) => setPlacementFilter(e.target.value as PromoPlacement | "all")}
-            className="text-xs border border-gray-200 rounded-md px-2 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316]"
+            className="text-sm border border-gray-200 rounded-md px-3 py-2 text-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] w-full sm:w-auto"
           >
             <option value="all">All placements</option>
             {PROMO_PLACEMENTS.map((p) => (
