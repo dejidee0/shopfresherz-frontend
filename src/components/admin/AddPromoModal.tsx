@@ -66,15 +66,7 @@ export default function AddPromoModal({
   const updatePromo = useUpdatePromo();
   const isPending = isEditMode ? updatePromo.isPending : createPromo.isPending;
 
-  // Product is only locked in edit mode when we actually have a resolved
-  // productId. Some promo rows are legacy/demo entries with no real product
-  // link at all (confirmed live — no productId, no slug, no matching
-  // catalog product) — for those, locking the field would permanently block
-  // saving, since the backend requires a valid productId to upsert. Instead
-  // we fall back to the normal searchable picker so the admin can link one.
-  const productLocked = isEditMode && !!form.productId;
-
-  // ── Sync form on open ──────────────────────────────────────────────────────
+  // ── Sync form on open ──
 
   useEffect(() => {
     if (!isOpen) return;
@@ -89,9 +81,15 @@ export default function AddPromoModal({
         imageUrl: initialData.imageUrl ?? "",
         videoUrl: initialData.videoUrl ?? "",
       });
-      // Show existing product name in search box (locked in edit mode)
+      // Pre-populate the search box with the current product name and mark it
+      // as selected so the search effect doesn't immediately fire. The admin can
+      // still clear the selection and search for a different product.
       setSearchQuery(initialData.productName ?? "");
-      setSelectedProduct(null);
+      setSelectedProduct(
+        initialData.productId
+          ? ({ id: initialData.productId, name: initialData.productName ?? "" } as Product)
+          : null,
+      );
     } else {
       setForm(emptyForm(defaultPlacement));
       setSearchQuery("");
@@ -108,11 +106,9 @@ export default function AddPromoModal({
   useEffect(() => setImageLoadFailed(false), [form.imageUrl]);
   useEffect(() => setVideoLoadFailed(false), [form.videoUrl]);
 
-  // ── Product search (whenever the product field isn't locked) ─────────────
+  // ── Product search ──────────────────────────────────────────────────────────
 
   useEffect(() => {
-    if (productLocked) return;
-
     const query = searchQuery.trim();
 
     if (selectedProduct && selectedProduct.name.toLowerCase() === query.toLowerCase()) {
@@ -146,7 +142,7 @@ export default function AddPromoModal({
       active = false;
       clearTimeout(timer);
     };
-  }, [searchQuery, selectedProduct, productLocked]);
+  }, [searchQuery, selectedProduct]);
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -207,6 +203,7 @@ export default function AddPromoModal({
 
     const payload = {
       productId: form.productId,
+      placement: form.placement,
       ctaText: form.ctaText,
       tag: form.tag || undefined,
       imageUrl: form.imageUrl || undefined,
@@ -236,8 +233,6 @@ export default function AddPromoModal({
 
   if (!isOpen) return null;
 
-  const placementLabel =
-    PROMO_PLACEMENTS.find((p) => p.value === form.placement)?.label ?? form.placement;
   const submitLabel = isPending
     ? isEditMode
       ? "Saving..."
@@ -270,24 +265,17 @@ export default function AddPromoModal({
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Placement <span className="text-red-500">*</span>
             </label>
-            {isEditMode ? (
-              <div className="w-full border border-gray-100 bg-gray-50 rounded-lg px-3 py-2.5 text-sm text-gray-500 select-none">
-                {placementLabel}
-                <span className="ml-2 text-xs text-gray-400">(cannot change in edit mode)</span>
-              </div>
-            ) : (
-              <select
-                value={form.placement}
-                onChange={(e) => set("placement", e.target.value as PromoPlacement)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
-              >
-                {PROMO_PLACEMENTS.map((p) => (
-                  <option key={p.value} value={p.value}>
-                    {p.label}
-                  </option>
-                ))}
-              </select>
-            )}
+            <select
+              value={form.placement}
+              onChange={(e) => set("placement", e.target.value as PromoPlacement)}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
+            >
+              {PROMO_PLACEMENTS.map((p) => (
+                <option key={p.value} value={p.value}>
+                  {p.label}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Product */}
@@ -296,75 +284,66 @@ export default function AddPromoModal({
               Product <span className="text-red-500">*</span>
             </label>
 
-            {productLocked ? (
-              <div className="w-full border border-gray-100 bg-gray-50 rounded-lg px-3 py-2.5 text-sm text-gray-500 select-none">
-                {searchQuery || "—"}
-                <span className="ml-2 text-xs text-gray-400">(cannot change in edit mode)</span>
-              </div>
-            ) : (
-              <>
-                {isEditMode && (
-                  <p className="mb-1.5 text-xs text-amber-600">
-                    This promo isn&apos;t linked to a product yet — search and select one below to fix it.
-                  </p>
-                )}
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setSelectedProduct(null);
-                    setForm((prev) => ({ ...prev, productId: "" }));
-                    clearError("productId");
-                  }}
-                  placeholder="Search and select a product..."
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
-                />
+            {isEditMode && !selectedProduct && (
+              <p className="mb-1.5 text-xs text-amber-600">
+                This promo isn&apos;t linked to a product yet — search and select one below to fix it.
+              </p>
+            )}
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setSelectedProduct(null);
+                setForm((prev) => ({ ...prev, productId: "" }));
+                clearError("productId");
+              }}
+              placeholder="Search and select a product..."
+              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#F97316] transition-all"
+            />
 
-                {(searchResults.length > 0 || isSearching) && (
-                  <div className="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg">
-                    {isSearching ? (
-                      <p className="px-3 py-3 text-sm text-gray-500">Searching products...</p>
-                    ) : (
-                      searchResults.map((product) => (
-                        <button
-                          key={product.id}
-                          type="button"
-                          onClick={() => selectProduct(product)}
-                          className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-orange-50 transition-colors"
-                        >
-                          <span className="min-w-0">
-                            <span className="block truncate text-sm font-semibold text-gray-800">
-                              {product.name}
-                            </span>
-                            <span className="block text-xs text-gray-400 mt-0.5">
-                              Stock: {product.stockQty ?? 0} · ₦{product.price.toLocaleString()}
-                            </span>
-                          </span>
-                        </button>
-                      ))
-                    )}
-                  </div>
-                )}
-
-                {selectedProduct && (
-                  <div className="mt-2 flex items-center justify-between bg-orange-50 border border-orange-100 rounded-lg px-3 py-2">
-                    <span className="text-xs font-medium text-orange-700 truncate">
-                      ✓ {selectedProduct.name}
-                    </span>
+            {(searchResults.length > 0 || isSearching) && (
+              <div className="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg">
+                {isSearching ? (
+                  <p className="px-3 py-3 text-sm text-gray-500">Searching products...</p>
+                ) : (
+                  searchResults.map((product) => (
                     <button
-                      onClick={() => {
-                        setSelectedProduct(null);
-                        setSearchQuery("");
-                        setForm((prev) => ({ ...prev, productId: "" }));
-                      }}
-                      className="ml-2 text-orange-400 hover:text-orange-600 transition-colors shrink-0"
+                      key={product.id}
+                      type="button"
+                      onClick={() => selectProduct(product)}
+                      className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-orange-50 transition-colors"
                     >
-                      <HiXMark size={14} />
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-semibold text-gray-800">
+                          {product.name}
+                        </span>
+                        <span className="block text-xs text-gray-400 mt-0.5">
+                          Stock: {product.stockQty ?? 0} · ₦{product.price.toLocaleString()}
+                        </span>
+                      </span>
                     </button>
-                  </div>
+                  ))
                 )}
-              </>
+              </div>
+            )}
+
+            {selectedProduct && (
+              <div className="mt-2 flex items-center justify-between bg-orange-50 border border-orange-100 rounded-lg px-3 py-2">
+                <span className="text-xs font-medium text-orange-700 truncate">
+                  ✓ {selectedProduct.name}
+                </span>
+                <button
+                  onClick={() => {
+                    setSelectedProduct(null);
+                    setSearchQuery("");
+                    setForm((prev) => ({ ...prev, productId: "" }));
+                  }}
+                  className="ml-2 text-orange-400 hover:text-orange-600 transition-colors shrink-0"
+                >
+                  <HiXMark size={14} />
+                </button>
+              </div>
             )}
 
             {errors.productId && <p className="mt-1 text-xs text-red-500">{errors.productId}</p>}

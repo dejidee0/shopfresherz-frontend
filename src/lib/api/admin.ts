@@ -120,6 +120,7 @@ export interface PromoDto {
 
 export interface CreatePromoRequest {
   productId?: string;
+  placement?: PromoPlacement;
   tag?: string;
   ctaText?: string;
   imageUrl?: string;
