@@ -33,13 +33,16 @@ function buildUrl(path: string, params?: RequestOptions['params']): string {
 export async function apiFetch<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { token, params, _retry, ...init } = options
 
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(init.headers as Record<string, string>),
+  // The browser must generate the multipart boundary for FormData uploads.
+  const headers = new Headers(init.headers)
+  const isFormData = typeof FormData !== 'undefined' && init.body instanceof FormData
+
+  if (!isFormData && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json')
   }
 
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`)
   }
 
   const response = await fetch(buildUrl(path, params), {
@@ -56,13 +59,19 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
       }
     }
 
-    let errorData
+    let errorData: unknown
     try {
       errorData = await response.json()
     } catch {
       errorData = { message: response.statusText }
     }
-    throw { code: errorData.code ?? 'SF-0000', message: errorData.message, status: response.status }
+    const error = errorData as { code?: string; message?: string }
+    throw {
+      code: error.code ?? 'SF-0000',
+      message: error.message ?? response.statusText,
+      status: response.status,
+      body: errorData,
+    }
   }
 
   // 204 No Content

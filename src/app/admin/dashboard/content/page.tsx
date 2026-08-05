@@ -578,10 +578,13 @@ const AdminContentPage = () => {
           defaultPlacement={modalState.placement}
           initialData={modalState.data ?? undefined}
           sectionId={
-            modalState.data?.id && sectionKeyToId.has(modalState.data.placement)
-              ? sectionKeyToId.get(modalState.data.placement)!
-              : modalState.data?.id
+            modalState.data
+              ? PROMO_MULTI_ITEM_PLACEMENTS.includes(modalState.data.placement)
+                ? modalState.data.id
+                : sectionKeyToId.get(modalState.data.placement) ?? modalState.data.id
+              : undefined
           }
+          allSections={allSectionsData}
         />
       )}
 

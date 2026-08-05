@@ -3,7 +3,13 @@
 import { useState, useEffect } from "react";
 import { HiXMark, HiArrowUpTray } from "react-icons/hi2";
 import { useCreatePromo, useUpdatePromo } from "@/lib/hooks/useAdmin";
-import { PROMO_PLACEMENTS, PROMO_PUT_UPDATE_PLACEMENTS, type PromoPlacement } from "@/lib/api/admin";
+import {
+  PROMO_PLACEMENTS,
+  PROMO_PUT_UPDATE_PLACEMENTS,
+  type PromoPlacement,
+  type PromotionalSectionAdminDto,
+} from "@/lib/api/admin";
+import { apiFetch } from "@/lib/api/client";
 import { Product } from "@/lib/types/product";
 import { productsApi } from "@/lib/api/products";
 import { useAuthStore } from "@/store/auth";
@@ -14,12 +20,12 @@ import type { PromoRow } from "@/app/admin/dashboard/content/page";
 interface AddPromoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  /** Preselected placement (e.g. opened via a specific section's Add button) — still changeable in add mode. */
   defaultPlacement: PromoPlacement;
-  /** Present in edit mode — omit for add mode. */
   initialData?: PromoRow;
-  /** Database GUID of the promotional section — required for backend media uploads. */
+  /** Raw section id from the row — may be a synthetic slug for singleton placements. */
   sectionId?: string;
+  /** All sections from the admin list endpoint — used to resolve real GUIDs for media uploads. */
+  allSections?: PromotionalSectionAdminDto[];
 }
 
 interface PromoFormData {
@@ -43,6 +49,25 @@ const emptyForm = (placement: PromoPlacement): PromoFormData => ({
   videoUrl: "",
 });
 
+interface MediaUploadResponse {
+  url?: string;
+}
+
+interface ApiErrorResponse {
+  message?: string;
+  status?: number;
+  body?: unknown;
+}
+
+const GUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+const isGuid = (value: string | undefined): value is string =>
+  !!value && GUID_PATTERN.test(value);
+
+const toApiError = (error: unknown): ApiErrorResponse | null =>
+  typeof error === "object" && error !== null ? (error as ApiErrorResponse) : null;
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function AddPromoModal({
@@ -51,6 +76,7 @@ export default function AddPromoModal({
   defaultPlacement,
   initialData,
   sectionId,
+  allSections,
 }: AddPromoModalProps) {
   const isEditMode = !!initialData;
 
@@ -68,6 +94,50 @@ export default function AddPromoModal({
   const createPromo = useCreatePromo();
   const updatePromo = useUpdatePromo();
   const isPending = isEditMode ? updatePromo.isPending : createPromo.isPending;
+
+  /**
+   * Singleton promo cards expose a display slug to the public page while the
+   * media endpoint only accepts its database GUID. Never fall through to that
+   * slug: doing so produces a misleading 404 and makes uploads look broken.
+   */
+  const resolveSectionId = (rawSectionId: string): string => {
+    if (isGuid(rawSectionId)) return rawSectionId;
+
+    const section = allSections?.find(
+      (candidate) =>
+        candidate.id === rawSectionId ||
+        candidate.sectionKey === rawSectionId ||
+        candidate.slugId === rawSectionId,
+    );
+
+    if (section) return section.id;
+
+    if (!allSections) {
+      throw new Error("Promo section details are still loading. Please wait a moment and try again.");
+    }
+
+    throw new Error("This promo card has no matching server section. Refresh the page and try again.");
+  };
+
+  const canUploadMedia =
+    !!sectionId &&
+    (isGuid(sectionId) ||
+      !!allSections?.some(
+        (section) =>
+          section.id === sectionId ||
+          section.sectionKey === sectionId ||
+          section.slugId === sectionId,
+      ));
+
+  const mediaUploadHelp = !sectionId
+    ? isEditMode
+      ? "This promo card has no server section ID yet. Refresh the page and try again."
+      : "Save the new promo first, then edit it to add an image or background video."
+    : !allSections && !isGuid(sectionId)
+      ? "Loading promo section details..."
+      : !canUploadMedia
+        ? "This promo card could not be matched to a server section. Refresh the page and try again."
+        : null;
 
   // ── Sync form on open ──
 
@@ -174,7 +244,8 @@ export default function AddPromoModal({
       set("imageUrl", url);
     } catch (error) {
       console.error("Failed to upload promo image:", error);
-      alert("Failed to upload image. Please try again.");
+      const message = error instanceof Error ? error.message : "Please try again.";
+      alert(`Failed to upload image: ${message}`);
     } finally {
       setIsUploading(false);
     }
@@ -208,36 +279,46 @@ export default function AddPromoModal({
     const baseUrl =
       process.env.NEXT_PUBLIC_API_URL ??
       "https://fresherz-001-site1.ftempurl.com/api/v1";
-    const url = `${baseUrl}/promotions/admin/${sectionId}/media`;
+    const resolvedSectionId = resolveSectionId(sectionId);
+    const url = `${baseUrl}/promotions/admin/${resolvedSectionId}/media`;
 
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
+    console.info("[Promo media upload] Starting", {
+      sectionId,
+      resolvedSectionId,
+      url,
+      fileName: file.name,
+      fileType: file.type,
+      fileSize: file.size,
     });
 
-    if (!response.ok) {
-      let message = `Upload failed with status ${response.status}`;
-      try {
-        const body = await response.json();
-        if (body?.message) message = body.message;
-      } catch {
-        // ignore
+    try {
+      // apiFetch preserves the multipart boundary and retries once with a
+      // refreshed token if the access token expired while the modal was open.
+      const data = await apiFetch<MediaUploadResponse>(
+        `/promotions/admin/${encodeURIComponent(resolvedSectionId)}/media`,
+        { method: "POST", token, body: formData },
+      );
+      if (!data?.url) {
+        throw new Error("Backend returned no URL for uploaded media.");
       }
-      throw new Error(message);
-    }
 
-    const data = await response.json();
-    if (!data?.url) {
-      throw new Error("Backend returned no URL for uploaded media.");
+      console.info("[Promo media upload] Completed", { resolvedSectionId, url: data.url });
+      return data.url;
+    } catch (error) {
+      const apiError = toApiError(error);
+      console.error("[Promo media upload] Failed", {
+        sectionId,
+        resolvedSectionId,
+        url,
+        status: apiError?.status,
+        responseBody: apiError?.body,
+        error,
+      });
+      throw new Error(apiError?.message ?? "Please try again.");
     }
-
-    return data.url;
   };
 
   const validate = (): boolean => {
@@ -487,13 +568,14 @@ export default function AddPromoModal({
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    disabled={isUploading}
+                    disabled={isUploading || !canUploadMedia}
                     onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0])}
                   />
                   <HiArrowUpTray size={20} className="text-gray-400" />
                 </label>
               )}
               {isUploading && <p className="text-sm text-gray-500">Uploading...</p>}
+              {mediaUploadHelp && <p className="text-xs text-amber-600">{mediaUploadHelp}</p>}
               {imageLoadFailed && (
                 <p className="text-xs text-red-500">
                   Couldn&apos;t load this image — the URL may be broken. Remove it and re-upload.
@@ -542,13 +624,14 @@ export default function AddPromoModal({
                       type="file"
                       accept="video/*"
                       className="hidden"
-                      disabled={isUploadingVideo}
+                      disabled={isUploadingVideo || !canUploadMedia}
                       onChange={(e) => e.target.files?.[0] && handleVideoUpload(e.target.files[0])}
                     />
                     <HiArrowUpTray size={20} className="text-gray-400" />
                   </label>
                 )}
                 {isUploadingVideo && <p className="text-sm text-gray-500">Uploading...</p>}
+                {mediaUploadHelp && <p className="text-xs text-amber-600">{mediaUploadHelp}</p>}
               </div>
               {videoLoadFailed && (
                 <p className="mt-1.5 text-xs text-red-500">
