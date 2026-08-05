@@ -141,6 +141,24 @@ export interface CreatePromoRequest {
   videoUrl?: string;
 }
 
+export interface PromotionalSectionAdminDto {
+  id: string;
+  productId?: string;
+  sectionKey: string;
+  slugId?: string;
+  slug?: string;
+  title?: string;
+  tag?: string;
+  badge?: string;
+  ctaText?: string;
+  imageUrl?: string;
+  description?: string;
+  videoUrl?: string;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
 /**
  * Every placement a promo card can appear in. These map 1:1 to backend route
  * segments — /promotions/{placement} (public read) and
@@ -624,6 +642,9 @@ export const adminApi = {
   /** Public read — the only display source for singleton placements (no real id exposed). */
   getPromoPublic: (token: string, placement: PromoPlacement) =>
     api.get<PromoDto | PromoDto[] | null>(`/promotions/${placement}`, { token }),
+
+  getAllPromoSections: (token: string) =>
+    api.get<PromotionalSectionAdminDto[]>('/promotions/admin/all', { token }),
 
   createPromo: (token: string, placement: PromoPlacement, payload: CreatePromoRequest) =>
     api.post<PromoDto>(`/promotions/admin/${placement}`, payload, { token }),

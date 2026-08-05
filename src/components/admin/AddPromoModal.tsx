@@ -6,7 +6,7 @@ import { useCreatePromo, useUpdatePromo } from "@/lib/hooks/useAdmin";
 import { PROMO_PLACEMENTS, PROMO_PUT_UPDATE_PLACEMENTS, type PromoPlacement } from "@/lib/api/admin";
 import { Product } from "@/lib/types/product";
 import { productsApi } from "@/lib/api/products";
-import { uploadToCloudinary, uploadVideoToCloudinary } from "@/lib/utils/cloudinary";
+import { useAuthStore } from "@/store/auth";
 import type { PromoRow } from "@/app/admin/dashboard/content/page";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -18,6 +18,8 @@ interface AddPromoModalProps {
   defaultPlacement: PromoPlacement;
   /** Present in edit mode — omit for add mode. */
   initialData?: PromoRow;
+  /** Database GUID of the promotional section — required for backend media uploads. */
+  sectionId?: string;
 }
 
 interface PromoFormData {
@@ -48,6 +50,7 @@ export default function AddPromoModal({
   onClose,
   defaultPlacement,
   initialData,
+  sectionId,
 }: AddPromoModalProps) {
   const isEditMode = !!initialData;
 
@@ -161,9 +164,13 @@ export default function AddPromoModal({
   };
 
   const handleImageUpload = async (file: File) => {
+    if (!sectionId) {
+      alert("Cannot upload image: section ID is missing.");
+      return;
+    }
     setIsUploading(true);
     try {
-      const url = await uploadToCloudinary(file);
+      const url = await uploadMediaToBackend(sectionId, file);
       set("imageUrl", url);
     } catch (error) {
       console.error("Failed to upload promo image:", error);
@@ -174,9 +181,13 @@ export default function AddPromoModal({
   };
 
   const handleVideoUpload = async (file: File) => {
+    if (!sectionId) {
+      alert("Cannot upload video: section ID is missing.");
+      return;
+    }
     setIsUploadingVideo(true);
     try {
-      const url = await uploadVideoToCloudinary(file);
+      const url = await uploadMediaToBackend(sectionId, file);
       set("videoUrl", url);
     } catch (error) {
       console.error("Failed to upload promo video:", error);
@@ -185,6 +196,48 @@ export default function AddPromoModal({
     } finally {
       setIsUploadingVideo(false);
     }
+  };
+
+  const uploadMediaToBackend = async (
+    sectionId: string,
+    file: File,
+  ): Promise<string> => {
+    const token = useAuthStore.getState().accessToken;
+    if (!token) throw new Error("No auth token");
+
+    const baseUrl =
+      process.env.NEXT_PUBLIC_API_URL ??
+      "https://fresherz-001-site1.ftempurl.com/api/v1";
+    const url = `${baseUrl}/promotions/admin/${sectionId}/media`;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      let message = `Upload failed with status ${response.status}`;
+      try {
+        const body = await response.json();
+        if (body?.message) message = body.message;
+      } catch {
+        // ignore
+      }
+      throw new Error(message);
+    }
+
+    const data = await response.json();
+    if (!data?.url) {
+      throw new Error("Backend returned no URL for uploaded media.");
+    }
+
+    return data.url;
   };
 
   const validate = (): boolean => {

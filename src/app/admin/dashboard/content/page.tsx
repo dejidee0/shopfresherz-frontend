@@ -14,6 +14,7 @@ import {
   usePromoPublic,
   useDeletePromo,
   useDeleteSingletonPromo,
+  useAllPromoSections,
 } from "@/lib/hooks/useAdmin";
 import {
   PROMO_PLACEMENTS,
@@ -373,6 +374,20 @@ const AdminContentPage = () => {
   const { data: laptopData, isLoading: isLoadingLaptop } = usePromoPublic("laptop-promo");
   const { data: storeBannerData, isLoading: isLoadingStoreBanner } = usePromoPublic("store-promo-banner");
 
+  // Fetch all promo sections to resolve database section GUIDs (needed for media uploads).
+  const { data: allSectionsData } = useAllPromoSections();
+
+  const sectionKeyToId = useMemo(() => {
+    if (!allSectionsData) return new Map<string, string>();
+    const map = new Map<string, string>();
+    for (const section of allSectionsData) {
+      if (section.sectionKey) {
+        map.set(section.sectionKey, section.id);
+      }
+    }
+    return map;
+  }, [allSectionsData]);
+
   const deletePromoMutation = useDeletePromo();
   const deleteSingletonPromoMutation = useDeleteSingletonPromo();
 
@@ -562,6 +577,11 @@ const AdminContentPage = () => {
           onClose={closeModal}
           defaultPlacement={modalState.placement}
           initialData={modalState.data ?? undefined}
+          sectionId={
+            modalState.data?.id && sectionKeyToId.has(modalState.data.placement)
+              ? sectionKeyToId.get(modalState.data.placement)!
+              : modalState.data?.id
+          }
         />
       )}
 

@@ -90,6 +90,16 @@ export function usePromoPublic(placement: PromoPlacement) {
   })
 }
 
+export function useAllPromoSections() {
+  const { accessToken } = useAuthStore()
+
+  return useQuery({
+    queryKey: ['admin', 'promotions', 'all'],
+    queryFn: () => adminApi.getAllPromoSections(accessToken!),
+    enabled: !!accessToken,
+  })
+}
+
 export function useCreatePromo() {
   const { accessToken } = useAuthStore()
   const queryClient = useQueryClient()
