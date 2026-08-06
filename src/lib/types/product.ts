@@ -126,6 +126,8 @@ export interface Banner {
   title: string;
   subTitle: string;
   imageUrl: string;
+  /** Optional looping background video for the hero slide — falls back to imageUrl when absent. */
+  videoUrl?: string;
   linkUrl: string;
   ctaText: string;
   sortOrder: number;

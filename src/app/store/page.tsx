@@ -484,9 +484,9 @@ export default function HomePage() {
       <MarqueeBanner />
 
       {/* 4. Flash deals */}
-      {/* {flashDeals.length > 0 && (
+      {flashDeals.length > 0 && (
         <FlashDealsStrip deals={flashDeals} sessionEndTime={flashDealsEndTime} />
-      )} */}
+      )}
       
       {/* ─── 6. BEST DEALS ──────────────────────────────────────────────── */}
 

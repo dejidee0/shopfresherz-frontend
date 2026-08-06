@@ -14,6 +14,8 @@ interface HeroSlide {
   title: string;
   subTitle: string;
   imageUrl: string;
+  /** Optional looping background video — falls back to imageUrl when absent. */
+  videoUrl?: string;
   linkUrl: string;
   ctaText: string;
   sortOrder: number;
@@ -37,6 +39,7 @@ interface PromoCard {
 function bannerToSlide(banner: Banner): HeroSlide {
   return {
     ...banner,
+    videoUrl: banner.videoUrl,
     tag: undefined,
     tagColor: "text-[#F97316]",
     theme: "dark",
@@ -61,6 +64,8 @@ export function HeroBanner() {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const promoInterval1Ref = useRef<ReturnType<typeof setInterval> | null>(null);
   const promoInterval2Ref = useRef<ReturnType<typeof setInterval> | null>(null);
+  const slideRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const [videoInView, setVideoInView] = useState<Set<number>>(new Set());
 
   const total = slides?.length || 0;
 
@@ -156,6 +161,32 @@ export function HeroBanner() {
     };
   }, [isPromoPaused2, promos.length]);
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        setVideoInView((prev) => {
+          const next = new Set(prev);
+          entries.forEach((entry) => {
+            const idx = Number(entry.target.getAttribute("data-slide-index"));
+            if (entry.isIntersecting) {
+              next.add(idx);
+            } else {
+              next.delete(idx);
+            }
+          });
+          return next;
+        });
+      },
+      { rootMargin: "200px" },
+    );
+
+    slideRefs.current.forEach((node) => {
+      if (node) observer.observe(node);
+    });
+
+    return () => observer.disconnect();
+  }, [slides]);
+
   function handleTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0].clientX;
   }
@@ -197,37 +228,53 @@ export function HeroBanner() {
                 const titleWords = s.title.split(" ");
                 const lastWord = titleWords.pop();
                 const leadingTitle = titleWords.join(" ");
+                const showVideo = !!s.videoUrl && videoInView.has(i);
 
                 return (
                   <div
                     key={s.id}
+                    ref={(node) => {
+                      if (node) slideRefs.current.set(i, node);
+                      else slideRefs.current.delete(i);
+                    }}
+                    data-slide-index={i}
                     className="relative min-w-full min-h-[480px] overflow-hidden rounded-[24px]"
                     aria-roledescription="slide"
                     aria-label={s.title}
                   >
-                    {s.imageUrl ? (
-                      <>
-                        <Image
-                          src={s.imageUrl}
-                          alt={s.title}
-                          fill
-                          sizes="(max-width: 1024px) 100vw, 70vw"
-                          style={{ objectFit: "cover", objectPosition: "center right" }}
-                          priority={i === 0}
-                        />
-                        <div
-                          style={{
-                            position: "absolute",
-                            inset: 0,
-                            zIndex: 1,
-                            background:
-                              "linear-gradient(to right, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.7) 45%, rgba(0,0,0,0.15) 100%)",
-                          }}
-                        />
-                      </>
+                    {showVideo ? (
+                      <video
+                        src={s.videoUrl}
+                        poster={s.imageUrl}
+                        muted
+                        autoPlay
+                        loop
+                        playsInline
+                        className="absolute inset-0 h-full w-full object-cover object-center"
+                        style={{ zIndex: 0 }}
+                      />
+                    ) : s.imageUrl ? (
+                      <Image
+                        src={s.imageUrl}
+                        alt={s.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 70vw"
+                        style={{ objectFit: "cover", objectPosition: "center right" }}
+                        priority={i === 0}
+                      />
                     ) : (
                       <div className="pointer-events-none absolute right-0 top-0 h-[300px] w-[300px] rounded-full bg-[radial-gradient(circle,rgba(249,115,22,0.08)_0%,transparent_70%)]" />
                     )}
+
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        zIndex: 1,
+                        background:
+                          "linear-gradient(to right, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.7) 45%, rgba(0,0,0,0.15) 100%)",
+                      }}
+                    />
 
                     <div
                       className={cn(
