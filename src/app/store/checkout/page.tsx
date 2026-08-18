@@ -11,6 +11,7 @@ import { PaymentStep } from "@/features/checkout/components/PaymentStep";
 import { ReviewStep } from "@/features/checkout/components/ReviewStep";
 import { RegisteredCheckout } from "@/features/checkout/components/RegisteredCheckout";
 import { StepIndicator } from "@/features/checkout/components/CheckoutShared";
+import { getCheckoutTotal } from "@/features/checkout/pricing";
 
 import {
   type DeliveryMethod,
@@ -217,8 +218,7 @@ export default function CheckoutPage() {
 
     setIsInitiating(true);
     try {
-      const taxable = Math.max(0, subtotal - discountAmount);
-      const total = taxable + deliveryFee;
+      const total = getCheckoutTotal(subtotal, discountAmount, deliveryFee);
 
       const result = await checkoutApi.initiatePayment(token, {
         items: items.map((item) => ({

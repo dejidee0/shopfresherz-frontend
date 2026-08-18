@@ -12,6 +12,7 @@ import {
 import { useCartStore } from '@/store/cart'
 import { cn, formatPrice } from '@/lib/utils/format'
 import type { CheckoutStep, CouponState } from '../types/checkout'
+import { getCheckoutTotal } from '../pricing'
 
 export function Field({
   label,
@@ -285,8 +286,7 @@ export function OrderSummary({
   const items = useCartStore((s) => s.items)
   const discountAmount = useCartStore((s) => s.discountAmount)
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const taxableAmount = Math.max(0, subtotal - discountAmount)
-  const total = taxableAmount + deliveryFee
+  const total = getCheckoutTotal(subtotal, discountAmount, deliveryFee)
 
   return (
     <div className="flex flex-col gap-4">

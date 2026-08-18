@@ -23,6 +23,7 @@ import { useAuthStore } from "@/store/auth";
 import { useCartStore } from "@/store/cart";
 import { toast } from "@/store/toast";
 import { formatPrice } from "@/lib/utils/format";
+import { getCheckoutTotal } from "../pricing";
 import type { Address, CreateAddressRequest } from "@/lib/api/account";
 import AddAddressModal from "@/components/account/AddAddressModal";
 
@@ -126,8 +127,7 @@ export function RegisteredCheckout({
   const { user } = useAuthStore();
   const subtotal = useCartStore((s) => s.subtotal());
   const discountAmount = useCartStore((s) => s.discountAmount);
-  const taxableAmount = Math.max(0, subtotal - discountAmount);
-  const total = taxableAmount + deliveryFee + taxableAmount * 0.075;
+  const total = getCheckoutTotal(subtotal, discountAmount, deliveryFee);
 
   const [showAllAddresses, setShowAllAddresses] = useState(false);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);

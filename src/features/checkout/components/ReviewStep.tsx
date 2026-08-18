@@ -7,6 +7,7 @@ import { useCartStore } from '@/store/cart'
 import { useAuthStore } from '@/store/auth'
 import { cn, formatPrice } from '@/lib/utils/format'
 import { useMagnetic } from '@/lib/hooks/useMagnetic'
+import { getCheckoutTotal } from '../pricing'
 import { OrderSummary, CheckoutLayout, StepIndicator } from './CheckoutShared'
 import {
   type DeliveryMethod,
@@ -62,8 +63,7 @@ export function ReviewStep({
   const items          = useCartStore((s) => s.items)
   const subtotal       = useCartStore((s) => s.subtotal())
   const discountAmount = useCartStore((s) => s.discountAmount)
-  const taxable        = Math.max(0, subtotal - discountAmount)
-  const total          = taxable + deliveryFee
+  const total          = getCheckoutTotal(subtotal, discountAmount, deliveryFee)
 
   const paymentLabel: Record<PaymentMethod, string> = {
     card:            'Pay Now (Flutterwave)',

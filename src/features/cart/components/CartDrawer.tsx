@@ -7,6 +7,7 @@ import { FiX, FiTrash2, FiMinus, FiPlus, FiShoppingBag } from 'react-icons/fi'
 import { useCartStore } from '@/store/cart'
 import { cn, formatPrice } from '@/lib/utils/format'
 import { DELIVERY_FEES } from '@/features/checkout/types/checkout'
+import { getCheckoutTotal } from '@/features/checkout/pricing'
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQty, subtotal, couponCode, discountAmount } =
@@ -15,11 +16,10 @@ export function CartDrawer() {
   const drawerRef = useRef<HTMLDivElement>(null)
   const sub = subtotal()
   const discount = discountAmount
-  const afterDiscount = sub - discount
   // Cart preview always estimates Standard delivery — the actual method is
   // chosen later in checkout.
   const deliveryFee = DELIVERY_FEES.standard
-  const total = afterDiscount + deliveryFee
+  const total = getCheckoutTotal(sub, discount, deliveryFee)
 
   // Close on Escape
   useEffect(() => {
